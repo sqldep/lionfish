@@ -49,6 +49,62 @@ namespace SQLtest
             ClassQuerries querries = new ClassQuerries();
             querries.queries = new List<SQLData>();
 
+
+            // The following SELECTS map to JSON (see example.json)
+
+            // 2. SELECT
+            // DDL ("queries" in JSON): procedures and views
+            // - sourceCode: `select * from table1` (string, required)
+            // - name (string, optional) - for visualization purposes - use your internal name if available
+            // - groupName (string, optional) - for visualization purposes - use your internal name if available
+            // - database (string, optional)
+            // - schema (string, optional)
+            //
+            // Expect columns in this order: SourceCode, Name, GroupName, Database, Schema
+
+
+
+            // 3. SELECT
+            // DbDef: ("databaseModel" in JSON) details on table and view columns
+            // ## Table (object)
+            //
+            // - schema: `ETL_SCHEMA` (string, required) - name of the schema for the table/view
+            // - name: ACCOUNT (string, required) - name of the table/view, avoid using duplicate names (only the first occurrence may be processed)
+            // - isView: false (boolean, optional, default) - true => view, otherwise => table
+            // - columns (array[Column]) - columns are processed sequentially, provide them in the same order as in your table/view
+            //
+            // ## Column (object)
+            //
+            // - name: `ACC_ID` (string, required) - name of the column, avoid using duplicate names (only the first occurrence may be processed)
+            // - dataType: `NUMBER(10)` (string, optional) - column data type
+            // - comment: `Unique account identifier` (string, optional) - column comment if available
+            //
+            // Expect columns in this order: Database, Schema, TableName, IsView, ColumnName, DataType, Comment, ColOrder
+
+
+            // 4. SELECT
+            // synonyms
+            // ## Synonym (object)
+            //
+            // - schema: `DW_SCHEMA` (string, required) - name of the synonym schema
+            // - name: ACCOUNTS (string, required) - synonym name, avoid using duplicate names (only the first occurrence may be processed)
+            // - sourceName: ACCOUNTS (string, required) - table/view name
+            // - sourceSchema: `ETL_SCHEMA` (string, optional) - name of the schema for source table/view
+            // - sourceDbLinkName (string, optional) - database link for source table/view
+            //
+            // Expect columns in this order: Database, Schema, Name, SoourceName, SourceSchema, SourceDbLinkName
+
+
+            // 5. SELECT
+            // ## DBLink (object)
+            //
+            // - owner : (string, required)
+            // - name : (string, required)
+            // - userName : (string, required)
+            // - host : (string, required)
+            //
+            // Expect columns in this order: Owner, Name, UserName, Host
+
             foreach (var dbName in dbNames)
             {
                 int iCmd = 0;
