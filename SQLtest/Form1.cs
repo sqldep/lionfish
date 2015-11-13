@@ -53,10 +53,10 @@ namespace SQLtest
 
 
                 // nasledujici radky zakomentuj a jedeme naostro
-                //debug = true;
-                //sqlDialect = "mssql";
-                //conn = "Data Source=mmnag1\\sql2014;Initial Catalog=Nemocnice_vyvoj;Persist Security Info=True;User ID=dplaner;Password=Intel12345";
-                //myKey = "63b95df9-da06-4612-9ad7-e763d4e1ea12";
+                debug = true;
+                sqlDialect = "mssql";
+                conn = "Data Source=mmnag1\\sql2014;Initial Catalog=Nemocnice_vyvoj;Persist Security Info=True;User ID=dplaner;Password=Intel12345";
+                myKey = "63b95df9-da06-4612-9ad7-e763d4e1ea12";
                 // na test lze pouzit: "356d0c42-8717-495d-ad6b-339cd6e530fb"
 
                 // go!

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace SQLtest
 {
-    public class ClassQuerries
+    public class ClassCompleteStructure
     {
-        public List<SQLData> queries { get; set; }
+        public List<SQLQuerry> queries { get; set; }
         public string userAccountId { get; set; }
 
         public string dialect { get; set; }

@@ -1,9 +1,9 @@
 SELECT 
-	d.definition as sourceCode
+	d.definition as sourceCode,
 	p.name as name,
 	('##DBNAME##' + '.' + s.name) as groupName,
-	'##DBNAME##' as database,
-	s.name as schema
+	'##DBNAME##' as databaseName,
+	s.name as schemaName
 FROM 
 	[##DBNAME##].sys.procedures p
 	INNER JOIN
@@ -17,8 +17,9 @@ SELECT
 	d2.definition as sourceCode,
 	v.name as name,
 	('##DBNAME##' + '.' + s2.name) as groupName,
-	'##DBNAME##' as database,
-	s.name as schema
+	'##DBNAME##' as databaseName
+        -- ,
+	-- toto pada          s.name as schemaName
 FROM
 	[##DBNAME##].sys.views v
 	INNER JOIN

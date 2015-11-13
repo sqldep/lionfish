@@ -16,38 +16,160 @@ namespace SQLtest
         public void Run (string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, List<string> failedDbs, bool debug)
         {
             
-
-            string sqlCommands = System.IO.File.ReadAllText(sqlDialect + ".sql");
-            string[] separator = { "--split" };
-            List<string> sqlCommandsList = sqlCommands.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
-
             // pripoj se do databaze
             SqlConnection connection = new SqlConnection(sqlConnection);
             connection.Open();
-            ClassQuerries querries = this.Run(connection, sqlCommandsList, failedDbs, debug);
-
-
-            querries.dialect = sqlDialect;
-            querries.userAccountId = myKey;
-
-
-            querries.customSqlSetName = customSqlSetName;
-
+            ClassCompleteStructure querries = this.Run(connection, sqlDialect, debug);
 
             // send
-           this.SendQuerries(querries);
+            querries.dialect = sqlDialect;
+            querries.userAccountId = myKey;
+            querries.customSqlSetName = customSqlSetName;
+            this.SendQuerries(querries);
+        }
 
+        private ClassCompleteStructure Run(SqlConnection connection, string sqlDialect, bool debug)
+        {
+            ClassCompleteStructure ret = new ClassCompleteStructure();
+            List<string> dbNames = this.GetDbNames(connection, sqlDialect, debug);
+            ret.queries = this.GetQuerries(connection, sqlDialect, dbNames, debug);
+
+            return ret;
         }
 
 
-        public ClassQuerries Run(SqlConnection connection, List<string> sqlCommandsList, List<string> failedDbs, bool debug)
+
+        private List<string> GetDbNames (SqlConnection connection, string sqlDialect, bool debug)
+        {
+            List<string> sqls =  this.GetSQLCommands(sqlDialect, "databases", null);
+
+            List<SQLResult> result = new List<SQLResult>();
+
+            foreach (var item in sqls)
+            {
+                this.RunSql(connection, result, item);
+            }
+
+            int count = 0;
+            List<string> ret = new List<string>();
+            foreach (var item in result)
+            {
+                count++;
+                ret.Add(item.Column0);
+
+                if (debug && count > 2) break;
+            }
+            return ret;
+        }
+
+        private List<SQLQuerry> GetQuerries(SqlConnection connection, string sqlDialect, List<string> dbNames, bool debug)
+        {
+            List<SQLQuerry> ret = new List<SQLQuerry>();
+
+            foreach (var dbName in dbNames)
+            {
+                try
+                {
+                    // sql commands
+                    List<StrReplace> replaces = new List<StrReplace>();
+                    StrReplace itemForReplace = new StrReplace()
+                    {
+                        SearchText = "##DBNAME##",
+                        ReplaceText = dbName
+                    };
+                    replaces.Add(itemForReplace);
+
+                    List<string> sqls = this.GetSQLCommands(sqlDialect, "queries", replaces);
+
+                    List<SQLResult> result = new List<SQLResult>();
+                    foreach (var item in sqls)
+                    {
+                        this.RunSql(connection, result, item);
+                    }
+
+                    foreach (var item in result)
+                    {
+                        SQLQuerry querryItem = new SQLQuerry()
+                        {
+                            sourceCode = item.Column0,
+                            name = item.Column1,
+                            groupName = item.Column2,
+                            database = item.Column3,
+                            schema = item.Column4
+                        };
+
+                        if(debug)
+                        {
+                            querryItem.sourceCode = querryItem.sourceCode.Substring(0, 25);
+                        }
+
+                        ret.Add(querryItem);
+                    }
+                }
+                catch(Exception)
+                {
+                    ;
+                }
+            }
+
+            return ret;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private List<string> GetSQLCommands (string sqlDialect, string purpose, List<StrReplace> list)
+        {
+
+            string sqlCommands = System.IO.File.ReadAllText("./" + sqlDialect + "/" + purpose + "/cmd.sql");
+
+            if (list != null)
+            {
+                foreach (var item in list)
+                {
+                    sqlCommands = sqlCommands.Replace(item.SearchText, item.ReplaceText);
+                }
+            }
+
+            string[] separator = { "--split" };
+            List<string> sqlCommandsList = sqlCommands.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            return sqlCommandsList;
+        }
+
+
+
+
+
+
+
+
+
+
+
+        private ClassCompleteStructure Run(SqlConnection connection, List<string> sqlCommandsList, List<string> failedDbs, bool debug)
         {
 
             // prvni prikaz zjistuje databaze
-            List<string> dbNames = this.RunSql(connection, sqlCommandsList.FirstOrDefault(), null, null, debug).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
+            List<string> dbNames = null; // this.RunSql(connection, sqlCommandsList.FirstOrDefault(), null, null, debug).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
 
-            ClassQuerries querries = new ClassQuerries();
-            querries.queries = new List<SQLData>();
+            ClassCompleteStructure querries = new ClassCompleteStructure();
+            querries.queries = new List<SQLQuerry>();
 
 
             // The following SELECTS map to JSON (see example.json)
@@ -117,9 +239,9 @@ namespace SQLtest
                             {
                                 string sqlCmd = item.Replace("##DBNAME##", dbName);
 
-                                List<SQLData> sqldata = new List<SQLData>();
+                                List<SQLQuerry> sqldata = new List<SQLQuerry>();
 
-                                string ret = RunSql(connection, sqlCmd, sqldata, dbName, debug);
+                                string ret = null; // RunSql(connection, sqlCmd, sqldata, dbName, debug);
 
 
                                 foreach (var item_data in sqldata)
@@ -149,7 +271,7 @@ namespace SQLtest
             return querries;
         }
 
-        private void SendQuerries (ClassQuerries querries)
+        private void SendQuerries (ClassCompleteStructure querries)
         { 
 
             var jsonSerialiser = new JavaScriptSerializer();
@@ -164,7 +286,7 @@ namespace SQLtest
             //    string HtmlResult = wc.UploadString(URI, myParameters);
             //}
 
-
+            return;
 
             var baseAddress = "https://sqldep.com/api/rest/sqlset/create/";
 
@@ -172,7 +294,6 @@ namespace SQLtest
             http.Accept = "application/json";
             http.ContentType = "application/json";
             http.Method = "POST";
-
             string parsedContent = json;
             ASCIIEncoding encoding = new ASCIIEncoding();
             Byte[] bytes = encoding.GetBytes(parsedContent);
@@ -187,10 +308,9 @@ namespace SQLtest
             var sr = new StreamReader(stream);
             var content = sr.ReadToEnd();
 
-
         }
 
-        private string RunSql(SqlConnection connection, string cmd, List<SQLData> sqldata, string schema, bool debug)
+        private string RunSql(SqlConnection connection, List<SQLResult> result, string cmd)
         {
             string ret = string.Empty;
 
@@ -210,26 +330,25 @@ namespace SQLtest
                         if (ii > 0) ret += "\t";
                         ret += reader.GetString(ii);
                     }
-                    if (sqldata != null)
-                    {
-                        SQLData newItem = new SQLData();
-                        newItem.schema = reader.GetString(4);
-                        newItem.groupName = reader.GetString(2);
-                        newItem.database = reader.GetString(3);
-                        newItem.name = reader.GetString(1);
-                        if (debug)
-                        {
-                            newItem.sourceCode = reader.GetString(0).Substring(0, 30);
-                        }
-                        else
-                        {
-                            newItem.sourceCode = reader.GetString(0);
-                        }
-
-                        sqldata.Add(newItem);
-                    }
-
                     ret += "\n";
+
+                    SQLResult newItem = new SQLResult();
+                        
+                    if (nCol > 0)
+                        newItem.Column0 = reader.GetString(0);
+                    if (nCol > 1)
+                        newItem.Column1 = reader.GetString(1);
+                    if (nCol > 2)
+                        newItem.Column2 = reader.GetString(2);
+                    if (nCol > 3)
+                        newItem.Column3 = reader.GetString(3);
+                    if (nCol > 4)
+                        newItem.Column4 = reader.GetString(4);
+                    if (nCol > 5)
+                        newItem.Column5 = reader.GetString(5);
+
+                    result.Add(newItem);
+
                 }
             }
 
