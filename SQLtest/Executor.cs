@@ -18,7 +18,7 @@ namespace SQLtest
             
 
             string sqlCommands = System.IO.File.ReadAllText(sqlDialect + ".sql");
-            string[] separator = { "GO--" };
+            string[] separator = { "--split" };
             List<string> sqlCommandsList = sqlCommands.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
 
             // pripoj se do databaze
