@@ -12,5 +12,6 @@ namespace SQLtest
         public string database { get; set; }
         public string groupName { get; set; }
         public string sourceCode { get; set; }
+        public string name { get; set; }
     }
 }

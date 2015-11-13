@@ -213,23 +213,19 @@ namespace SQLtest
                     if (sqldata != null)
                     {
                         SQLData newItem = new SQLData();
-                        if (nCol >= 1)
-                            newItem.schema = reader.GetString(0);
-                        if (nCol >= 2)
-                            newItem.groupName = reader.GetString(1);
-                        if (nCol >= 3)
+                        newItem.schema = reader.GetString(4);
+                        newItem.groupName = reader.GetString(2);
+                        newItem.database = reader.GetString(3);
+                        newItem.name = reader.GetString(1);
+                        if (debug)
                         {
-                            if (debug)
-                            {
-                                newItem.sourceCode = reader.GetString(2).Substring(0, 30);
-                            }
-                            else
-                            {
-                                newItem.sourceCode = reader.GetString(2);
-                            }
+                            newItem.sourceCode = reader.GetString(0).Substring(0, 30);
+                        }
+                        else
+                        {
+                            newItem.sourceCode = reader.GetString(0);
                         }
 
-                        newItem.database = schema;
                         sqldata.Add(newItem);
                     }
 

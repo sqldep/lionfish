@@ -12,12 +12,12 @@ SELECT
 
 GO--
 
-
-
 SELECT 
+	d.definition as SourceCode
 	p.name as Name,
 	('##DBNAME##' + '.' + s.name) as GroupName,
-	d.definition as SourceCode
+	'##DBNAME##' as Database,
+	s.name as Schema
 FROM 
 	[##DBNAME##].sys.procedures p
 	INNER JOIN
@@ -31,15 +31,17 @@ FROM
 GO--
 
 SELECT
-			v.name as Name,
-			('##DBNAME##' + '.' + s2.name) as GroupName,
-		d2.definition as SourceCode
-		FROM
-			[##DBNAME##].sys.views v
-			INNER JOIN
-				[##DBNAME##].sys.schemas s2 on v.schema_id = s2.schema_id
-			INNER JOIN
-				[##DBNAME##].sys.sql_modules d2 on v.object_id = d2.object_id
+	d2.definition as SourceCode,
+	v.name as Name,
+	('##DBNAME##' + '.' + s2.name) as GroupName,
+	'##DBNAME##' as Database,
+	s.name as Schema
+FROM
+	[##DBNAME##].sys.views v
+	INNER JOIN
+		[##DBNAME##].sys.schemas s2 on v.schema_id = s2.schema_id
+	INNER JOIN
+		[##DBNAME##].sys.sql_modules d2 on v.object_id = d2.object_id
 
 
 GO-- 
@@ -49,12 +51,12 @@ GO--
 --details on table and view columns
 
 SELECT
-	'##DBNAME##' as DbName,
-	s.name as SchemaName,
-	t.name as TabName,
+	'##DBNAME##' as Database,
+	s.name as Schema,
+	t.name as TableName,
 	CASE WHEN t.type = 'U' THEN 'false' ELSE 'true' END as IsView,
-	c.name as ColName,
-	tp.name + (CASE WHEN (CHARINDEX('char', tp.name) > 0) THEN '(' + CAST(c.max_length AS varchar(100)) + ')' ELSE '' END) as DType,
+	c.name as ColumnName,
+	tp.name + (CASE WHEN (CHARINDEX('char', tp.name) > 0) THEN '(' + CAST(c.max_length AS varchar(100)) + ')' ELSE '' END) as DataType,
 	'' as Comment,
 	c.column_id as ColOrder
 FROM
@@ -73,9 +75,9 @@ WHERE
 GO--
 
 SELECT
-	'##DBNAME##' as DbName,
-	sch.name as SchemaName,
-	s.name as SynName,
+	'##DBNAME##' as Database,
+	sch.name as Schema,
+	s.name as Name,
 	(CASE WHEN (len(s.base_object_name) - len(REPLACE(s.base_object_name, '.', ''))) = 3
 			THEN SUBSTRING(s.base_object_name,
 			CHARINDEX('.', s.base_object_name, CHARINDEX('.', s.base_object_name) + 1) + 1,
@@ -89,7 +91,7 @@ SELECT
 							  1,
 							 CHARINDEX('.', s.base_object_name) - 1)
 		  ELSE ''
-   END) as sourceSchema,
+   END) as SourceSchema,
    (CASE WHEN (len(s.base_object_name) - len(REPLACE(s.base_object_name, '.', ''))) > 0
 		  THEN REVERSE(SUBSTRING(REVERSE(s.base_object_name),
 							 1,
@@ -101,7 +103,7 @@ SELECT
 		WHEN (len(s.base_object_name) - len(REPLACE(s.base_object_name, '.', ''))) = 2
 				  THEN SUBSTRING(s.base_object_name, 1, CHARINDEX('.', s.base_object_name) - 1)
 		ELSE ''
-  END) as sourceDbLinkName
+  END) as SourceDbLinkName
 FROM
 	[##DBNAME##].sys.synonyms s
 	INNER JOIN
