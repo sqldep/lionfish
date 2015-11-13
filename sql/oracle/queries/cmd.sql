@@ -1,9 +1,9 @@
 select
-  src.TEXT as SourceCode,
-  src.NAME as Name,
-  src.TYPE as GroupName,
-  'default' as Database
-  src.OWNER as Schema
+  src.TEXT as sourceCode,
+  src.NAME as name,
+  src.TYPE as groupName,
+  'default' as database
+  src.OWNER as schema
 from all_source src
 where instr(
 	-- blacklist of schemas to export
@@ -51,22 +51,22 @@ order by src.OWNER,src.name,src.TYPE,src.line;
 --split
 
 select
-	TO_LOB(v.text) SourceCode,
-	v.VIEW_NAME as Name,
-	v.OWNER||'.'||v.VIEW_NAME as GroupName,
-	v.OWNER as Schema,
-	'default' as Database
+	TO_LOB(v.text) sourceCode,
+	v.VIEW_NAME as name,
+	v.OWNER||'.'||v.VIEW_NAME as groupName,
+	v.OWNER as schema,
+	'default' as database
   from all_views v
   where instr(:c_prohibited_schema,v.OWNER) = 0; -- black list of oracle default schemas
 
 --split
 
 select
-	TO_LOB(mv.QUERY) SourceCode,
-	mv.MVIEW_NAME as Name,
-	mv.OWNER||'.'||mv.MVIEW_NAME as GroupName,
-	mv.OWNER as Schema,
-	'default' as Database
+	TO_LOB(mv.QUERY) sourceCode,
+	mv.MVIEW_NAME as name,
+	mv.OWNER||'.'||mv.MVIEW_NAME as groupName,
+	mv.OWNER as schema,
+	'default' as database
   from all_mviews mv
   where instr(:c_prohibited_schema,mv.OWNER) = 0; -- black list of oracle default schemas
 

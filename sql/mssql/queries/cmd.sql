@@ -1,9 +1,9 @@
 SELECT 
-	d.definition as SourceCode
-	p.name as Name,
-	('##DBNAME##' + '.' + s.name) as GroupName,
-	'##DBNAME##' as Database,
-	s.name as Schema
+	d.definition as sourceCode
+	p.name as name,
+	('##DBNAME##' + '.' + s.name) as groupName,
+	'##DBNAME##' as database,
+	s.name as schema
 FROM 
 	[##DBNAME##].sys.procedures p
 	INNER JOIN
@@ -14,11 +14,11 @@ FROM
 --split
 
 SELECT
-	d2.definition as SourceCode,
-	v.name as Name,
-	('##DBNAME##' + '.' + s2.name) as GroupName,
-	'##DBNAME##' as Database,
-	s.name as Schema
+	d2.definition as sourceCode,
+	v.name as name,
+	('##DBNAME##' + '.' + s2.name) as groupName,
+	'##DBNAME##' as database,
+	s.name as schema
 FROM
 	[##DBNAME##].sys.views v
 	INNER JOIN

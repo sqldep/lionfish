@@ -1,9 +1,9 @@
 select
-  s.OWNER as Schema,
-  s.SYNONYM_NAME as Name,
-  s.TABLE_OWNER as SourceSchema,
-  s.TABLE_NAME as SourceName,
-  s.DB_LINK as SourceDbLinkName 
+  s.OWNER as schema,
+  s.SYNONYM_NAME as name,
+  s.TABLE_OWNER as sourceSchema,
+  s.TABLE_NAME as sourceName,
+  s.DB_LINK as sourceDbLinkName 
 from all_synonyms s,
 	 all_objects o
 where s.table_owner = o.owner 

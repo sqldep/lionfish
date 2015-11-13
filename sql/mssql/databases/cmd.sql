@@ -1,6 +1,6 @@
 
 SELECT
-		d.name dbname
+		d.name as database
 	FROM
 		sys.databases d
 	WHERE

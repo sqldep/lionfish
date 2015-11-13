@@ -1,8 +1,8 @@
 select
-	dbl.owner as Owner,
-	dbl.db_link as Name,
-	dbl.username as UserName,
-	dbl.host as Host
+	dbl.owner as owner,
+	dbl.db_link as name,
+	dbl.username as userName,
+	dbl.host as host
 from ALL_DB_LINKS dbl
 where instr(
 	'ADAMS
