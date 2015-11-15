@@ -7,15 +7,16 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using System.Windows.Forms;
 
 namespace SQLtest
 {
     class Executor
     {
 
-        public void Run (string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, List<string> failedDbs, bool debug)
+        public void Run(string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, List<string> failedDbs, bool debug)
         {
-            
+
             // pripoj se do databaze
             SqlConnection connection = new SqlConnection(sqlConnection);
             connection.Open();
@@ -25,155 +26,14 @@ namespace SQLtest
             querries.dialect = sqlDialect;
             querries.userAccountId = myKey;
             querries.customSqlSetName = customSqlSetName;
-            this.SendQuerries(querries);
+            this.SendQuerries(querries, debug);
         }
 
         private ClassCompleteStructure Run(SqlConnection connection, string sqlDialect, bool debug)
         {
+            // The following SELECTS map to JSON (see example.json)
             ClassCompleteStructure ret = new ClassCompleteStructure();
             List<string> dbNames = this.GetDbNames(connection, sqlDialect, debug);
-            ret.queries = this.GetQuerries(connection, sqlDialect, dbNames, debug);
-
-            return ret;
-        }
-
-
-
-        private List<string> GetDbNames (SqlConnection connection, string sqlDialect, bool debug)
-        {
-            List<string> sqls =  this.GetSQLCommands(sqlDialect, "databases", null);
-
-            List<SQLResult> result = new List<SQLResult>();
-
-            foreach (var item in sqls)
-            {
-                this.RunSql(connection, result, item);
-            }
-
-            int count = 0;
-            List<string> ret = new List<string>();
-            foreach (var item in result)
-            {
-                count++;
-                ret.Add(item.Column0);
-
-                if (debug && count > 2) break;
-            }
-            return ret;
-        }
-
-        private List<SQLQuerry> GetQuerries(SqlConnection connection, string sqlDialect, List<string> dbNames, bool debug)
-        {
-            List<SQLQuerry> ret = new List<SQLQuerry>();
-
-            foreach (var dbName in dbNames)
-            {
-                try
-                {
-                    // sql commands
-                    List<StrReplace> replaces = new List<StrReplace>();
-                    StrReplace itemForReplace = new StrReplace()
-                    {
-                        SearchText = "##DBNAME##",
-                        ReplaceText = dbName
-                    };
-                    replaces.Add(itemForReplace);
-
-                    List<string> sqls = this.GetSQLCommands(sqlDialect, "queries", replaces);
-
-                    List<SQLResult> result = new List<SQLResult>();
-                    foreach (var item in sqls)
-                    {
-                        this.RunSql(connection, result, item);
-                    }
-
-                    foreach (var item in result)
-                    {
-                        SQLQuerry querryItem = new SQLQuerry()
-                        {
-                            sourceCode = item.Column0,
-                            name = item.Column1,
-                            groupName = item.Column2,
-                            database = item.Column3,
-                            schema = item.Column4
-                        };
-
-                        if(debug)
-                        {
-                            querryItem.sourceCode = querryItem.sourceCode.Substring(0, 25);
-                        }
-
-                        ret.Add(querryItem);
-                    }
-                }
-                catch(Exception)
-                {
-                    ;
-                }
-            }
-
-            return ret;
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        private List<string> GetSQLCommands (string sqlDialect, string purpose, List<StrReplace> list)
-        {
-
-            string sqlCommands = System.IO.File.ReadAllText("./" + sqlDialect + "/" + purpose + "/cmd.sql");
-
-            if (list != null)
-            {
-                foreach (var item in list)
-                {
-                    sqlCommands = sqlCommands.Replace(item.SearchText, item.ReplaceText);
-                }
-            }
-
-            string[] separator = { "--split" };
-            List<string> sqlCommandsList = sqlCommands.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            return sqlCommandsList;
-        }
-
-
-
-
-
-
-
-
-
-
-
-        private ClassCompleteStructure Run(SqlConnection connection, List<string> sqlCommandsList, List<string> failedDbs, bool debug)
-        {
-
-            // prvni prikaz zjistuje databaze
-            List<string> dbNames = null; // this.RunSql(connection, sqlCommandsList.FirstOrDefault(), null, null, debug).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
-
-            ClassCompleteStructure querries = new ClassCompleteStructure();
-            querries.queries = new List<SQLQuerry>();
-
-
-            // The following SELECTS map to JSON (see example.json)
-
             // 2. SELECT
             // DDL ("queries" in JSON): procedures and views
             // - sourceCode: `select * from table1` (string, required)
@@ -183,7 +43,6 @@ namespace SQLtest
             // - schema (string, optional)
             //
             // Expect columns in this order: SourceCode, Name, GroupName, Database, Schema
-
 
 
             // 3. SELECT
@@ -227,52 +86,116 @@ namespace SQLtest
             //
             // Expect columns in this order: Owner, Name, UserName, Host
 
-            foreach (var dbName in dbNames)
-            {
-                int iCmd = 0;
-                try
-                {
-                    foreach (var item in sqlCommandsList)
-                    {
-                        if (iCmd > 0)
-                        {
-                            {
-                                string sqlCmd = item.Replace("##DBNAME##", dbName);
 
-                                List<SQLQuerry> sqldata = new List<SQLQuerry>();
+            ret.queries = this.GetQuerries(connection, sqlDialect, dbNames, debug);
 
-                                string ret = null; // RunSql(connection, sqlCmd, sqldata, dbName, debug);
-
-
-                                foreach (var item_data in sqldata)
-                                {
-                                    querries.queries.Add(item_data);
-
-                                }
-
-                            }
-                        }
-
-                        iCmd++;
-                    }
-                }
-                catch(Exception)
-                {
-                    failedDbs.Add(dbName);
-                }
-                if (debug) break;
-            }
-
-            if (failedDbs.Count == dbNames.Count)
-            {
-                throw new Exception("None database was succesfully analyzed.");
-            }
-
-            return querries;
+            ret.databaseModel = new SQLDatabaseModel();
+            ret.databaseModel.databases = this.GetDatabaseModels(connection, sqlDialect, dbNames, debug);
+            return ret;
         }
 
-        private void SendQuerries (ClassCompleteStructure querries)
-        { 
+
+
+        private List<string> GetDbNames(SqlConnection connection, string sqlDialect, bool debug)
+        {
+            List<string> sqls = this.GetSQLCommands(sqlDialect, "databases", null);
+
+            List<SQLResult> result = new List<SQLResult>();
+
+            foreach (var item in sqls)
+            {
+                this.RunSql(connection, result, item);
+            }
+
+            int count = 0;
+            List<string> ret = new List<string>();
+            foreach (var item in result)
+            {
+                count++;
+                ret.Add(item.Column0);
+            }
+            return ret;
+        }
+
+        private List<SQLQuerry> GetQuerries(SqlConnection connection, string sqlDialect, List<string> dbNames, bool debug)
+        {
+            List<SQLQuerry> ret = new List<SQLQuerry>();
+
+            int count = 0;
+            foreach (var dbName in dbNames)
+            {
+                if (debug && count > 3) break;
+                try
+                {
+                    // sql commands
+                    List<StrReplace> replaces = new List<StrReplace>();
+                    StrReplace itemForReplace = new StrReplace()
+                    {
+                        SearchText = "##DBNAME##",
+                        ReplaceText = dbName
+                    };
+                    replaces.Add(itemForReplace);
+
+                    List<string> sqls = this.GetSQLCommands(sqlDialect, "queries", replaces);
+
+                    List<SQLResult> result = new List<SQLResult>();
+                    foreach (var item in sqls)
+                    {
+                        this.RunSql(connection, result, item);
+                    }
+
+                    foreach (var item in result)
+                    {
+                        SQLQuerry querryItem = new SQLQuerry()
+                        {
+                            sourceCode = item.Column0,
+                            name = item.Column1,
+                            groupName = item.Column2,
+                            database = item.Column3,
+                            schema = item.Column4
+                        };
+
+                        if (debug)
+                        {
+                            // for debug purposes make short ouputs
+                            querryItem.sourceCode = querryItem.sourceCode.Substring(0, 25);
+                            if (count > 3) break;
+                        }
+
+                        ret.Add(querryItem);
+                        count++;
+                    }
+                }
+                catch (Exception)
+                {
+                    ;
+                }
+            }
+
+            return ret;
+        }
+
+        private List<string> GetSQLCommands(string sqlDialect, string purpose, List<StrReplace> list)
+        {
+
+            string sqlCommands = System.IO.File.ReadAllText("./" + sqlDialect + "/" + purpose + "/cmd.sql");
+
+            if (list != null)
+            {
+                foreach (var item in list)
+                {
+                    sqlCommands = sqlCommands.Replace(item.SearchText, item.ReplaceText);
+                }
+            }
+
+            string[] separator = { "--split" };
+            List<string> sqlCommandsList = sqlCommands.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            return sqlCommandsList;
+        }
+
+        private void SendQuerries(ClassCompleteStructure querries, bool debug)
+        {
 
             var jsonSerialiser = new JavaScriptSerializer();
             var json = jsonSerialiser.Serialize(querries);
@@ -286,7 +209,7 @@ namespace SQLtest
             //    string HtmlResult = wc.UploadString(URI, myParameters);
             //}
 
-            return;
+            if(debug) return;
 
             var baseAddress = "https://sqldep.com/api/rest/sqlset/create/";
 
@@ -333,7 +256,7 @@ namespace SQLtest
                     ret += "\n";
 
                     SQLResult newItem = new SQLResult();
-                        
+
                     if (nCol > 0)
                         newItem.Column0 = reader.GetString(0);
                     if (nCol > 1)
@@ -355,6 +278,93 @@ namespace SQLtest
             reader.Close();
             toGo.Dispose();
 
+            return ret;
+        }
+ 
+
+        private List<SQLDatabaseModelItem> GetDatabaseModels(SqlConnection connection, string sqlDialect, List<string> dbNames, bool debug)
+        {
+            List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
+
+            int tableCount = 0;
+            int synonymsCount = 0;
+
+            foreach (var dbName in dbNames)
+            {
+                try
+                {
+                    SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
+                    modelItem.name = dbName;
+
+
+                    // sql commands
+                    List<StrReplace> replaces = new List<StrReplace>();
+                    StrReplace itemForReplace = new StrReplace()
+                    {
+                        SearchText = "##DBNAME##",
+                        ReplaceText = dbName
+                    };
+                    replaces.Add(itemForReplace);
+
+                    // tabulky
+                    modelItem.tables = new List<SQLTableModelItem>();
+                    List<string> sqlsTables = this.GetSQLCommands(sqlDialect, "tables", replaces);
+                    List<SQLResult> tables = new List<SQLResult>();
+                    foreach (var item in sqlsTables)
+                    {
+                        this.RunSql(connection, tables, item);
+                    }
+                    foreach (var item in tables)
+                    {
+                        if (debug && tableCount > 3) break;
+                        SQLTableModelItem tableModelItem = new SQLTableModelItem()
+                        {
+                            name = item.Column2,
+                            isView = false,
+                            schema = dbName
+                        };
+                        modelItem.tables.Add(tableModelItem);
+                        tableCount++;
+                    }
+
+                    // synonyms (to jsou vjucka :-)
+                    modelItem.synonyms = new List<SQLSynonymModelItem>();
+                    List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, "synonyms", replaces);
+                    List<SQLResult> synonyms = new List<SQLResult>();
+                    foreach (var item in sqlsSynonyms)
+                    {
+                        this.RunSql(connection, synonyms, item);
+                    }
+                    foreach (var item in synonyms)
+                    {
+                        if (debug && synonymsCount > 3)
+                            break;
+
+                        SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
+                        {
+                            name = item.Column0,
+                            schema = dbName
+                        };
+                        modelItem.synonyms.Add(synonymModelItem);
+                        synonymsCount++;
+                    }
+                    ret.Add(modelItem);
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.IndexOf("offline") >= 0)
+                    {
+                        ;//knonw error - databse is offline, ignore
+                    }
+                    else
+                    {
+                        if (debug)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+                }
+            }
             return ret;
         }
     }

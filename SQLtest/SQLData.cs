@@ -31,4 +31,44 @@ namespace SQLtest
         public string SearchText { get; set; }
         public string ReplaceText { get; set; }
     }
+
+    public class SQLDatabaseModel
+    {
+        public List<SQLDatabaseModelItem> databases { get; set; }
+    }
+
+    public class SQLDatabaseModelItem
+    {
+        public string name { get; set; }
+
+        public List<SQLTableModelItem> tables { get; set; }
+        public List<SQLSynonymModelItem> synonyms { get; set; }
+    }
+
+    public class SQLTableModelItem
+    {
+        public string schema { get; set; }
+        public string name { get; set; }
+        public bool isView { get; set; }
+
+        public List<SQLColumnModelItem> columns { get; set; }
+
+
+    }
+
+    public class SQLColumnModelItem
+    {
+        public string name { get; set; }
+        public bool comment { get; set; }
+        public string dataType { get; set; }
+    }
+
+    public class SQLSynonymModelItem
+    {
+        public string schema { get; set; }
+        public string name { get; set; }
+        public string sourceName { get; set; }
+        public string sourceSchema { get; set; }
+        public string sourceDbLinkName { get; set; }
+    }
 }

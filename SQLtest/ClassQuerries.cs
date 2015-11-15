@@ -9,6 +9,8 @@ namespace SQLtest
     public class ClassCompleteStructure
     {
         public List<SQLQuerry> queries { get; set; }
+
+        public SQLDatabaseModel databaseModel { get; set; }
         public string userAccountId { get; set; }
 
         public string dialect { get; set; }
