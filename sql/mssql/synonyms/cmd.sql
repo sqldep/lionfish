@@ -1,6 +1,6 @@
 SELECT
-	'##DBNAME##' as database,
-	sch.name as schema,
+	'##DBNAME##' as mydatabase,
+	sch.name as myschema,
 	s.name as name,
 	(CASE WHEN (len(s.base_object_name) - len(REPLACE(s.base_object_name, '.', ''))) = 3
 			THEN SUBSTRING(s.base_object_name,

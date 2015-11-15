@@ -1,12 +1,12 @@
 SELECT
-	'##DBNAME##' as database,
-	s.name as schema,
+	'##DBNAME##' as mydatabase,
+	s.name as myschema,
 	t.name as tableName,
 	CASE WHEN t.type = 'U' THEN 'false' ELSE 'true' END as isView,
 	c.name as columnName,
 	tp.name + (CASE WHEN (CHARINDEX('char', tp.name) > 0) THEN '(' + CAST(c.max_length AS varchar(100)) + ')' ELSE '' END) as dataType,
 	'' as Comment,
-	c.column_id as colOrder
+	cast(c.column_id as varchar(max)) as colOrder
 FROM
 	[##DBNAME##].sys.objects t
 	INNER JOIN
