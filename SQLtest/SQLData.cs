@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SQLtest
 {
@@ -14,6 +13,8 @@ namespace SQLtest
         public string Column3 { get; set; }
         public string Column4 { get; set; }
         public string Column5 { get; set; }
+        public string Column6 { get; set; }
+        public string Column7 { get; set; }
     }
 
 
@@ -47,9 +48,10 @@ namespace SQLtest
 
     public class SQLTableModelItem
     {
+        public string database { get; set; }
         public string schema { get; set; }
-        public string name { get; set; }
-        public bool isView { get; set; }
+        public string tableName { get; set; }
+        public string isView { get; set; }
 
         public List<SQLColumnModelItem> columns { get; set; }
 
@@ -58,9 +60,10 @@ namespace SQLtest
 
     public class SQLColumnModelItem
     {
-        public string name { get; set; }
-        public bool comment { get; set; }
+        public string columnName { get; set; }
         public string dataType { get; set; }
+        public string comment { get; set; }
+        public string colOrder { get; set; }
     }
 
     public class SQLSynonymModelItem

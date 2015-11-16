@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
@@ -94,8 +93,6 @@ namespace SQLtest
             return ret;
         }
 
-
-
         private List<string> GetDbNames(SqlConnection connection, string sqlDialect, bool debug)
         {
             List<string> sqls = this.GetSQLCommands(sqlDialect, "databases", null);
@@ -107,13 +104,17 @@ namespace SQLtest
                 this.RunSql(connection, result, item);
             }
 
-            int count = 0;
             List<string> ret = new List<string>();
             foreach (var item in result)
             {
-                count++;
+                if(debug && item.Column0.IndexOf("Nemocnice") < 0)
+                {
+                    continue;
+                }
+
                 ret.Add(item.Column0);
             }
+
             return ret;
         }
 
@@ -233,9 +234,8 @@ namespace SQLtest
 
         }
 
-        private string RunSql(SqlConnection connection, List<SQLResult> result, string cmd)
+        private void RunSql(SqlConnection connection, List<SQLResult> result, string cmd)
         {
-            string ret = string.Empty;
 
             SqlCommand toGo = connection.CreateCommand();
             toGo.CommandText = cmd;
@@ -247,13 +247,6 @@ namespace SQLtest
                 while (reader.Read())
                 {
                     int nCol = reader.VisibleFieldCount;
-
-                    for (int ii = 0; ii < nCol; ii++)
-                    {
-                        if (ii > 0) ret += "\t";
-                        ret += reader.GetString(ii);
-                    }
-                    ret += "\n";
 
                     SQLResult newItem = new SQLResult();
 
@@ -269,6 +262,8 @@ namespace SQLtest
                         newItem.Column4 = reader.GetString(4);
                     if (nCol > 5)
                         newItem.Column5 = reader.GetString(5);
+                    if (nCol > 6)
+                        newItem.Column6 = reader.GetString(6);
 
                     result.Add(newItem);
 
@@ -277,8 +272,6 @@ namespace SQLtest
 
             reader.Close();
             toGo.Dispose();
-
-            return ret;
         }
  
 
@@ -306,28 +299,48 @@ namespace SQLtest
                     };
                     replaces.Add(itemForReplace);
 
-                    // tabulky
+                    // tabulky a viecka se sloupci dohromady
                     modelItem.tables = new List<SQLTableModelItem>();
-                    List<string> sqlsTables = this.GetSQLCommands(sqlDialect, "tables", replaces);
-                    List<SQLResult> tables = new List<SQLResult>();
-                    foreach (var item in sqlsTables)
+                    List<string> sqlsTablesWithColumns = this.GetSQLCommands(sqlDialect, "tables", replaces);
+                    List<SQLResult> tablesWithColumns = new List<SQLResult>();
+                    foreach (var item in sqlsTablesWithColumns)
                     {
-                        this.RunSql(connection, tables, item);
-                    }
-                    foreach (var item in tables)
-                    {
-                        if (debug && tableCount > 3) break;
-                        SQLTableModelItem tableModelItem = new SQLTableModelItem()
-                        {
-                            name = item.Column2,
-                            isView = false,
-                            schema = dbName
-                        };
-                        modelItem.tables.Add(tableModelItem);
-                        tableCount++;
+                        this.RunSql(connection, tablesWithColumns, item);
                     }
 
-                    // synonyms (to jsou vjucka :-)
+                    foreach (var item in tablesWithColumns)
+                    {
+                        if (debug && tableCount > 3) break;
+
+                        string tableName = item.Column2;
+
+                        SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.tableName == tableName);
+
+                        if (tableModelItem == null)
+                        {
+                            tableModelItem = new SQLTableModelItem()
+                            {
+                                database = item.Column0,
+                                schema = item.Column1,
+                                tableName = item.Column2,
+                                isView =  item.Column3,
+                                columns = new List<SQLColumnModelItem>()
+                            };
+                            modelItem.tables.Add(tableModelItem);
+                            tableCount++;
+                        }
+
+                        SQLColumnModelItem columnModelItem = new SQLColumnModelItem()
+                        {
+                            columnName = item.Column4,
+                            dataType = item.Column5,
+                            comment = item.Column6,
+                            colOrder = item.Column7
+                        };
+                        tableModelItem.columns.Add(columnModelItem);
+                    }
+
+                    // synonyms
                     modelItem.synonyms = new List<SQLSynonymModelItem>();
                     List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, "synonyms", replaces);
                     List<SQLResult> synonyms = new List<SQLResult>();
