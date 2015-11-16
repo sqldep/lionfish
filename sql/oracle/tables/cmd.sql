@@ -1,6 +1,6 @@
 select
-  'default' as database,
-  x.owner as schema,
+  'default' as databaseName,
+  x.owner as schemaName,
   x.table_name as tableName,
   nvl2(w.object_name,'Y','N') as isView, -- type materialized view is a view too
   x.column_name as columnName,

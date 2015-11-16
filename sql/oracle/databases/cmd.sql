@@ -1,1 +1,1 @@
-select ora_database_name as database from dual;
+select ora_database_name from dual;

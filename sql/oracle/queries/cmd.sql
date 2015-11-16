@@ -2,8 +2,8 @@ select
   src.TEXT as sourceCode,
   src.NAME as name,
   src.TYPE as groupName,
-  'default' as database
-  src.OWNER as schema
+  'default' as databaseName
+  src.OWNER as schemaName
 from all_source src
 where instr(
 	-- blacklist of schemas to export
@@ -54,8 +54,8 @@ select
 	TO_LOB(v.text) sourceCode,
 	v.VIEW_NAME as name,
 	v.OWNER||'.'||v.VIEW_NAME as groupName,
-	v.OWNER as schema,
-	'default' as database
+	v.OWNER as schemaName,
+	'default' as databaseName
   from all_views v
   where instr(:c_prohibited_schema,v.OWNER) = 0; -- black list of oracle default schemas
 

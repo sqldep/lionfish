@@ -1,5 +1,5 @@
 select
-  s.OWNER as schema,
+  s.OWNER as schemaName,
   s.SYNONYM_NAME as name,
   s.TABLE_OWNER as sourceSchema,
   s.TABLE_NAME as sourceName,
