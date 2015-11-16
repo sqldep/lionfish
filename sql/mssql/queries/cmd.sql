@@ -17,9 +17,8 @@ SELECT
 	d2.definition as sourceCode,
 	v.name as name,
 	('##DBNAME##' + '.' + s2.name) as groupName,
-	'##DBNAME##' as databaseName
-        -- ,
-	-- toto pada          s.name as schemaName
+	'##DBNAME##' as databaseName,
+	s2.name as schemaName
 FROM
 	[##DBNAME##].sys.views v
 	INNER JOIN
