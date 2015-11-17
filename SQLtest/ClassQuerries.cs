@@ -5,9 +5,11 @@ using System.Text;
 
 namespace SQLtest
 {
-    public class ClassCompleteStructure
+    public class SQLCompleteStructure
     {
         public List<SQLQuerry> queries { get; set; }
+
+        public List<SQLDBLink> dblinks { get; set; }
 
         public SQLDatabaseModel databaseModel { get; set; }
         public string userAccountId { get; set; }

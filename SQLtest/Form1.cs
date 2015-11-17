@@ -6,7 +6,6 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Web.Script.Serialization;
 using System.Net;
@@ -33,7 +32,6 @@ namespace SQLtest
                 }
 
 
-                bool debug = false;
                 string conn = this.textBoxConnectionString.Text.ToString();
                 string myName = this.textBoxUserName.Text.ToString();
                 string myKey = this.textBoxKey.Text.ToString();
@@ -52,22 +50,25 @@ namespace SQLtest
                 }
 
 
-                // nasledujici radky zakomentuj a jedeme naostro
-                debug = true;
-                sqlDialect = "mssql";
-                conn = "Data Source=mmnag1\\sql2014;Initial Catalog=Nemocnice_vyvoj;Persist Security Info=True;User ID=dplaner;Password=Intel12345";
-                myKey = "63b95df9-da06-4612-9ad7-e763d4e1ea12";
+#if DEBUG
+                {
+                // jen pro ucely testovani
+                    sqlDialect = "mssql";
+                    conn = "Data Source=mmnag1\\sql2014;Initial Catalog=Nemocnice_vyvoj;Persist Security Info=True;User ID=dplaner;Password=Intel12345";
+                    myKey = "63b95df9-da06-4612-9ad7-e763d4e1ea12";
+                }
+#endif
                 // na test lze pouzit: "356d0c42-8717-495d-ad6b-339cd6e530fb"
 
                 // go!
-                Guid myGuid;
-                if (!Guid.TryParse(myKey, out myGuid))
-                {
-                    throw new Exception("Invalid key, it is not possible to handle as quide!");
-                }
+                //Guid myGuid;
+                //if (!Guid.TryParse(myKey, out myGuid))
+                //{
+                //    throw new Exception("Invalid key, it is not possible to handle as quide!");
+                //}
 
                 List<string> failedDbs = new List<string>();
-                new Executor().Run(conn, dbType, myName, myKey, sqlDialect, failedDbs, debug);
+                new Executor().Run(conn, dbType, myName, myKey, sqlDialect, failedDbs);
 
                 if (failedDbs.Count > 0)
                 {

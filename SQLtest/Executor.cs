@@ -13,26 +13,26 @@ namespace SQLtest
     class Executor
     {
 
-        public void Run(string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, List<string> failedDbs, bool debug)
+        public void Run(string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, List<string> failedDbs)
         {
 
             // pripoj se do databaze
             SqlConnection connection = new SqlConnection(sqlConnection);
             connection.Open();
-            ClassCompleteStructure querries = this.Run(connection, sqlDialect, debug);
+            SQLCompleteStructure dbStructure = this.Run(connection, sqlDialect);
 
             // send
-            querries.dialect = sqlDialect;
-            querries.userAccountId = myKey;
-            querries.customSqlSetName = customSqlSetName;
-            this.SendQuerries(querries, debug);
+            dbStructure.dialect = sqlDialect;
+            dbStructure.userAccountId = myKey;
+            dbStructure.customSqlSetName = customSqlSetName;
+            this.SendStructure(dbStructure);
         }
 
-        private ClassCompleteStructure Run(SqlConnection connection, string sqlDialect, bool debug)
+        private SQLCompleteStructure Run(SqlConnection connection, string sqlDialect)
         {
             // The following SELECTS map to JSON (see example.json)
-            ClassCompleteStructure ret = new ClassCompleteStructure();
-            List<string> dbNames = this.GetDbNames(connection, sqlDialect, debug);
+            SQLCompleteStructure ret = new SQLCompleteStructure();
+            List<string> dbNames = this.GetDbNames(connection, sqlDialect);
             // 2. SELECT
             // DDL ("queries" in JSON): procedures and views
             // - sourceCode: `select * from table1` (string, required)
@@ -86,14 +86,16 @@ namespace SQLtest
             // Expect columns in this order: Owner, Name, UserName, Host
 
 
-            ret.queries = this.GetQuerries(connection, sqlDialect, dbNames, debug);
+            ret.queries = this.GetQuerries(connection, sqlDialect, dbNames);
 
             ret.databaseModel = new SQLDatabaseModel();
-            ret.databaseModel.databases = this.GetDatabaseModels(connection, sqlDialect, dbNames, debug);
+            ret.databaseModel.databases = this.GetDatabaseModels(connection, sqlDialect, dbNames);
+
+            ret.dblinks = this.GetDBLinks(connection, sqlDialect);
             return ret;
         }
 
-        private List<string> GetDbNames(SqlConnection connection, string sqlDialect, bool debug)
+        private List<string> GetDbNames(SqlConnection connection, string sqlDialect)
         {
             List<string> sqls = this.GetSQLCommands(sqlDialect, "databases", null);
 
@@ -107,10 +109,12 @@ namespace SQLtest
             List<string> ret = new List<string>();
             foreach (var item in result)
             {
-                if(debug && item.Column0.IndexOf("Nemocnice") < 0)
+#if DEBUG
+                if(item.Column0.IndexOf("Nemocnice") < 0)
                 {
                     continue;
                 }
+#endif
 
                 ret.Add(item.Column0);
             }
@@ -118,14 +122,13 @@ namespace SQLtest
             return ret;
         }
 
-        private List<SQLQuerry> GetQuerries(SqlConnection connection, string sqlDialect, List<string> dbNames, bool debug)
+        private List<SQLQuerry> GetQuerries(SqlConnection connection, string sqlDialect, List<string> dbNames)
         {
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
             int count = 0;
             foreach (var dbName in dbNames)
             {
-                if (debug && count > 3) break;
                 try
                 {
                     // sql commands
@@ -156,12 +159,13 @@ namespace SQLtest
                             schema = item.Column4
                         };
 
-                        if (debug)
+#if DEBUG
                         {
                             // for debug purposes make short ouputs
                             querryItem.sourceCode = querryItem.sourceCode.Substring(0, 25);
                             if (count > 3) break;
                         }
+#endif
 
                         ret.Add(querryItem);
                         count++;
@@ -169,8 +173,48 @@ namespace SQLtest
                 }
                 catch (Exception)
                 {
-                    ;
+                    throw;
                 }
+            }
+
+            return ret;
+        }
+
+
+        private List<SQLDBLink> GetDBLinks (SqlConnection connection, string sqlDialect)
+        {
+            List<SQLDBLink> ret = new List<SQLDBLink>();
+
+            int count = 0;
+            try
+            {
+                // sql commands
+
+                List<string> sqls = this.GetSQLCommands(sqlDialect, "dblinks", null);
+
+                List<SQLResult> result = new List<SQLResult>();
+                foreach (var item in sqls)
+                {
+                    this.RunSql(connection, result, item);
+                }
+
+                foreach (var item in result)
+                {
+                    SQLDBLink dblinkItem = new SQLDBLink()
+                    {
+                        owner = item.Column0,
+                        db_link = item.Column1,
+                        username = item.Column2,
+                        host = item.Column3,
+                    };
+
+                    ret.Add(dblinkItem);
+                    count++;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
 
             return ret;
@@ -195,7 +239,7 @@ namespace SQLtest
             return sqlCommandsList;
         }
 
-        private void SendQuerries(ClassCompleteStructure querries, bool debug)
+        private void SendStructure(SQLCompleteStructure querries)
         {
 
             var jsonSerialiser = new JavaScriptSerializer();
@@ -210,7 +254,6 @@ namespace SQLtest
             //    string HtmlResult = wc.UploadString(URI, myParameters);
             //}
 
-            if(debug) return;
 
             var baseAddress = "https://sqldep.com/api/rest/sqlset/create/";
 
@@ -275,7 +318,7 @@ namespace SQLtest
         }
  
 
-        private List<SQLDatabaseModelItem> GetDatabaseModels(SqlConnection connection, string sqlDialect, List<string> dbNames, bool debug)
+        private List<SQLDatabaseModelItem> GetDatabaseModels(SqlConnection connection, string sqlDialect, List<string> dbNames)
         {
             List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
 
@@ -310,8 +353,6 @@ namespace SQLtest
 
                     foreach (var item in tablesWithColumns)
                     {
-                        if (debug && tableCount > 3) break;
-
                         string tableName = item.Column2;
 
                         SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.tableName == tableName);
@@ -350,13 +391,14 @@ namespace SQLtest
                     }
                     foreach (var item in synonyms)
                     {
-                        if (debug && synonymsCount > 3)
-                            break;
-
                         SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
                         {
-                            name = item.Column0,
-                            schema = dbName
+                            database = item.Column0,
+                            schema = item.Column1,
+                            name = item.Column2,
+                            sourceName = item.Column3,
+                            sourceSchema = item.Column4,
+                            sourceDbLinkName = item.Column5
                         };
                         modelItem.synonyms.Add(synonymModelItem);
                         synonymsCount++;
@@ -371,10 +413,7 @@ namespace SQLtest
                     }
                     else
                     {
-                        if (debug)
-                        {
-                            MessageBox.Show(ex.Message);
-                        }
+                        MessageBox.Show(ex.Message);
                     }
                 }
             }

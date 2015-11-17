@@ -44,6 +44,7 @@ namespace SQLtest
 
         public List<SQLTableModelItem> tables { get; set; }
         public List<SQLSynonymModelItem> synonyms { get; set; }
+
     }
 
     public class SQLTableModelItem
@@ -68,10 +69,20 @@ namespace SQLtest
 
     public class SQLSynonymModelItem
     {
+        public string database { get; set; }
         public string schema { get; set; }
         public string name { get; set; }
         public string sourceName { get; set; }
         public string sourceSchema { get; set; }
         public string sourceDbLinkName { get; set; }
     }
+
+    public class SQLDBLink
+    {
+        public string owner { get; set; }
+        public string db_link { get; set; }
+        public string username { get; set; }
+        public string host { get; set; }
+    }
+
 }
