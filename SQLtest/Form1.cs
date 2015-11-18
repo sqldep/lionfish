@@ -54,7 +54,7 @@ namespace SQLtest
                 {
                 // jen pro ucely testovani
                     sqlDialect = "mssql";
-                    conn = "Data Source=mmnag1\\sql2014;Initial Catalog=Nemocnice_vyvoj;Persist Security Info=True;User ID=dplaner;Password=Intel12345";
+                    //conn = @"Driver ={SQL Server}; Server = mmnag1\sql2014; Initial Catalog = Nemocnice_vyvoj; UID = dplaner; PWD = ";
                     myKey = "63b95df9-da06-4612-9ad7-e763d4e1ea12";
                 }
 #endif

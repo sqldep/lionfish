@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace SQLtest
         {
 
             // pripoj se do databaze
-            SqlConnection connection = new SqlConnection(sqlConnection);
+            OdbcConnection connection = new OdbcConnection(sqlConnection);
             connection.Open();
             SQLCompleteStructure dbStructure = this.Run(connection, sqlDialect);
 
@@ -28,7 +29,7 @@ namespace SQLtest
             this.SendStructure(dbStructure);
         }
 
-        private SQLCompleteStructure Run(SqlConnection connection, string sqlDialect)
+        private SQLCompleteStructure Run(OdbcConnection connection, string sqlDialect)
         {
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
@@ -95,7 +96,7 @@ namespace SQLtest
             return ret;
         }
 
-        private List<string> GetDbNames(SqlConnection connection, string sqlDialect)
+        private List<string> GetDbNames(OdbcConnection connection, string sqlDialect)
         {
             List<string> sqls = this.GetSQLCommands(sqlDialect, "databases", null);
 
@@ -122,7 +123,7 @@ namespace SQLtest
             return ret;
         }
 
-        private List<SQLQuerry> GetQuerries(SqlConnection connection, string sqlDialect, List<string> dbNames)
+        private List<SQLQuerry> GetQuerries(OdbcConnection connection, string sqlDialect, List<string> dbNames)
         {
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
@@ -181,7 +182,7 @@ namespace SQLtest
         }
 
 
-        private List<SQLDBLink> GetDBLinks (SqlConnection connection, string sqlDialect)
+        private List<SQLDBLink> GetDBLinks (OdbcConnection connection, string sqlDialect)
         {
             List<SQLDBLink> ret = new List<SQLDBLink>();
 
@@ -277,13 +278,13 @@ namespace SQLtest
 
         }
 
-        private void RunSql(SqlConnection connection, List<SQLResult> result, string cmd)
+        private void RunSql(OdbcConnection connection, List<SQLResult> result, string cmd)
         {
 
-            SqlCommand toGo = connection.CreateCommand();
+            OdbcCommand toGo = connection.CreateCommand();
             toGo.CommandText = cmd;
 
-            SqlDataReader reader = toGo.ExecuteReader();
+            OdbcDataReader reader = toGo.ExecuteReader();
 
             if (reader.HasRows)
             {
@@ -318,7 +319,7 @@ namespace SQLtest
         }
  
 
-        private List<SQLDatabaseModelItem> GetDatabaseModels(SqlConnection connection, string sqlDialect, List<string> dbNames)
+        private List<SQLDatabaseModelItem> GetDatabaseModels(OdbcConnection connection, string sqlDialect, List<string> dbNames)
         {
             List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
 

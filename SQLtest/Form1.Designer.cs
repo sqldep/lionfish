@@ -76,8 +76,7 @@
             this.textBoxConnectionString.Name = "textBoxConnectionString";
             this.textBoxConnectionString.Size = new System.Drawing.Size(601, 20);
             this.textBoxConnectionString.TabIndex = 3;
-            this.textBoxConnectionString.Text = "Data Source=SERVER;Initial Catalog=master;Persist Security Info=True;User ID=USER" +
-    ";Password=PASSWORD";
+            this.textBoxConnectionString.Text = "Driver={SQL Server};Server=SERVER;Database=master;UID=USER;PWD=PASSWORD";
             // 
             // label2
             // 
