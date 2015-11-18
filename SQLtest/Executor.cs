@@ -355,7 +355,7 @@ namespace SQLtest
                     {
                         string tableName = item.Column2;
 
-                        SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.tableName == tableName);
+                        SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.name == tableName);
 
                         if (tableModelItem == null)
                         {
@@ -363,7 +363,7 @@ namespace SQLtest
                             {
                                 database = item.Column0,
                                 schema = item.Column1,
-                                tableName = item.Column2,
+                                name = item.Column2,
                                 isView =  item.Column3,
                                 columns = new List<SQLColumnModelItem>()
                             };
@@ -373,10 +373,9 @@ namespace SQLtest
 
                         SQLColumnModelItem columnModelItem = new SQLColumnModelItem()
                         {
-                            columnName = item.Column4,
+                            name = item.Column4,
                             dataType = item.Column5,
-                            comment = item.Column6,
-                            colOrder = item.Column7
+                            comment = item.Column6
                         };
                         tableModelItem.columns.Add(columnModelItem);
                     }

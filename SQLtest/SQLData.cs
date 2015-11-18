@@ -51,7 +51,7 @@ namespace SQLtest
     {
         public string database { get; set; }
         public string schema { get; set; }
-        public string tableName { get; set; }
+        public string name { get; set; }
         public string isView { get; set; }
 
         public List<SQLColumnModelItem> columns { get; set; }
@@ -61,10 +61,9 @@ namespace SQLtest
 
     public class SQLColumnModelItem
     {
-        public string columnName { get; set; }
+        public string name { get; set; }
         public string dataType { get; set; }
         public string comment { get; set; }
-        public string colOrder { get; set; }
     }
 
     public class SQLSynonymModelItem
