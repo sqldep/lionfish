@@ -16,8 +16,7 @@ select
 													   else null 
 													 end||')'
 	  end /*||decode(x.nullable, 'N', ' NOT NULL')*/ as dataType,
-  c.comments as comments,  
-  x.column_id as colOrder
+  c.comments as comments
 from all_tab_cols x,
 	 all_col_comments c,
 	(select 
@@ -78,5 +77,5 @@ where c.column_name = x.column_name -- joining cols and colls somments
      WOOD
      XDB'
 	,x.OWNER) = 0 -- black list of oracle default schemas
-order by x.owner, x.table_name, x.column_id;
+order by x.owner, x.table_name, isView, x.column_id;
 
