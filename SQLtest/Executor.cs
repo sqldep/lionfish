@@ -224,7 +224,7 @@ namespace SQLtest
         private List<string> GetSQLCommands(string sqlDialect, string purpose, List<StrReplace> list)
         {
 
-            string sqlCommands = System.IO.File.ReadAllText("./" + sqlDialect + "/" + purpose + "/cmd.sql");
+            string sqlCommands = System.IO.File.ReadAllText("./sql/" + sqlDialect + "/" + purpose + "/cmd.sql");
 
             if (list != null)
             {
