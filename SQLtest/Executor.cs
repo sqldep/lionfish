@@ -13,27 +13,58 @@ namespace SQLtest
 {
     class Executor
     {
+        public string LogFileName { get; set; }
+        public string LogJSONName { get; set; }
+
+        private void Log(string msg)
+        {
+            StreamWriter wr = File.AppendText(LogFileName);
+            wr.Write(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+            wr.Write("\t");
+            wr.WriteLine(msg);
+            wr.Close();
+        }
+
+        private void LogJSON(string json)
+        {
+            StreamWriter wr = File.AppendText(LogJSONName);
+            wr.Write(json);
+            wr.Close();
+        }
 
         public void Run(string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, List<string> failedDbs)
         {
+            try
+            {
+                this.LogFileName = "SQLtestLog.txt";
+                this.LogJSONName = "Export_" + customSqlSetName + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".txt";
+                // pripoj se do databaze
+                this.Log("Before database open.");
+                OdbcConnection connection = new OdbcConnection(sqlConnection);
+                connection.Open();
+                this.Log("Database open.");
+                SQLCompleteStructure dbStructure = this.Run(connection, sqlDialect);
 
-            // pripoj se do databaze
-            OdbcConnection connection = new OdbcConnection(sqlConnection);
-            connection.Open();
-            SQLCompleteStructure dbStructure = this.Run(connection, sqlDialect);
-
-            // send
-            dbStructure.dialect = sqlDialect;
-            dbStructure.userAccountId = myKey;
-            dbStructure.customSqlSetName = customSqlSetName;
-            this.SendStructure(dbStructure);
+                // send
+                dbStructure.dialect = sqlDialect;
+                dbStructure.userAccountId = myKey;
+                dbStructure.customSqlSetName = customSqlSetName;
+                this.SendStructure(dbStructure);
+            }
+            catch (Exception ex)
+            {
+                this.Log("Error " + ex.Message);
+            }
         }
 
         private SQLCompleteStructure Run(OdbcConnection connection, string sqlDialect)
         {
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
+            this.Log("Getting list of databases");
             List<string> dbNames = this.GetDbNames(connection, sqlDialect);
+            this.Log("List of databases has " + dbNames.Count + " items.");
+
             // 2. SELECT
             // DDL ("queries" in JSON): procedures and views
             // - sourceCode: `select * from table1` (string, required)
@@ -86,13 +117,16 @@ namespace SQLtest
             //
             // Expect columns in this order: Owner, Name, UserName, Host
 
-
+            this.Log("Getting list of querries");
             ret.queries = this.GetQuerries(connection, sqlDialect, dbNames);
+            this.Log("List of querries has " + ret.queries.Count + " items.");
 
             ret.databaseModel = new SQLDatabaseModel();
             ret.databaseModel.databases = this.GetDatabaseModels(connection, sqlDialect, dbNames);
 
+            this.Log("Getting list of dblinks");
             ret.dblinks = this.GetDBLinks(connection, sqlDialect);
+            this.Log("List of dblinks has " + ret.dblinks.Count + " items.");
             return ret;
         }
 
@@ -255,7 +289,8 @@ namespace SQLtest
             //    string HtmlResult = wc.UploadString(URI, myParameters);
             //}
 
-
+            this.LogJSON(json);
+            this.Log("Before sending data. Data saved in file " + LogJSONName);
             var baseAddress = "https://sqldep.com/api/rest/sqlset/create/";
 
             var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
@@ -275,7 +310,7 @@ namespace SQLtest
             var stream = response.GetResponseStream();
             var sr = new StreamReader(stream);
             var content = sr.ReadToEnd();
-
+            this.Log("Data sent.");
         }
 
         private void RunSql(OdbcConnection connection, List<SQLResult> result, string cmd)
@@ -333,6 +368,7 @@ namespace SQLtest
                     SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
                     modelItem.name = dbName;
 
+                    this.Log("Getting tables in database" + dbName + ".");
 
                     // sql commands
                     List<StrReplace> replaces = new List<StrReplace>();
@@ -380,8 +416,12 @@ namespace SQLtest
                         };
                         tableModelItem.columns.Add(columnModelItem);
                     }
+                    this.Log("Tables #["+ modelItem.tables.Count + "] in database" + dbName + " processed.");
+
 
                     // synonyms
+                    this.Log("Getting synonyms in database" + dbName + ".");
+
                     modelItem.synonyms = new List<SQLSynonymModelItem>();
                     List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, "synonyms", replaces);
                     List<SQLResult> synonyms = new List<SQLResult>();
@@ -404,15 +444,18 @@ namespace SQLtest
                         synonymsCount++;
                     }
                     ret.Add(modelItem);
+                    this.Log("Synonyms #["+ sqlsSynonyms .Count + "] in database" + dbName + "processed.");
                 }
                 catch (Exception ex)
                 {
+
                     if (ex.Message.IndexOf("offline") >= 0)
                     {
                         ;//knonw error - databse is offline, ignore
                     }
                     else
                     {
+                        this.Log("Error " + ex.Message);
                         MessageBox.Show(ex.Message);
                     }
                 }
