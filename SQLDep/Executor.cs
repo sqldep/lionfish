@@ -14,7 +14,6 @@ namespace SQLDep
     class Executor
     {
         public string LogFileName { get; set; }
-        public string LogJSONName { get; set; }
 
         private void Log(string msg)
         {
@@ -25,19 +24,15 @@ namespace SQLDep
             wr.Close();
         }
 
-        private void LogJSON(string json)
-        {
-            StreamWriter wr = File.AppendText(LogJSONName);
-            wr.Write(json);
-            wr.Close();
-        }
+        private string myJson = string.Empty;
 
-        public void Run(string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, List<string> failedDbs)
+        public void Run(string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, out string exportFileName)
         {
             try
             {
                 this.LogFileName = "SQLDepLog.txt";
-                this.LogJSONName = "Export_" + customSqlSetName + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".txt";
+                string logJSONName = "Export_" + customSqlSetName + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".txt";
+                exportFileName = logJSONName;
                 // pripoj se do databaze
                 this.Log("Before database open.");
                 OdbcConnection connection = new OdbcConnection(sqlConnection);
@@ -45,15 +40,39 @@ namespace SQLDep
                 this.Log("Database open.");
                 SQLCompleteStructure dbStructure = this.Run(connection, sqlDialect);
 
-                // send
+                int totalTablesCount = 0;
+                foreach (var item in dbStructure.databaseModel.databases)
+                {
+                    totalTablesCount += item.tables.Count;
+                }
+
+                if (dbStructure.queries.Count == 0 && totalTablesCount == 0)
+                {
+                    throw new Exception("None data collected. Missinq any querry or table.");
+                }
+
                 dbStructure.dialect = sqlDialect;
                 dbStructure.userAccountId = myKey;
                 dbStructure.customSqlSetName = customSqlSetName;
-                this.SendStructure(dbStructure);
+                myJson = this.SaveStructureToFile(dbStructure, logJSONName);
             }
             catch (Exception ex)
             {
                 this.Log("Error " + ex.Message);
+                throw;
+            }
+        }
+
+        public void SendStructure()
+        {
+            try
+            {
+                this.SendStructure(this.myJson);
+            }
+            catch (Exception ex)
+            {
+                this.Log("Error " + ex.Message);
+                throw;
             }
         }
 
@@ -274,9 +293,8 @@ namespace SQLDep
             return sqlCommandsList;
         }
 
-        private void SendStructure(SQLCompleteStructure querries)
+        private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-
             var jsonSerialiser = new JavaScriptSerializer();
             var json = jsonSerialiser.Serialize(querries);
 
@@ -289,8 +307,28 @@ namespace SQLDep
             //    string HtmlResult = wc.UploadString(URI, myParameters);
             //}
 
-            this.LogJSON(json);
-            this.Log("Before sending data. Data saved in file " + LogJSONName);
+            StreamWriter wr = File.AppendText(logJSONName);
+            wr.Write(json);
+            wr.Close();
+
+            this.Log("Result data saved in " + logJSONName);
+            return json;
+        }
+    
+
+        private void SendStructure(string json)
+        {
+
+            // post data
+            //string URI = " https://dev-jessie.sqldep.com/api/rest/sqlset/create/";
+            //string myParameters = json;
+            //using (WebClient wc = new WebClient())
+            //{
+            //    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+            //    string HtmlResult = wc.UploadString(URI, myParameters);
+            //}
+
+            this.Log("Before sending data.");
             var baseAddress = "https://sqldep.com/api/rest/sqlset/create/";
 
             var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
@@ -306,10 +344,14 @@ namespace SQLDep
             newStream.Close();
 
             var response = http.GetResponse();
-
             var stream = response.GetResponseStream();
             var sr = new StreamReader(stream);
             var content = sr.ReadToEnd();
+
+            if (content.IndexOf("success") < 0)
+            {
+                throw new Exception("Unexpected returned message " + content);
+            }
             this.Log("Data sent.");
         }
 

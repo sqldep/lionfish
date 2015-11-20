@@ -18,6 +18,35 @@ namespace SQLDep
         public Form1()
         {
             InitializeComponent();
+            InitializeValues();
+        }
+
+
+        private void InitializeValues()
+        {
+            string sqlDialect = UIConfig.Get(UIConfig.SQL_DIALECT, "mssql");
+            this.InitDatabaseValues(sqlDialect);
+            this.textBoxUserName.Text = UIConfig.Get(UIConfig.DATA_SET_NAME, "My Data Set Name");
+            this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "12345678-1234-1234-1234-123456789012");
+        }
+
+        private void InitDatabaseValues(string sqlDialect)
+        {
+            switch (sqlDialect)
+            {
+                case "oracle":
+                    {
+                        this.comboBoxDatabase.SelectedIndex = 0;
+                        this.textBoxConnectionString.Text = UIConfig.Get(UIConfig.DB_CONN + sqlDialect, "Driver={Oracle};Server=SERVER;Database=master;UID=USER;PWD=PASSWORD");
+                        break;
+                    }
+                case "mssql":
+                    {
+                        this.comboBoxDatabase.SelectedIndex = 1;
+                        this.textBoxConnectionString.Text = UIConfig.Get(UIConfig.DB_CONN + sqlDialect, "Driver={SQL Server};Server=SERVER;Database=master;UID=USER;PWD=PASSWORD");
+                        break;
+                    }
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -30,7 +59,6 @@ namespace SQLDep
                 {
                     throw new Exception("Please select database!");
                 }
-
 
                 string conn = this.textBoxConnectionString.Text.ToString();
                 string myName = this.textBoxUserName.Text.ToString();
@@ -49,17 +77,13 @@ namespace SQLDep
                     default: throw new Exception("Undefined db type, please select your database type from combobox!"); 
                 }
 
+                // uloz nastaveni uzivatele
+                UIConfig.Set(UIConfig.SQL_DIALECT, sqlDialect);
+                UIConfig.Set(UIConfig.DB_CONN + sqlDialect, this.textBoxConnectionString.Text.ToString());
+                UIConfig.Set(UIConfig.DATA_SET_NAME, this.textBoxUserName.Text.ToString());
+                UIConfig.Set(UIConfig.SQLDEP_KEY, this.textBoxKey.Text.ToString());
 
-#if DEBUG
-                {
-                // jen pro ucely testovani
-                    sqlDialect = "mssql";
-                    //conn = @"Driver ={SQL Server}; Server = mmnag1\sql2014; Initial Catalog = Nemocnice_vyvoj; UID = dplaner; PWD = ";
-                    myKey = "63b95df9-da06-4612-9ad7-e763d4e1ea12";
-                }
-#endif
                 // na test lze pouzit: "356d0c42-8717-495d-ad6b-339cd6e530fb"
-
                 // go!
                 //Guid myGuid;
                 //if (!Guid.TryParse(myKey, out myGuid))
@@ -68,19 +92,24 @@ namespace SQLDep
                 //}
 
                 List<string> failedDbs = new List<string>();
-                new Executor().Run(conn, dbType, myName, myKey, sqlDialect, failedDbs);
+                Executor executor = new Executor();
 
-                if (failedDbs.Count > 0)
+                string exportFileName;
+                executor.Run(conn, dbType, myName, myKey, sqlDialect, out exportFileName);
+
+                DialogResult answer = MessageBox.Show("Send data to SQLDep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
+
+                if (answer == DialogResult.Yes)
                 {
-                    string msg = failedDbs.Count + " databases were not performed properly. Verify your connection. Some data were sent.";
-                    MessageBox.Show(msg);
+                    executor.SendStructure();
+                    MessageBox.Show("Completed succesfully. Data were sent!");
                 }
                 else
                 {
-                    MessageBox.Show("Completed succesfully. Thank you!");
-                    this.Close();
+                    MessageBox.Show("Completed succesfully. Data are saved on disk! " + exportFileName);
                 }
 
+                executor = null; // zahod vysledky
             }
             catch (Exception ex)
             {
@@ -89,5 +118,20 @@ namespace SQLDep
             }
         }
 
+        private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int dbType = this.comboBoxDatabase.SelectedIndex;
+            switch (dbType)
+            {
+                case 0:
+                    {
+                        this.InitDatabaseValues("oracle"); break;
+                    }
+                case 1:
+                    {
+                        this.InitDatabaseValues("mssql"); break;
+                    }
+            }
+        }
     }
 }

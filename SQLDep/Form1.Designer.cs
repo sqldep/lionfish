@@ -49,6 +49,7 @@
             this.comboBoxDatabase.Name = "comboBoxDatabase";
             this.comboBoxDatabase.Size = new System.Drawing.Size(234, 21);
             this.comboBoxDatabase.TabIndex = 0;
+            this.comboBoxDatabase.SelectedIndexChanged += new System.EventHandler(this.comboBoxDatabase_SelectedIndexChanged);
             // 
             // label1
             // 
