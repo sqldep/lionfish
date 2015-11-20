@@ -7,8 +7,8 @@
     <ProjectGuid>{02000301-8F3E-4071-B0D2-2A8EE89F2D73}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SQLtest</RootNamespace>
-    <AssemblyName>SQLtest</AssemblyName>
+    <RootNamespace>SQLDep</RootNamespace>
+    <AssemblyName>SQLDep</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

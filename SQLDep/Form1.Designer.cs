@@ -1,4 +1,4 @@
-﻿namespace SQLtest
+﻿namespace SQLDep
 {
     partial class Form1
     {

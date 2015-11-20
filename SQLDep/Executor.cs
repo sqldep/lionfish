@@ -9,7 +9,7 @@ using System.Text;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
-namespace SQLtest
+namespace SQLDep
 {
     class Executor
     {
@@ -36,7 +36,7 @@ namespace SQLtest
         {
             try
             {
-                this.LogFileName = "SQLtestLog.txt";
+                this.LogFileName = "SQLDepLog.txt";
                 this.LogJSONName = "Export_" + customSqlSetName + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".txt";
                 // pripoj se do databaze
                 this.Log("Before database open.");

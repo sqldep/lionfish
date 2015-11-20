@@ -11,7 +11,7 @@ using System.Web.Script.Serialization;
 using System.Net;
 using System.IO;
 
-namespace SQLtest
+namespace SQLDep
 {
     public partial class Form1 : Form
     {
