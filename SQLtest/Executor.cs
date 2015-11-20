@@ -436,8 +436,8 @@ namespace SQLtest
                             database = item.Column0,
                             schema = item.Column1,
                             name = item.Column2,
-                            sourceName = item.Column3,
-                            sourceSchema = item.Column4,
+                            sourceName = item.Column4,
+                            sourceSchema = item.Column3,
                             sourceDbLinkName = item.Column5
                         };
                         modelItem.synonyms.Add(synonymModelItem);
