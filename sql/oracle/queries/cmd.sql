@@ -3,7 +3,8 @@ select
   src.NAME as name,
   src.TYPE as groupName,
   '##DBNAME##' as databaseName,
-  src.OWNER as schemaName
+  src.OWNER as schemaName,
+  src.line as lineNumber
 from all_source src
 where
   src.TYPE in ('FUNCTION','PROCEDURE','PACKAGE BODY','PACKAGE')
