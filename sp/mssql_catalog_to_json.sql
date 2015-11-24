@@ -179,6 +179,7 @@ BEGIN
 	-- Build the JSON request
 	insert into #RequestTable values (N'{' + @NewLine);
 	insert into #RequestTable values (N'   "userAccountId": "' + @UserAccountId + '",' + @NewLine); -- // * Required; will be provided to you by SQLdep team
+	insert into #RequestTable values (N'   "createdBy": "mssql_catalog_to_json.sql",' + @NewLine); --
 	insert into #RequestTable values (N'   "dialect": "mssql",' + @NewLine); --                        // * Required; options: oracle/postgres/mssql/redshift/..
 	insert into #RequestTable values (N'   "customSqlSetName": "' + @CustomSqlSetName + '",' + @NewLine); --  // Optional; when empty hash value will be generated; allowed characters [a-Z0-9_]
 	insert into #RequestTable values (N'   "queries" : [' + @NewLine);

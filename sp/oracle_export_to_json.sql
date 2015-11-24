@@ -554,6 +554,7 @@ begin
   commit;
   append_clob( '{ ') ; --TOP LEVEL
   append_clob( json_tag('userAccountId', '7f3e205e-34c9-4791-a343-83988b230d0e')) ; --TODO rewrite correct ID
+  append_clob( json_tag('createdBy', 'oracle_export_to_json.sql')) ;
   append_clob( json_tag('dialect', 'oracle')) ;
   append_clob( json_tag('customSqlSetName', '')) ;
   append_clob( '"queries" : [ ') ;
