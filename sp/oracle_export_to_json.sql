@@ -321,7 +321,7 @@ declare
     -- Materialized views - source code
     create_table(get_curr_schema(),'SQLDEP_TMP_LONG_FIX',
                  '(fullviewname VARCHAR2(100),owner VARCHAR2(100),view_name VARCHAR2(100),sourcecode CLOB)');
-    execute immediate v_sql_view using c_prohibited_schema;
+    execute immediate v_sql_mview using c_prohibited_schema;
     commit;
     loop
       fetch view_src_cur into View_SRC_Cur_rec;
