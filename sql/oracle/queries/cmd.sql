@@ -17,7 +17,7 @@ select
 	v.OWNER||'.'||v.VIEW_NAME as groupName,
 	v.OWNER as schemaName,
 	'##DBNAME##' as databaseName
-  from all_views v;
+from all_views v;
 
 --split
 
@@ -27,4 +27,4 @@ select
 	mv.OWNER||'.'||mv.MVIEW_NAME as groupName,
 	mv.OWNER as schemaName,
 	'##DBNAME##' as databaseName
-  from all_mviews mv;
+from all_mviews mv;

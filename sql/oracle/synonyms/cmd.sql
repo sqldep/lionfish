@@ -12,43 +12,4 @@ where s.table_owner = o.owner
 					  ('MATERIALIZED VIEW'
 					  ,'TABLE'
 					  ,'SYNONYM'
-					  ,'VIEW') 
-  and instr(
-	-- blacklist of schemas to export
-	'ADAMS
-     ANONYMOUS
-     AURORA$ORB$UNAUTHENTICATED
-     AWR_STAGE
-     BLAKE
-     CLARK
-     CLOTH
-     CSMIG
-     CTXSYS
-     DBSNMP
-     DEMO
-     DIP
-     DMSYS
-     DSSYS
-     EXFSYS
-     HR
-     JONES
-     LBACSYS
-     MDSYS
-     OE
-     ORACLE_OCM
-     ORDPLUGINS
-     ORDSYS
-     OUTLN
-     PAPER
-     PERFSTAT
-     SCOTT
-     SH
-     STEEL
-     SYS
-     SYSTEM
-     TRACESVR
-     TSMSYS
-     WMSYS
-     WOOD
-     XDB'
-	,s.TABLE_OWNER) = 0;-- black list of oracle default schemas 
+					  ,'VIEW');

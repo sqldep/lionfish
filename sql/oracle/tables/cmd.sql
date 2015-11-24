@@ -1,5 +1,5 @@
 select
-  'default' as databaseName,
+  '##DBNAME##' as databaseName,
   x.owner as schemaName,
   x.table_name as tableName,
   nvl2(w.object_name,'Y','N') as isView, -- type materialized view is a view too
@@ -38,44 +38,4 @@ where c.column_name = x.column_name -- joining cols and colls somments
   and x.table_name = t.object_name(+)
   and x.owner =w.owner(+) -- outer join views 
   and x.table_name = w.object_name(+) 
-  and instr(
-	-- blacklist of schemas to export
-	'ADAMS
-     ANONYMOUS
-     AURORA$ORB$UNAUTHENTICATED
-     AWR_STAGE
-     BLAKE
-     CLARK
-     CLOTH
-     CSMIG
-     CTXSYS
-     DBSNMP
-     DEMO
-     DIP
-     DMSYS
-     DSSYS
-     EXFSYS
-     HR
-     JONES
-     LBACSYS
-     MDSYS
-     OE
-     ORACLE_OCM
-     ORDPLUGINS
-     ORDSYS
-     OUTLN
-     PAPER
-     PERFSTAT
-     SCOTT
-     SH
-     STEEL
-     SYS
-     SYSTEM
-     TRACESVR
-     TSMSYS
-     WMSYS
-     WOOD
-     XDB'
-	,x.OWNER) = 0 -- black list of oracle default schemas
 order by x.owner, x.table_name, isView, x.column_id;
-
