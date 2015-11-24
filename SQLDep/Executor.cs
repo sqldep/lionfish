@@ -296,6 +296,7 @@ namespace SQLDep
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
             var jsonSerialiser = new JavaScriptSerializer();
+            jsonSerialiser.MaxJsonLength = Int32.MaxValue;
             var json = jsonSerialiser.Serialize(querries);
 
             // post data
