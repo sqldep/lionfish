@@ -6,6 +6,8 @@ Windows GUI app to export database structure to SQLDep
 - execute the .exe file.
 - select database driver
 - fill in connection string (see examples at https://www.connectionstrings.com/)
+   - to find out ODBC drivers you have installed (on Windows) go to Control Panel -> Data Source Administrator
+   - the Name column is exactly what you fill in the Driver of connection string
 - fill in your userAccountId from https://sqldep.com/accounts/api/ or  https://sqldep.com/browser/upload/api/
 - name your export
 - click on Run
