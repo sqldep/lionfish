@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Web.Script.Serialization;
 using System.Net;
 using System.IO;
+using System.Data.Odbc;
 
 namespace SQLDep
 {
@@ -24,64 +25,147 @@ namespace SQLDep
 
         private void InitializeValues()
         {
-            string sqlDialect = UIConfig.Get(UIConfig.SQL_DIALECT, "mssql");
-            this.InitDatabaseValues(sqlDialect);
+            this.comboBoxDatabase.SelectedIndex = this.GetDatabaseTypeIdx(UIConfig.Get(UIConfig.SQL_DIALECT, "mssql"));
+            this.comboBoxAuthType.SelectedIndex = this.GetAuthTypeIdx(UIConfig.Get(UIConfig.AUTH_TYPE, "sql_auth"));
+            this.textBoxServerName.Text = UIConfig.Get(UIConfig.SERVER_NAME, "");
+            this.textBoxLoginName.Text = UIConfig.Get(UIConfig.LOGIN_NAME, "");
+            this.textBoxLoginPassword.Text = UIConfig.Get(UIConfig.LOGIN_PASSWORD, "");
             this.textBoxUserName.Text = UIConfig.Get(UIConfig.DATA_SET_NAME, "My Data Set Name");
+            this.textBoxDatabaseName.Text = UIConfig.Get(UIConfig.DATABASE_NAME, "master");
             this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "12345678-1234-1234-1234-123456789012");
+            this.buttonRun.Enabled = false;
+            this.EnableAuthSettings();
         }
 
-        private void InitDatabaseValues(string sqlDialect)
+        public void EnableAuthSettings()
         {
-            switch (sqlDialect)
+            if ( this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex) == "sql_auth")
             {
-                case "oracle":
-                    {
-                        this.comboBoxDatabase.SelectedIndex = 0;
-                        this.textBoxConnectionString.Text = UIConfig.Get(UIConfig.DB_CONN + sqlDialect, "Driver={Oracle};Server=SERVER;Database=master;UID=USER;PWD=PASSWORD");
-                        break;
-                    }
-                case "mssql":
-                    {
-                        this.comboBoxDatabase.SelectedIndex = 1;
-                        this.textBoxConnectionString.Text = UIConfig.Get(UIConfig.DB_CONN + sqlDialect, "Driver={SQL Server};Server=SERVER;Database=master;UID=USER;PWD=PASSWORD");
-                        break;
-                    }
+                this.textBoxLoginName.Enabled = true;
+                this.textBoxLoginPassword.Enabled = true;
+            }
+            else
+            {
+                this.textBoxLoginName.Enabled = false;
+                this.textBoxLoginPassword.Enabled = false;
             }
         }
+
+        private int GetDatabaseTypeIdx (string sqlDialect)
+        {
+            if (sqlDialect == "oracle")
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+        private string GetDatabaseTypeName(int idx)
+        {
+            if (idx == 0)
+            {
+                return "oracle";
+            }
+            else
+            {
+                return "mssql";
+            }
+        }
+
+
+        private int GetAuthTypeIdx(string authType)
+        {
+            if (authType == "sql_auth")
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+        private string GetAuthTypeName(int idx)
+        {
+            if (idx == 0)
+            {
+                return "sql_auth";
+            }
+            else
+            {
+                return "win_auth";
+            }
+        }
+
+        private string BuildConnectionString ()
+        {
+            string ret = string.Empty;
+
+            switch (this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex))
+            {
+                case "oracle":
+                {
+                    ret += "Driver={Oracle};";
+                    break;
+                }
+                case "mssql":
+                default:
+                {
+                    ret += "Driver={SQL Server};";
+                    break;
+                }
+            }
+
+            ret += "Server=" + this.textBoxServerName.Text + ";";
+            ret += "Database=" + this.textBoxDatabaseName.Text + ";";
+
+            switch (this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex))
+            {
+                case "win_auth":
+                {
+                    ret += "Authentication=Windows Authentication;";
+                    break;
+                }
+                default:
+                case "sql_auth":
+                {
+                    ret += "UID=" + this.textBoxLoginName.Text + ";";
+                    ret += "PWD=" + this.textBoxLoginPassword.Text + ";";
+                    break;
+                }
+            }
+
+            return ret;
+        }
+
+        private void SaveDialogSettings ()
+        {
+            UIConfig.Set(UIConfig.AUTH_TYPE, this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex));
+            UIConfig.Set(UIConfig.SQL_DIALECT, this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex));
+            UIConfig.Set(UIConfig.DATA_SET_NAME, this.textBoxUserName.Text.ToString());
+            UIConfig.Set(UIConfig.SQLDEP_KEY, this.textBoxKey.Text.ToString());
+            UIConfig.Set(UIConfig.SERVER_NAME, this.textBoxServerName.Text.ToString());
+            UIConfig.Set(UIConfig.LOGIN_NAME, this.textBoxLoginName.Text.ToString());
+            UIConfig.Set(UIConfig.LOGIN_PASSWORD, this.textBoxLoginPassword.Text.ToString());
+            UIConfig.Set(UIConfig.DATABASE_NAME, this.textBoxDatabaseName.Text.ToString());
+        }
+
 
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                // co to vybral ?
-                int dbType = this.comboBoxDatabase.SelectedIndex;
-                if (dbType < 0)
-                {
-                    throw new Exception("Please select database!");
-                }
+                this.SaveDialogSettings();
 
-                string conn = this.textBoxConnectionString.Text.ToString();
+
+                string conn = this.BuildConnectionString();
                 string myName = this.textBoxUserName.Text.ToString();
                 string myKey = this.textBoxKey.Text.ToString();
-                string sqlDialect;
-                switch(dbType)
-                {
-                    case 0:
-                        {
-                            sqlDialect = "oracle"; break;
-                        }
-                    case 1:
-                        {
-                            sqlDialect = "mssql"; break;
-                        }
-                    default: throw new Exception("Undefined db type, please select your database type from combobox!"); 
-                }
+                string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
 
-                // uloz nastaveni uzivatele
-                UIConfig.Set(UIConfig.SQL_DIALECT, sqlDialect);
-                UIConfig.Set(UIConfig.DB_CONN + sqlDialect, this.textBoxConnectionString.Text.ToString());
-                UIConfig.Set(UIConfig.DATA_SET_NAME, this.textBoxUserName.Text.ToString());
-                UIConfig.Set(UIConfig.SQLDEP_KEY, this.textBoxKey.Text.ToString());
 
                 // na test lze pouzit: "356d0c42-8717-495d-ad6b-339cd6e530fb"
                 // go!
@@ -95,7 +179,7 @@ namespace SQLDep
                 Executor executor = new Executor();
 
                 string exportFileName;
-                executor.Run(conn, dbType, myName, myKey, sqlDialect, out exportFileName);
+                executor.Run(conn, myName, myKey, sqlDialect, out exportFileName);
 
                 DialogResult answer = MessageBox.Show("Send data to SQLDep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
 
@@ -120,17 +204,28 @@ namespace SQLDep
 
         private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int dbType = this.comboBoxDatabase.SelectedIndex;
-            switch (dbType)
+        }
+
+        private void comboBoxAuthType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.EnableAuthSettings();
+        }
+
+        private void buttonTestConnection_Click(object sender, EventArgs e)
+        {
+            string strConn = this.BuildConnectionString();
+            try
             {
-                case 0:
-                    {
-                        this.InitDatabaseValues("oracle"); break;
-                    }
-                case 1:
-                    {
-                        this.InitDatabaseValues("mssql"); break;
-                    }
+                OdbcConnection connection = new OdbcConnection(strConn);
+                connection.Open();
+                connection.Close();
+                this.buttonRun.Enabled = true;
+                this.SaveDialogSettings();
+                MessageBox.Show("Database connected!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Database not connected! Error: " + ex.ToString());
             }
         }
     }

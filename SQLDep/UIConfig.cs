@@ -11,9 +11,13 @@ namespace SQLDep
     {
         // klice se musi lisit
         public const string SQL_DIALECT = "sql_dialect";
-        public const string DB_CONN = "db_connection";
+        public const string SERVER_NAME = "server_name";
         public const string DATA_SET_NAME = "data_set_name";
         public const string SQLDEP_KEY = "SQL_dep_key";
+        public const string LOGIN_NAME = "login_name";
+        public const string LOGIN_PASSWORD = "login_password";
+        public const string AUTH_TYPE = "auth_type";
+        public const string DATABASE_NAME = "database_name";
 
         static public string Get (string key, string defaultValue)
         {

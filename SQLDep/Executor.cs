@@ -26,7 +26,7 @@ namespace SQLDep
 
         private string myJson = string.Empty;
 
-        public void Run(string sqlConnection, int dbType, string customSqlSetName, string myKey, string sqlDialect, out string exportFileName)
+        public void Run(string sqlConnection, string customSqlSetName, string myKey, string sqlDialect, out string exportFileName)
         {
             try
             {
