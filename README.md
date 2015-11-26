@@ -1,30 +1,48 @@
 # lionfish
 Windows GUI app to export database structure to SQLDep
 
-## How to run & use (compiled version)
+## What does it do?
 
-- execute the .exe file.
-- select database driver
-- fill in connection string (see examples at https://www.connectionstrings.com/)
-   - to find out ODBC drivers you have installed (on Windows) go to Control Panel -> Data Source Administrator
-   - the Name column is exactly what you fill in the Driver of connection string
-- fill in your userAccountId from https://sqldep.com/accounts/api/ or  https://sqldep.com/browser/upload/api/
-- name your export
-- click on Run
+The utility exports all
+
+- CREATE TABLE ...
+- CREATE VIEW ...
+- CREATE PROCEDURE ...
+- CREATE SYNONYM ...
+- CREATE LINK ...
+
+statements into a file. Optionally the utility allows you to
+send data directly to SQLDep.com under your Account Id.
+
+## How to use
+
+1. select Database and Driver
+1. fill in Username, Password and Database fields
+1. fill in your userAccountId (or Key) you got by email or from sqldep.com
+1. click on `Test Connection`
+1. fill in the name of your export
+1. click on `Extract to file` and wait for it to finish (might take some time)
+1. (optional) click on `Send data to SQLDep.com`
+
+## What will it do to my database?
+
+The utility will run SELECT statements located under `/sql` directory.
+These SELECTs pull data out of DB catalog or dictionary. If you
+are concerned about safety you can even check the source code written
+in C#.
+
+https://github.com/sqldep/lionfish
 
 ## Prerequesities for Oracle
 
 Download and install the Oracle Instant Client for ODBC
 
-## What does it do?
+## Troubleshooting
 
-After you specify a connection string the app will run SELECT
-statements against your DB catalog. It will dump the
-structure of your database into a JSON file and then POST it
-via HTTP to sqldep.com.
+Check the log file `SQLDepLog.txt` for detailed information. Please
+report any bug you find to `martin@sqldep.com` or file an issue
+at:
 
-No data are SELECTed, only structure of the database.
+https://github.com/sqldep/lionfish/issues
 
-You can inspect the SQL code in the `/sql` directory.
-
-The outgoing JSON file will also be stored locally for your convenience.
+Please attach relevant parts of log.
