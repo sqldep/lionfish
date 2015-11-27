@@ -27,8 +27,10 @@ send data directly to SQLdep.com under your Account Id.
 ## What will it do to my database?
 
 The utility will run SELECT statements located under `/sql` directory.
-These SELECTs pull data out of DB catalog or dictionary. If you
-are concerned about safety you can even check the source code written
+These SELECTs pull data out of DB catalog or dictionary. No temporary
+tables are created during this process.
+
+If you are concerned about safety you can even check the source code written
 in C#.
 
 https://github.com/sqldep/lionfish
