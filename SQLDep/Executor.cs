@@ -30,7 +30,7 @@ namespace SQLDep
         {
             try
             {
-                this.LogFileName = "SQLDepLog.txt";
+                this.LogFileName = "SQLdepLog.txt";
                 string logJSONName = "Export_" + customSqlSetName + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".txt";
                 exportFileName = logJSONName;
                 // pripoj se do databaze

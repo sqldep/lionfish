@@ -1,5 +1,5 @@
 # lionfish
-Windows GUI app to export database structure to SQLDep
+Windows GUI app to export database structure to SQLdep
 
 ## What does it do?
 
@@ -12,7 +12,7 @@ The utility exports all
 - CREATE LINK ...
 
 statements into a file. Optionally the utility allows you to
-send data directly to SQLDep.com under your Account Id.
+send data directly to SQLdep.com under your Account Id.
 
 ## How to use
 
@@ -22,7 +22,7 @@ send data directly to SQLDep.com under your Account Id.
 1. click on `Test Connection`
 1. fill in the name of your export
 1. click on `Extract to file` and wait for it to finish (might take some time)
-1. (optional) click on `Send data to SQLDep.com`
+1. (optional) click on `Send data to SQLdep.com`
 
 ## What will it do to my database?
 
@@ -39,7 +39,7 @@ Download and install the Oracle Instant Client for ODBC
 
 ## Troubleshooting
 
-Check the log file `SQLDepLog.txt` for detailed information. Please
+Check the log file `SQLdepLog.txt` for detailed information. Please
 report any bug you find to `martin@sqldep.com` or file an issue
 at:
 
