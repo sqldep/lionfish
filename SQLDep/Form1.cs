@@ -104,17 +104,29 @@ namespace SQLDep
         {
             string ret = string.Empty;
 
+            List<string> drivers = ODBCUtils.GetSystemDriverList();
             switch (this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex))
             {
                 case "oracle":
                 {
-                    ret += "Driver={Oracle};";
+                    string driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
+                    if (string.IsNullOrEmpty(driverName))
+                    {
+                        driverName = "Oracle ODBC Driver";
+                    }
+
+                    ret += "Driver={"+ driverName + "};";
                     break;
                 }
                 case "mssql":
                 default:
                 {
-                    ret += "Driver={SQL Server};";
+                    string driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
+                    if (string.IsNullOrEmpty(driverName))
+                    {
+                        driverName = "SQL Server";
+                    }
+                    ret += "Driver={"+ driverName + "};";
                     break;
                 }
             }
