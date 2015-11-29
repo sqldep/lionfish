@@ -137,7 +137,14 @@ namespace SQLDep
             // Expect columns in this order: Owner, Name, UserName, Host
 
             this.Log("Getting list of querries");
-            ret.queries = this.GetQuerries(connection, sqlDialect, dbNames);
+            if (sqlDialect == "oracle")
+            {
+                ret.queries = this.GetQuerries(connection, sqlDialect, dbNames);
+            }
+            else
+            {
+                ret.queries = this.GetOracleQuerries(connection, sqlDialect, dbNames);
+            }
             this.Log("List of querries has " + ret.queries.Count + " items.");
 
             ret.databaseModel = new SQLDatabaseModel();
@@ -171,6 +178,108 @@ namespace SQLDep
 #endif
 
                 ret.Add(item.Column0);
+            }
+
+            return ret;
+        }
+
+        private List<SQLQuerry> GetOracleQuerries(OdbcConnection connection, string sqlDialect, List<string> dbNames)
+        {
+            List<SQLQuerry> ret = new List<SQLQuerry>();
+
+            foreach (var dbName in dbNames)
+            {
+                try
+                {
+                    // sql commands
+                    List<StrReplace> replaces = new List<StrReplace>();
+                    StrReplace itemForReplace = new StrReplace()
+                    {
+                        SearchText = "##DBNAME##",
+                        ReplaceText = dbName
+                    };
+                    replaces.Add(itemForReplace);
+
+                    List<string> sqls = this.GetSQLCommands(sqlDialect, "queries", replaces);
+
+                    // vem prvni select, procedury spojime dle cisla radku
+                    {
+                        List<SQLResult> firstBlock = new List<SQLResult>();
+                        this.RunSql(connection, firstBlock, sqls.FirstOrDefault());
+
+
+                        List<string> names = firstBlock.Select(x => x.Column1).Distinct().ToList();
+                        List<string> groupNames = firstBlock.Select(x => x.Column2).Distinct().ToList();
+                        List<string> schemaNames = firstBlock.Select(x => x.Column3).Distinct().ToList();
+
+                        foreach (var name in names)
+                        {
+                            foreach (var groupName in groupNames)
+                            {
+                                foreach (var schemaName in schemaNames)
+                                {
+                                    List<SQLResult> firstBlockItem = firstBlock.Where(x => x.Column1 == name && x.Column2 == groupName && x.Column3 == schemaName).ToList();
+                                    // 
+                                    if (firstBlockItem != null && firstBlockItem.Count > 0)
+                                    {
+
+                                        string wholeCode = string.Empty;
+                                        foreach (var item in firstBlockItem)
+                                        {
+                                            if (wholeCode.Length > 0)
+                                            {
+                                                wholeCode += "\n";
+                                            }
+                                            wholeCode += item.Column0;
+                                        }
+
+                                        SQLResult resultItem = firstBlockItem.FirstOrDefault();
+
+                                        // hura mame prvni procedurku :-)
+                                        SQLQuerry querryItem = new SQLQuerry()
+                                        {
+                                            sourceCode = wholeCode,
+                                            name = name,
+                                            groupName = groupName,
+                                            database = resultItem.Column3,
+                                            schema = resultItem.Column4
+                                        };
+
+                                        ret.Add(querryItem);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    sqls.RemoveAt(0);
+                
+                // dalsi selecty jako predtim
+
+                    List<SQLResult> result = new List<SQLResult>();
+                    foreach (var item in sqls)
+                    {
+                        this.RunSql(connection, result, item);
+                    }
+
+                    foreach (var item in result)
+                    {
+                        SQLQuerry querryItem = new SQLQuerry()
+                        {
+                            sourceCode = item.Column0,
+                            name = item.Column1,
+                            groupName = item.Column2,
+                            database = item.Column3,
+                            schema = item.Column4
+                        };
+
+                        ret.Add(querryItem);
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
 
             return ret;
@@ -233,7 +342,6 @@ namespace SQLDep
 
             return ret;
         }
-
 
         private List<SQLDBLink> GetDBLinks (OdbcConnection connection, string sqlDialect)
         {
