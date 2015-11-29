@@ -254,20 +254,32 @@ namespace SQLDep
                         
 
                     sqls.RemoveAt(0);
-                
-                // dalsi selecty jako predtim
+                    List<SQLResult> secondBlock = new List<SQLResult>();
+                    this.RunSql(connection, secondBlock, sqls.FirstOrDefault());
 
-                    List<SQLResult> result = new List<SQLResult>();
-                    foreach (var item in sqls)
-                    {
-                        this.RunSql(connection, result, item);
-                    }
-
-                    foreach (var item in result)
+                    foreach (var item in secondBlock)
                     {
                         SQLQuerry querryItem = new SQLQuerry()
                         {
-                            sourceCode = item.Column0,
+                            sourceCode = "CREATE OR REPLACE FORCE VIEW " + item.Column2 + " AS " +  item.Column0,
+                            name = item.Column1,
+                            groupName = item.Column2,
+                            database = item.Column3,
+                            schema = item.Column4
+                        };
+
+                        ret.Add(querryItem);
+                    }
+
+                    sqls.RemoveAt(0);
+                    List<SQLResult> thirdBlock = new List<SQLResult>();
+                    this.RunSql(connection, thirdBlock, sqls.FirstOrDefault());
+
+                    foreach (var item in thirdBlock)
+                    {
+                        SQLQuerry querryItem = new SQLQuerry()
+                        {
+                            sourceCode = "CREATE MATERIALIZED VIEW " + item.Column2 + " AS " + item.Column0,
                             name = item.Column1,
                             groupName = item.Column2,
                             database = item.Column3,
