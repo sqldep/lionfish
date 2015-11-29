@@ -31,7 +31,7 @@ namespace SQLDep
             try
             {
                 this.LogFileName = "SQLdepLog.txt";
-                string logJSONName = "Export_" + customSqlSetName + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".txt";
+                string logJSONName = "Export_" + customSqlSetName + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
                 exportFileName = logJSONName;
                 // pripoj se do databaze
                 this.Log("Before database open.");
@@ -139,11 +139,11 @@ namespace SQLDep
             this.Log("Getting list of querries");
             if (sqlDialect == "oracle")
             {
-                ret.queries = this.GetQuerries(connection, sqlDialect, dbNames);
+                ret.queries = this.GetOracleQuerries(connection, sqlDialect, dbNames);
             }
             else
             {
-                ret.queries = this.GetOracleQuerries(connection, sqlDialect, dbNames);
+                ret.queries = this.GetQuerries(connection, sqlDialect, dbNames);
             }
             this.Log("List of querries has " + ret.queries.Count + " items.");
 
@@ -203,54 +203,55 @@ namespace SQLDep
                     List<string> sqls = this.GetSQLCommands(sqlDialect, "queries", replaces);
 
                     // vem prvni select, procedury spojime dle cisla radku
+
+                    List<SQLResult> firstBlock = new List<SQLResult>();
+                    this.RunSql(connection, firstBlock, sqls.FirstOrDefault());
+
+                    string wholeCode = string.Empty;
+                    string queryName = string.Empty;
+                    string querySchema = string.Empty;
+                    string queryDatabase = string.Empty;
+                    string queryGroup = string.Empty;
+                    int counter = 0;
+
+                    foreach (var item in firstBlock)
                     {
-                        List<SQLResult> firstBlock = new List<SQLResult>();
-                        this.RunSql(connection, firstBlock, sqls.FirstOrDefault());
+                        //this.Log(counter.ToString());
+                        if (item.Column5.Equals("1")) { // dump previous wholeCode
 
-
-                        List<string> names = firstBlock.Select(x => x.Column1).Distinct().ToList();
-                        List<string> groupNames = firstBlock.Select(x => x.Column2).Distinct().ToList();
-                        List<string> schemaNames = firstBlock.Select(x => x.Column3).Distinct().ToList();
-
-                        foreach (var name in names)
-                        {
-                            foreach (var groupName in groupNames)
+                            if (counter > 0)
                             {
-                                foreach (var schemaName in schemaNames)
+                                SQLQuerry querryItem = new SQLQuerry()
                                 {
-                                    List<SQLResult> firstBlockItem = firstBlock.Where(x => x.Column1 == name && x.Column2 == groupName && x.Column3 == schemaName).ToList();
-                                    // 
-                                    if (firstBlockItem != null && firstBlockItem.Count > 0)
-                                    {
+                                    sourceCode = wholeCode,
+                                    name = queryName,
+                                    groupName = queryGroup,
+                                    database = queryDatabase,
+                                    schema = querySchema
+                                };
 
-                                        string wholeCode = string.Empty;
-                                        foreach (var item in firstBlockItem)
-                                        {
-                                            if (wholeCode.Length > 0)
-                                            {
-                                                wholeCode += "\n";
-                                            }
-                                            wholeCode += item.Column0;
-                                        }
-
-                                        SQLResult resultItem = firstBlockItem.FirstOrDefault();
-
-                                        // hura mame prvni procedurku :-)
-                                        SQLQuerry querryItem = new SQLQuerry()
-                                        {
-                                            sourceCode = wholeCode,
-                                            name = name,
-                                            groupName = groupName,
-                                            database = resultItem.Column3,
-                                            schema = resultItem.Column4
-                                        };
-
-                                        ret.Add(querryItem);
-                                    }
-                                }
+                                ret.Add(querryItem);
+                                //this.Log("Query done");
                             }
+
+                            wholeCode = item.Column0;
+                            queryName = item.Column1;
+                            queryGroup = item.Column2;
+                            querySchema = item.Column4;
+                            queryDatabase = item.Column3;
                         }
+                        else
+                        {
+                            wholeCode += item.Column0;
+                            queryName = item.Column1;
+                            querySchema = item.Column4;
+                            queryDatabase = item.Column3;
+                            queryGroup = item.Column2;
+                        }
+                        counter++;
                     }
+
+                        
 
                     sqls.RemoveAt(0);
                 
