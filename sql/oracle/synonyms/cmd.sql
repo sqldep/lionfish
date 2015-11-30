@@ -1,4 +1,5 @@
 select
+  '##DBNAME##' as databaseName,
   s.OWNER as schemaName,
   s.SYNONYM_NAME as name,
   s.TABLE_OWNER as sourceSchema,
