@@ -481,6 +481,7 @@ namespace SQLDep
         {
 
             OdbcCommand toGo = connection.CreateCommand();
+            toGo.CommandTimeout = 3600 * 12;
             toGo.CommandText = cmd;
 
             OdbcDataReader reader = toGo.ExecuteReader();
