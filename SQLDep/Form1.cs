@@ -193,7 +193,7 @@ namespace SQLDep
                 string exportFileName;
                 executor.Run(conn, myName, myKey, sqlDialect, out exportFileName);
 
-                DialogResult answer = MessageBox.Show("Send data to SQLDep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
+                DialogResult answer = MessageBox.Show("Send data to SQLdep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
 
                 if (answer == DialogResult.Yes)
                 {
