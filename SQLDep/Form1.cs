@@ -168,6 +168,9 @@ namespace SQLDep
 
         private void button1_Click(object sender, EventArgs e)
         {
+            this.buttonRun.Enabled = false;
+            string form1Text = this.Text;
+            this.Text = form1Text + " Running - Please Wait ... ";
             try
             {
                 this.SaveDialogSettings();
@@ -212,6 +215,8 @@ namespace SQLDep
                 string msg = ex.Message;
                 MessageBox.Show(msg);
             }
+            this.buttonRun.Enabled = true;
+            this.Text = form1Text;
         }
 
         private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
