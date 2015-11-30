@@ -576,7 +576,7 @@ namespace SQLDep
                         {
                             name = item.Column4,
                             dataType = item.Column5,
-                            comment = item.Column6
+                            comment = "" // item.Column6
                         };
                         tableModelItem.columns.Add(columnModelItem);
                     }
