@@ -41,10 +41,8 @@ Download and install the Oracle Instant Client for ODBC
 
 ## Troubleshooting
 
-Check the log file `SQLdepLog.txt` for detailed information. Please
-report any bug you find to `martin@sqldep.com` or file an issue
-at:
-
-https://github.com/sqldep/lionfish/issues
+Check the log file `SQLdepLog.txt` for detailed information.
+Bugs can be reported at https://github.com/sqldep/lionfish/issues
+or via form at http://www.sqldep.com.
 
 Please attach relevant parts of log.
