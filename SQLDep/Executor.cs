@@ -58,7 +58,7 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                this.Log("Error " + ex.Message);
+                this.Log("Error " + ex.Message + "\n" + ex.StackTrace);
                 throw;
             }
         }
@@ -71,7 +71,7 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                this.Log("Error " + ex.Message);
+                this.Log("Error " + ex.Message + "\n" + ex.StackTrace);
                 throw;
             }
         }
@@ -619,7 +619,7 @@ namespace SQLDep
                     }
                     else
                     {
-                        this.Log("Error " + ex.Message);
+                        this.Log("Error " + ex.Message + "\n" + ex.StackTrace);
                         MessageBox.Show(ex.Message);
                     }
                 }
