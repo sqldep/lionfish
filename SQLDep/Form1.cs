@@ -105,32 +105,29 @@ namespace SQLDep
             string ret = string.Empty;
 
             List<string> drivers = ODBCUtils.GetSystemDriverList();
+            string driverName = string.Empty;
             switch (this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex))
             {
                 case "oracle":
                 {
-                    string driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
-                    if (string.IsNullOrEmpty(driverName))
-                    {
-                        driverName = "Oracle ODBC Driver";
-                    }
-
-                    ret += "Driver={"+ driverName + "};";
+                    driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
                     break;
                 }
                 case "mssql":
                 default:
                 {
-                    string driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
-                    if (string.IsNullOrEmpty(driverName))
-                    {
-                        driverName = "SQL Server";
-                    }
-                    ret += "Driver={"+ driverName + "};";
+                    driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
                     break;
                 }
             }
-
+            if (string.IsNullOrEmpty(driverName))
+            {
+                MessageBox.Show("No ODBC driver found, please install and try again", "Warning", MessageBoxButtons.OK);
+                return String.Empty;
+            } else
+            {
+                ret += "Driver={" + driverName + "};";
+            }
             ret += "Server=" + this.textBoxServerName.Text + ";";
             ret += "Database=" + this.textBoxDatabaseName.Text + ";";
 
@@ -231,18 +228,21 @@ namespace SQLDep
         private void buttonTestConnection_Click(object sender, EventArgs e)
         {
             string strConn = this.BuildConnectionString();
-            try
+            if (!String.IsNullOrEmpty(strConn))
             {
-                OdbcConnection connection = new OdbcConnection(strConn);
-                connection.Open();
-                connection.Close();
-                this.buttonRun.Enabled = true;
-                this.SaveDialogSettings();
-                MessageBox.Show("Database connected!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Database not connected! Error: " + ex.ToString());
+                try
+                {
+                    OdbcConnection connection = new OdbcConnection(strConn);
+                    connection.Open();
+                    connection.Close();
+                    this.buttonRun.Enabled = true;
+                    this.SaveDialogSettings();
+                    MessageBox.Show("Database connected!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Database not connected! Error: " + ex.ToString());
+                }
             }
         }
     }
