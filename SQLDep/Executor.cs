@@ -13,6 +13,14 @@ namespace SQLDep
 {
     class Executor
     {
+
+        public Executor(DBExecutor dbExecutor)
+        {
+            this.DBExecutor = dbExecutor;
+        }
+
+        private DBExecutor DBExecutor { get; set; }
+
         public string LogFileName { get; set; }
 
         private void Log(string msg)
@@ -26,7 +34,7 @@ namespace SQLDep
 
         private string myJson = string.Empty;
 
-        public void Run(string sqlConnection, string customSqlSetName, string myKey, string sqlDialect, out string exportFileName)
+        public void Run(string customSqlSetName, string myKey, string sqlDialect, out string exportFileName)
         {
             try
             {
@@ -35,10 +43,9 @@ namespace SQLDep
                 exportFileName = logJSONName;
                 // pripoj se do databaze
                 this.Log("Before database open.");
-                OdbcConnection connection = new OdbcConnection(sqlConnection);
-                connection.Open();
+                DBExecutor.Connect();
                 this.Log("Database open.");
-                SQLCompleteStructure dbStructure = this.Run(connection, sqlDialect);
+                SQLCompleteStructure dbStructure = this.Run(sqlDialect);
 
                 int totalTablesCount = 0;
                 foreach (var item in dbStructure.databaseModel.databases)
@@ -55,6 +62,7 @@ namespace SQLDep
                 dbStructure.userAccountId = myKey;
                 dbStructure.customSqlSetName = customSqlSetName;
                 myJson = this.SaveStructureToFile(dbStructure, logJSONName);
+                DBExecutor.Close();
             }
             catch (Exception ex)
             {
@@ -76,12 +84,12 @@ namespace SQLDep
             }
         }
 
-        private SQLCompleteStructure Run(OdbcConnection connection, string sqlDialect)
+        private SQLCompleteStructure Run(string sqlDialect)
         {
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
             this.Log("Getting list of databases");
-            List<string> dbNames = this.GetDbNames(connection, sqlDialect);
+            List<string> dbNames = this.GetDbNames(sqlDialect);
             this.Log("List of databases has " + dbNames.Count + " items.");
 
             // 2. SELECT
@@ -139,24 +147,24 @@ namespace SQLDep
             this.Log("Getting list of querries");
             if (sqlDialect == "oracle")
             {
-                ret.queries = this.GetOracleQuerries(connection, sqlDialect, dbNames);
+                ret.queries = this.GetOracleQuerries(sqlDialect, dbNames);
             }
             else
             {
-                ret.queries = this.GetQuerries(connection, sqlDialect, dbNames);
+                ret.queries = this.GetQuerries(sqlDialect, dbNames);
             }
             this.Log("List of querries has " + ret.queries.Count + " items.");
 
             ret.databaseModel = new SQLDatabaseModel();
-            ret.databaseModel.databases = this.GetDatabaseModels(connection, sqlDialect, dbNames);
+            ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
 
             this.Log("Getting list of dblinks");
-            ret.dblinks = this.GetDBLinks(connection, sqlDialect);
+            ret.dblinks = this.GetDBLinks(sqlDialect);
             this.Log("List of dblinks has " + ret.dblinks.Count + " items.");
             return ret;
         }
 
-        private List<string> GetDbNames(OdbcConnection connection, string sqlDialect)
+        private List<string> GetDbNames(string sqlDialect)
         {
             List<string> sqls = this.GetSQLCommands(sqlDialect, "databases", null);
 
@@ -164,7 +172,7 @@ namespace SQLDep
 
             foreach (var item in sqls)
             {
-                this.RunSql(connection, result, item);
+                DBExecutor.RunSql(result, item);
             }
 
             List<string> ret = new List<string>();
@@ -183,7 +191,7 @@ namespace SQLDep
             return ret;
         }
 
-        private List<SQLQuerry> GetOracleQuerries(OdbcConnection connection, string sqlDialect, List<string> dbNames)
+        private List<SQLQuerry> GetOracleQuerries(string sqlDialect, List<string> dbNames)
         {
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
@@ -205,7 +213,7 @@ namespace SQLDep
                     // vem prvni select, procedury spojime dle cisla radku
 
                     List<SQLResult> firstBlock = new List<SQLResult>();
-                    this.RunSql(connection, firstBlock, sqls.FirstOrDefault());
+                    DBExecutor.RunSql(firstBlock, sqls.FirstOrDefault());
 
                     string wholeCode = string.Empty;
                     string queryName = string.Empty;
@@ -255,7 +263,7 @@ namespace SQLDep
 
                     sqls.RemoveAt(0);
                     List<SQLResult> secondBlock = new List<SQLResult>();
-                    this.RunSql(connection, secondBlock, sqls.FirstOrDefault());
+                    DBExecutor.RunSql(secondBlock, sqls.FirstOrDefault());
 
                     foreach (var item in secondBlock)
                     {
@@ -273,7 +281,7 @@ namespace SQLDep
 
                     sqls.RemoveAt(0);
                     List<SQLResult> thirdBlock = new List<SQLResult>();
-                    this.RunSql(connection, thirdBlock, sqls.FirstOrDefault());
+                    DBExecutor.RunSql(thirdBlock, sqls.FirstOrDefault());
 
                     foreach (var item in thirdBlock)
                     {
@@ -298,7 +306,7 @@ namespace SQLDep
             return ret;
         }
 
-        private List<SQLQuerry> GetQuerries(OdbcConnection connection, string sqlDialect, List<string> dbNames)
+        private List<SQLQuerry> GetQuerries(string sqlDialect, List<string> dbNames)
         {
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
@@ -321,7 +329,7 @@ namespace SQLDep
                     List<SQLResult> result = new List<SQLResult>();
                     foreach (var item in sqls)
                     {
-                        this.RunSql(connection, result, item);
+                        DBExecutor.RunSql(result, item);
                     }
 
                     foreach (var item in result)
@@ -356,7 +364,7 @@ namespace SQLDep
             return ret;
         }
 
-        private List<SQLDBLink> GetDBLinks (OdbcConnection connection, string sqlDialect)
+        private List<SQLDBLink> GetDBLinks (string sqlDialect)
         {
             List<SQLDBLink> ret = new List<SQLDBLink>();
 
@@ -370,7 +378,7 @@ namespace SQLDep
                 List<SQLResult> result = new List<SQLResult>();
                 foreach (var item in sqls)
                 {
-                    this.RunSql(connection, result, item);
+                    DBExecutor.RunSql(result, item);
                 }
 
                 foreach (var item in result)
@@ -477,48 +485,9 @@ namespace SQLDep
             this.Log("Data sent.");
         }
 
-        private void RunSql(OdbcConnection connection, List<SQLResult> result, string cmd)
-        {
-
-            OdbcCommand toGo = connection.CreateCommand();
-            toGo.CommandTimeout = 3600 * 12;
-            toGo.CommandText = cmd;
-
-            OdbcDataReader reader = toGo.ExecuteReader();
-
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    int nCol = reader.FieldCount;
-                    SQLResult newItem = new SQLResult();
-
-                    if (nCol > 0)
-                        newItem.Column0 = reader.IsDBNull(0) ? String.Empty : reader.GetValue(0).ToString();
-                    if (nCol > 1)
-                        newItem.Column1 = reader.IsDBNull(1) ? String.Empty : reader.GetValue(1).ToString();
-                    if (nCol > 2)
-                        newItem.Column2 = reader.IsDBNull(2) ? String.Empty : reader.GetValue(2).ToString();
-                    if (nCol > 3)
-                        newItem.Column3 = reader.IsDBNull(3) ? String.Empty : reader.GetValue(3).ToString();
-                    if (nCol > 4)
-                        newItem.Column4 = reader.IsDBNull(4) ? String.Empty : reader.GetValue(4).ToString();
-                    if (nCol > 5)
-                        newItem.Column5 = reader.IsDBNull(5) ? String.Empty : reader.GetValue(5).ToString();
-                    if (nCol > 6)
-                        newItem.Column6 = reader.IsDBNull(6) ? String.Empty : reader.GetValue(6).ToString();
-
-                    result.Add(newItem);
-
-                }
-            }
-
-            reader.Close();
-            toGo.Dispose();
-        }
  
 
-        private List<SQLDatabaseModelItem> GetDatabaseModels(OdbcConnection connection, string sqlDialect, List<string> dbNames)
+        private List<SQLDatabaseModelItem> GetDatabaseModels(string sqlDialect, List<string> dbNames)
         {
             List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
 
@@ -549,7 +518,7 @@ namespace SQLDep
                     List<SQLResult> tablesWithColumns = new List<SQLResult>();
                     foreach (var item in sqlsTablesWithColumns)
                     {
-                        this.RunSql(connection, tablesWithColumns, item);
+                        DBExecutor.RunSql(tablesWithColumns, item);
                     }
 
                     foreach (var item in tablesWithColumns)
@@ -591,7 +560,7 @@ namespace SQLDep
                     List<SQLResult> synonyms = new List<SQLResult>();
                     foreach (var item in sqlsSynonyms)
                     {
-                        this.RunSql(connection, synonyms, item);
+                        DBExecutor.RunSql(synonyms, item);
                     }
                     foreach (var item in synonyms)
                     {

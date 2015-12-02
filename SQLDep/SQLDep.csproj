@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassQuerries.cs" />
+    <Compile Include="DBExecutor.cs" />
     <Compile Include="Executor.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

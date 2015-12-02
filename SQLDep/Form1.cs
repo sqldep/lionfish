@@ -100,54 +100,13 @@ namespace SQLDep
             }
         }
 
-        private string BuildConnectionString ()
+        private void BuildConnectionString (DBExecutor dbExecutor)
         {
-            string ret = string.Empty;
-
-            List<string> drivers = ODBCUtils.GetSystemDriverList();
-            string driverName = string.Empty;
-            switch (this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex))
-            {
-                case "oracle":
-                {
-                    driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
-                    break;
-                }
-                case "mssql":
-                default:
-                {
-                    driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
-                    break;
-                }
-            }
-            if (string.IsNullOrEmpty(driverName))
-            {
-                MessageBox.Show("No ODBC driver found, please install and try again", "Warning", MessageBoxButtons.OK);
-                return String.Empty;
-            } else
-            {
-                ret += "Driver={" + driverName + "};";
-            }
-            ret += "Server=" + this.textBoxServerName.Text + ";";
-            ret += "Database=" + this.textBoxDatabaseName.Text + ";";
-
-            switch (this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex))
-            {
-                case "win_auth":
-                {
-                    ret += "Authentication=Windows Authentication;";
-                    break;
-                }
-                default:
-                case "sql_auth":
-                {
-                    ret += "UID=" + this.textBoxLoginName.Text + ";";
-                    ret += "PWD=" + this.textBoxLoginPassword.Text + ";";
-                    break;
-                }
-            }
-
-            return ret;
+            dbExecutor.BuildConnectionString(this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
+                                                this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex),
+                                                this.textBoxServerName.Text, this.textBoxDatabaseName.Text,
+                                                this.textBoxLoginName.Text,
+                                                this.textBoxLoginPassword.Text);
         }
 
         private void SaveDialogSettings ()
@@ -171,9 +130,9 @@ namespace SQLDep
             try
             {
                 this.SaveDialogSettings();
+                DBExecutor dbExecutor = new DBExecutor();
+                this.BuildConnectionString(dbExecutor);
 
-
-                string conn = this.BuildConnectionString();
                 string myName = this.textBoxUserName.Text.ToString();
                 string myKey = this.textBoxKey.Text.ToString();
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
@@ -188,10 +147,10 @@ namespace SQLDep
                 //}
 
                 List<string> failedDbs = new List<string>();
-                Executor executor = new Executor();
+                Executor executor = new Executor(dbExecutor);
 
                 string exportFileName;
-                executor.Run(conn, myName, myKey, sqlDialect, out exportFileName);
+                executor.Run(myName, myKey, sqlDialect, out exportFileName);
 
                 DialogResult answer = MessageBox.Show("Send data to SQLdep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
 
@@ -227,22 +186,20 @@ namespace SQLDep
 
         private void buttonTestConnection_Click(object sender, EventArgs e)
         {
-            string strConn = this.BuildConnectionString();
-            if (!String.IsNullOrEmpty(strConn))
+            try
             {
-                try
-                {
-                    OdbcConnection connection = new OdbcConnection(strConn);
-                    connection.Open();
-                    connection.Close();
-                    this.buttonRun.Enabled = true;
-                    this.SaveDialogSettings();
-                    MessageBox.Show("Database connected!");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Database not connected! Error: " + ex.ToString());
-                }
+
+                DBExecutor dbExecutor = new DBExecutor();
+                this.BuildConnectionString(dbExecutor);
+                dbExecutor.Connect();
+                dbExecutor.Close();
+                this.buttonRun.Enabled = true;
+                this.SaveDialogSettings();
+                MessageBox.Show("Database connected!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Database not connected! Error: " + ex.ToString());
             }
         }
     }
