@@ -13,4 +13,4 @@ where s.table_owner = o.owner
 					  ('MATERIALIZED VIEW'
 					  ,'TABLE'
 					  ,'SYNONYM'
-					  ,'VIEW');
+					  ,'VIEW')

@@ -38,4 +38,4 @@ where c.column_name = x.column_name -- joining cols and colls somments
   and x.table_name = t.object_name(+)
   and x.owner =w.owner(+) -- outer join views 
   and x.table_name = w.object_name(+) 
-order by x.owner, x.table_name, isView, x.column_id;
+order by x.owner, x.table_name, isView, x.column_id
