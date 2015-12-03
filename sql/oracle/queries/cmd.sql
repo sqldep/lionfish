@@ -8,6 +8,26 @@ select
 from all_source src
 where
   src.TYPE in ('FUNCTION','PROCEDURE','PACKAGE BODY','PACKAGE')
+  and src.OWNER NOT IN (
+	'APEX_040200',
+	'CTXSYS',
+	'DVF',
+	'DVSYS',
+	'GSMADMIN_INTERNAL',
+	'LBACSYS',
+	'MDSYS',
+	'OLAPSYS',
+	'ORCL',
+	'ORDDATA',
+	'ORDPLUGINS',
+	'ORDSYS',
+	'PUBLIC',
+	'SI_INFORMTN_SCHEMA',
+	'SYS',
+	'SYSTEM',
+	'WMSYS',
+	'XDB'
+	)
 order by src.OWNER,src.name,src.TYPE,src.line
 
 --split
@@ -19,6 +39,26 @@ select
 	v.OWNER as schemaName,
 	'##DBNAME##' as databaseName
 from all_views v
+where v.OWNER NOT IN (
+	'APEX_040200',
+	'CTXSYS',
+	'DVF',
+	'DVSYS',
+	'GSMADMIN_INTERNAL',
+	'LBACSYS',
+	'MDSYS',
+	'OLAPSYS',
+	'ORCL',
+	'ORDDATA',
+	'ORDPLUGINS',
+	'ORDSYS',
+	'PUBLIC',
+	'SI_INFORMTN_SCHEMA',
+	'SYS',
+	'SYSTEM',
+	'WMSYS',
+	'XDB'
+	)
 
 --split
 
@@ -29,3 +69,24 @@ select
 	mv.OWNER as schemaName,
 	'##DBNAME##' as databaseName
 from all_mviews mv
+where  mv.OWNER NOT IN (
+	'APEX_040200',
+	'CTXSYS',
+	'DVF',
+	'DVSYS',
+	'GSMADMIN_INTERNAL',
+	'LBACSYS',
+	'MDSYS',
+	'OLAPSYS',
+	'ORCL',
+	'ORDDATA',
+	'ORDPLUGINS',
+	'ORDSYS',
+	'PUBLIC',
+	'SI_INFORMTN_SCHEMA',
+	'SYS',
+	'SYSTEM',
+	'WMSYS',
+	'XDB'
+	)
+

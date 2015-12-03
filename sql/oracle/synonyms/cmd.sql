@@ -14,3 +14,24 @@ where s.table_owner = o.owner
 					  ,'TABLE'
 					  ,'SYNONYM'
 					  ,'VIEW')
+  and s.OWNER NOT IN (
+	'APEX_040200',
+	'CTXSYS',
+	'DVF',
+	'DVSYS',
+	'GSMADMIN_INTERNAL',
+	'LBACSYS',
+	'MDSYS',
+	'OLAPSYS',
+	'ORCL',
+	'ORDDATA',
+	'ORDPLUGINS',
+	'ORDSYS',
+	'PUBLIC',
+	'SI_INFORMTN_SCHEMA',
+	'SYS',
+	'SYSTEM',
+	'WMSYS',
+	'XDB'
+	)
+

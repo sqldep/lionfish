@@ -38,4 +38,25 @@ where c.column_name = x.column_name -- joining cols and colls somments
   and x.table_name = t.object_name(+)
   and x.owner =w.owner(+) -- outer join views 
   and x.table_name = w.object_name(+) 
+  and x.owner NOT IN (
+	'APEX_040200',
+	'CTXSYS',
+	'DVF',
+	'DVSYS',
+	'GSMADMIN_INTERNAL',
+	'LBACSYS',
+	'MDSYS',
+	'OLAPSYS',
+	'ORCL',
+	'ORDDATA',
+	'ORDPLUGINS',
+	'ORDSYS',
+	'PUBLIC',
+	'SI_INFORMTN_SCHEMA',
+	'SYS',
+	'SYSTEM',
+	'WMSYS',
+	'XDB'
+	)
+
 order by x.owner, x.table_name, isView, x.column_id
