@@ -145,6 +145,7 @@ namespace SQLDep
             this.Log("Getting list of querries");
             if (sqlDialect == "oracle")
             {
+                this.Log("Using Oracle dialect");
                 ret.queries = this.GetOracleQuerries(sqlDialect, dbNames);
             }
             else
@@ -207,23 +208,23 @@ namespace SQLDep
                     List<SQLResult> firstBlock = new List<SQLResult>();
                     DBExecutor.RunSql(firstBlock, sqls.FirstOrDefault());
 
-                    string wholeCode = string.Empty;
+                    StringBuilder wholeCode = new StringBuilder(512 * 1024);
                     string queryName = string.Empty;
                     string querySchema = string.Empty;
                     string queryDatabase = string.Empty;
                     string queryGroup = string.Empty;
                     int counter = 0;
+                    int query_counter = 0;
 
                     foreach (var item in firstBlock)
                     {
-                        //this.Log(counter.ToString());
                         if (item.Column5.Equals("1")) { // dump previous wholeCode
 
                             if (counter > 0)
                             {
                                 SQLQuerry querryItem = new SQLQuerry()
                                 {
-                                    sourceCode = wholeCode,
+                                    sourceCode = wholeCode.ToString(),
                                     name = queryName,
                                     groupName = queryGroup,
                                     database = queryDatabase,
@@ -231,10 +232,12 @@ namespace SQLDep
                                 };
 
                                 ret.Add(querryItem);
-                                //this.Log("Query done");
+                                this.Log("Query done " + query_counter);
+                                query_counter++;
                             }
 
-                            wholeCode = item.Column0;
+                            wholeCode.Length = 0;
+                            wholeCode.Append(item.Column0);
                             queryName = item.Column1;
                             queryGroup = item.Column2;
                             querySchema = item.Column4;
@@ -242,7 +245,7 @@ namespace SQLDep
                         }
                         else
                         {
-                            wholeCode += item.Column0;
+                            wholeCode.Append(item.Column0);
                             queryName = item.Column1;
                             querySchema = item.Column4;
                             queryDatabase = item.Column3;
@@ -255,7 +258,7 @@ namespace SQLDep
 
                     sqls.RemoveAt(0);
                     List<SQLResult> secondBlock = new List<SQLResult>();
-                    DBExecutor.RunSql(secondBlock, sqls.FirstOrDefault());
+                    DBExecutor.RunQuerySql(secondBlock, sqls.FirstOrDefault());
 
                     foreach (var item in secondBlock)
                     {
@@ -273,7 +276,7 @@ namespace SQLDep
 
                     sqls.RemoveAt(0);
                     List<SQLResult> thirdBlock = new List<SQLResult>();
-                    DBExecutor.RunSql(thirdBlock, sqls.FirstOrDefault());
+                    DBExecutor.RunQuerySql(thirdBlock, sqls.FirstOrDefault());
 
                     foreach (var item in thirdBlock)
                     {

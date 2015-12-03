@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Linq;
 using System.Text;
-using System.Data.OleDb;
+using Oracle.DataAccess;
+using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
 
 
 
@@ -32,7 +34,7 @@ namespace SQLDep
 
         private OdbcConnection ODBCConnection { get; set; }
 
-        private OleDbConnection OleDbConnection { get; set; }
+        private OracleConnection OleDbConnection { get; set; }
 
         public void BuildConnectionString(string dbType, string auth_type, string server, string database, string loginName, string loginpassword)
         {
@@ -42,7 +44,7 @@ namespace SQLDep
             if (dbType == "oracle")
             {
                 this.MyDriver = DBExecutor.UseDriver.OLEDB;
-                ret = "provider = OraOLEDB.Oracle; data source = " + database + ";user id=" + loginName + ";password=" + loginpassword;
+                ret = "data source = " + database + ";user id=" + loginName + ";password=" + loginpassword ;
                 this.ConnectString = ret;
                 return;
             }
@@ -104,7 +106,7 @@ namespace SQLDep
             }
             else if (this.MyDriver == UseDriver.OLEDB)
             {
-                OleDbConnection connection = new OleDbConnection(this.ConnectString);
+                OracleConnection connection = new OracleConnection(this.ConnectString);
                 connection.Open();
                 this.OleDbConnection = connection;
             }
@@ -128,7 +130,18 @@ namespace SQLDep
             }
             else if (this.MyDriver == UseDriver.OLEDB)
             {
-                this.RunSqlOLEDB(result, cmd);
+                this.RunSqlOLEDB(result, cmd, false);
+            }
+        }
+        public void RunQuerySql(List<SQLResult> result, string cmd)
+        {
+            if (this.MyDriver == UseDriver.ODBC)
+            {
+                this.RunSqlODBC(result, cmd);
+            }
+            else if (this.MyDriver == UseDriver.OLEDB)
+            {
+                this.RunSqlOLEDB(result, cmd, true);
             }
         }
 
@@ -172,15 +185,15 @@ namespace SQLDep
             toGo.Dispose();
         }
 
-        private void RunSqlOLEDB(List<SQLResult> result, string cmd)
+        private void RunSqlOLEDB(List<SQLResult> result, string cmd, Boolean codeFirst)
         {
 
-            OleDbCommand toGo = this.OleDbConnection.CreateCommand();
+            OracleCommand toGo = this.OleDbConnection.CreateCommand();
             toGo.CommandTimeout = 3600 * 12;
             toGo.CommandText = cmd;
+            toGo.InitialLONGFetchSize = -1;
 
-            OleDbDataReader reader = toGo.ExecuteReader();
-
+            OracleDataReader reader = toGo.ExecuteReader();
             if (reader.HasRows)
             {
                 while (reader.Read())
@@ -209,7 +222,7 @@ namespace SQLDep
             }
 
             reader.Close();
-            toGo.Dispose();
+            //toGo.Dispose();
         }
     }
 }
