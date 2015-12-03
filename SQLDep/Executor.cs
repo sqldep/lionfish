@@ -176,12 +176,6 @@ namespace SQLDep
             List<string> ret = new List<string>();
             foreach (var item in result)
             {
-#if DEBUG
-                if(item.Column0.IndexOf("Nemocnice") < 0)
-                {
-                    continue;
-                }
-#endif
 
                 ret.Add(item.Column0);
             }
@@ -341,13 +335,6 @@ namespace SQLDep
                             schema = item.Column4
                         };
 
-#if DEBUG
-                        {
-                            // for debug purposes make short ouputs
-                            querryItem.sourceCode = querryItem.sourceCode.Substring(0, 25);
-                            if (count > 3) break;
-                        }
-#endif
 
                         ret.Add(querryItem);
                         count++;
