@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Linq;
 using System.Text;
-using Oracle.DataAccess;
-using Oracle.DataAccess.Client;
-using Oracle.DataAccess.Types;
+using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 
 
 
