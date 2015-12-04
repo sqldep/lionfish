@@ -47,6 +47,7 @@
             this.buttonTestConnection = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.textBoxDatabaseName = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // comboBoxDatabase
@@ -204,10 +205,11 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(8, 153);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(53, 13);
+            this.label9.Size = new System.Drawing.Size(80, 13);
             this.label9.TabIndex = 1;
-            this.label9.Text = "Database";
+            this.label9.Text = "Database (SID)";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+
             // 
             // textBoxDatabaseName
             // 
@@ -216,11 +218,22 @@
             this.textBoxDatabaseName.Size = new System.Drawing.Size(234, 20);
             this.textBoxDatabaseName.TabIndex = 5;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(338, 45);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(84, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "or <host>:<port>";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(468, 237);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.textBoxDatabaseName);
             this.Controls.Add(this.textBoxLoginName);
             this.Controls.Add(this.textBoxServerName);
@@ -267,6 +280,7 @@
         private System.Windows.Forms.Button buttonTestConnection;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxDatabaseName;
+        private System.Windows.Forms.Label label2;
     }
 }
 

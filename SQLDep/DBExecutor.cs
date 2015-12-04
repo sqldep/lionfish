@@ -44,8 +44,20 @@ namespace SQLDep
             if (dbType == "oracle")
             {
                 this.MyDriver = DBExecutor.UseDriver.OLEDB;
-                ret = "data source = " + database + ";user id=" + loginName + ";password=" + loginpassword ;
-                this.ConnectString = ret;
+                string[] hostport = new String[2];
+                if (server.Contains(":"))
+                {
+                    Char colon = ':';
+                    hostport = server.Split(colon);
+                    this.ConnectString = String.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={4})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={3})));User Id = {1}; Password = {2}; ",
+                        hostport[0], loginName, loginpassword, database, hostport[1]);
+                }
+                else
+                {
+                    this.ConnectString = String.Format("Data Source = {0}; User Id = {1}; Password = {2};",
+                    database, loginName, loginpassword);
+                }
+
                 return;
             }
 
