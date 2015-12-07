@@ -128,6 +128,9 @@ namespace SQLDep
 
         private void button1_Click(object sender, EventArgs e)
         {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            DialogResult result = fbd.ShowDialog();
+
             this.buttonRun.Enabled = false;
             string form1Text = this.Text;
             this.Text = form1Text + " Running - Please Wait ... ";
@@ -153,8 +156,8 @@ namespace SQLDep
                 List<string> failedDbs = new List<string>();
                 Executor executor = new Executor(dbExecutor);
 
-                string exportFileName;
-                executor.Run(myName, myKey, sqlDialect, out exportFileName);
+                string exportFileName = fbd.SelectedPath + "\\DBexport_" + this.textBoxServerName.Text + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
+                executor.Run(myName, myKey, sqlDialect, exportFileName);
 
                 DialogResult answer = MessageBox.Show("Send data to SQLdep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
 

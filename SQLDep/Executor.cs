@@ -32,13 +32,11 @@ namespace SQLDep
 
         private string myJson = string.Empty;
 
-        public void Run(string customSqlSetName, string myKey, string sqlDialect, out string exportFileName)
+        public void Run(string customSqlSetName, string myKey, string sqlDialect, string exportFileName)
         {
             try
             {
                 this.LogFileName = "SQLdepLog.txt";
-                string logJSONName = "Export_" + customSqlSetName + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
-                exportFileName = logJSONName;
                 // pripoj se do databaze
                 this.Log("Before database open.");
                 DBExecutor.Connect();
@@ -59,7 +57,7 @@ namespace SQLDep
                 dbStructure.dialect = sqlDialect;
                 dbStructure.userAccountId = myKey;
                 dbStructure.customSqlSetName = customSqlSetName;
-                myJson = this.SaveStructureToFile(dbStructure, logJSONName);
+                myJson = this.SaveStructureToFile(dbStructure, exportFileName);
                 DBExecutor.Close();
             }
             catch (Exception ex)
