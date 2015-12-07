@@ -47,6 +47,7 @@
             this.buttonTestConnection = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.textBoxDatabaseName = new System.Windows.Forms.TextBox();
+            this.textBoxPort = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -60,7 +61,6 @@
             this.comboBoxDatabase.Name = "comboBoxDatabase";
             this.comboBoxDatabase.Size = new System.Drawing.Size(234, 21);
             this.comboBoxDatabase.TabIndex = 0;
-            this.comboBoxDatabase.SelectedIndexChanged += new System.EventHandler(this.comboBoxDatabase_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -74,10 +74,10 @@
             // 
             // buttonRun
             // 
-            this.buttonRun.Location = new System.Drawing.Point(350, 197);
+            this.buttonRun.Location = new System.Drawing.Point(350, 230);
             this.buttonRun.Name = "buttonRun";
             this.buttonRun.Size = new System.Drawing.Size(111, 32);
-            this.buttonRun.TabIndex = 2;
+            this.buttonRun.TabIndex = 10;
             this.buttonRun.Text = "Extract to file";
             this.buttonRun.UseVisualStyleBackColor = true;
             this.buttonRun.Click += new System.EventHandler(this.button1_Click);
@@ -85,7 +85,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 181);
+            this.label3.Location = new System.Drawing.Point(8, 219);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(25, 13);
             this.label3.TabIndex = 4;
@@ -93,24 +93,24 @@
             // 
             // textBoxKey
             // 
-            this.textBoxKey.Location = new System.Drawing.Point(98, 178);
+            this.textBoxKey.Location = new System.Drawing.Point(98, 216);
             this.textBoxKey.Name = "textBoxKey";
             this.textBoxKey.Size = new System.Drawing.Size(234, 20);
-            this.textBoxKey.TabIndex = 6;
+            this.textBoxKey.TabIndex = 8;
             this.textBoxKey.Text = "12345678-1234-1234-1234-123456789012";
             // 
             // textBoxUserName
             // 
-            this.textBoxUserName.Location = new System.Drawing.Point(98, 204);
+            this.textBoxUserName.Location = new System.Drawing.Point(98, 242);
             this.textBoxUserName.Name = "textBoxUserName";
             this.textBoxUserName.Size = new System.Drawing.Size(234, 20);
-            this.textBoxUserName.TabIndex = 7;
+            this.textBoxUserName.TabIndex = 9;
             this.textBoxUserName.Text = "Your set name";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(8, 207);
+            this.label4.Location = new System.Drawing.Point(8, 245);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(35, 13);
             this.label4.TabIndex = 4;
@@ -119,17 +119,17 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 44);
+            this.label5.Location = new System.Drawing.Point(7, 45);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(67, 13);
+            this.label5.Size = new System.Drawing.Size(55, 13);
             this.label5.TabIndex = 1;
-            this.label5.Text = "Server name";
+            this.label5.Text = "Hostname";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 70);
+            this.label6.Location = new System.Drawing.Point(7, 95);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(75, 13);
             this.label6.TabIndex = 1;
@@ -139,7 +139,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(41, 99);
+            this.label7.Location = new System.Drawing.Point(41, 124);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(58, 13);
             this.label7.TabIndex = 1;
@@ -149,7 +149,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(41, 127);
+            this.label8.Location = new System.Drawing.Point(41, 152);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(53, 13);
             this.label8.TabIndex = 1;
@@ -162,19 +162,19 @@
             this.comboBoxAuthType.Items.AddRange(new object[] {
             "SQL Server Authentication",
             "Windows Authentication "});
-            this.comboBoxAuthType.Location = new System.Drawing.Point(98, 69);
+            this.comboBoxAuthType.Location = new System.Drawing.Point(98, 94);
             this.comboBoxAuthType.Name = "comboBoxAuthType";
             this.comboBoxAuthType.Size = new System.Drawing.Size(234, 21);
-            this.comboBoxAuthType.TabIndex = 2;
+            this.comboBoxAuthType.TabIndex = 3;
             this.comboBoxAuthType.SelectedIndexChanged += new System.EventHandler(this.comboBoxAuthType_SelectedIndexChanged);
             // 
             // textBoxLoginPassword
             // 
-            this.textBoxLoginPassword.Location = new System.Drawing.Point(123, 123);
+            this.textBoxLoginPassword.Location = new System.Drawing.Point(123, 148);
             this.textBoxLoginPassword.Name = "textBoxLoginPassword";
             this.textBoxLoginPassword.PasswordChar = '*';
             this.textBoxLoginPassword.Size = new System.Drawing.Size(209, 20);
-            this.textBoxLoginPassword.TabIndex = 4;
+            this.textBoxLoginPassword.TabIndex = 5;
             // 
             // textBoxServerName
             // 
@@ -185,17 +185,17 @@
             // 
             // textBoxLoginName
             // 
-            this.textBoxLoginName.Location = new System.Drawing.Point(123, 95);
+            this.textBoxLoginName.Location = new System.Drawing.Point(123, 120);
             this.textBoxLoginName.Name = "textBoxLoginName";
             this.textBoxLoginName.Size = new System.Drawing.Size(209, 20);
-            this.textBoxLoginName.TabIndex = 3;
+            this.textBoxLoginName.TabIndex = 4;
             // 
             // buttonTestConnection
             // 
-            this.buttonTestConnection.Location = new System.Drawing.Point(350, 142);
+            this.buttonTestConnection.Location = new System.Drawing.Point(350, 167);
             this.buttonTestConnection.Name = "buttonTestConnection";
             this.buttonTestConnection.Size = new System.Drawing.Size(111, 32);
-            this.buttonTestConnection.TabIndex = 2;
+            this.buttonTestConnection.TabIndex = 7;
             this.buttonTestConnection.Text = "Test Connection";
             this.buttonTestConnection.UseVisualStyleBackColor = true;
             this.buttonTestConnection.Click += new System.EventHandler(this.buttonTestConnection_Click);
@@ -203,36 +203,44 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(8, 153);
+            this.label9.Location = new System.Drawing.Point(8, 178);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(80, 13);
             this.label9.TabIndex = 1;
             this.label9.Text = "Database (SID)";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-
             // 
             // textBoxDatabaseName
             // 
-            this.textBoxDatabaseName.Location = new System.Drawing.Point(98, 150);
+            this.textBoxDatabaseName.Location = new System.Drawing.Point(98, 175);
             this.textBoxDatabaseName.Name = "textBoxDatabaseName";
             this.textBoxDatabaseName.Size = new System.Drawing.Size(234, 20);
-            this.textBoxDatabaseName.TabIndex = 5;
+            this.textBoxDatabaseName.TabIndex = 6;
+            // 
+            // textBoxPort
+            // 
+            this.textBoxPort.Location = new System.Drawing.Point(98, 68);
+            this.textBoxPort.Name = "textBoxPort";
+            this.textBoxPort.Size = new System.Drawing.Size(234, 20);
+            this.textBoxPort.TabIndex = 2;
+            this.textBoxPort.Text = "1523";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(338, 45);
+            this.label2.Location = new System.Drawing.Point(8, 70);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(84, 13);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "or <host>:<port>";
+            this.label2.Size = new System.Drawing.Size(26, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Port";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(468, 237);
+            this.ClientSize = new System.Drawing.Size(468, 273);
+            this.Controls.Add(this.textBoxPort);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBoxDatabaseName);
             this.Controls.Add(this.textBoxLoginName);
@@ -280,6 +288,7 @@
         private System.Windows.Forms.Button buttonTestConnection;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxDatabaseName;
+        private System.Windows.Forms.TextBox textBoxPort;
         private System.Windows.Forms.Label label2;
     }
 }

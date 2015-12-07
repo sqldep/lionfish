@@ -28,6 +28,7 @@ namespace SQLDep
             this.comboBoxDatabase.SelectedIndex = this.GetDatabaseTypeIdx(UIConfig.Get(UIConfig.SQL_DIALECT, "mssql"));
             this.comboBoxAuthType.SelectedIndex = this.GetAuthTypeIdx(UIConfig.Get(UIConfig.AUTH_TYPE, "sql_auth"));
             this.textBoxServerName.Text = UIConfig.Get(UIConfig.SERVER_NAME, "");
+            this.textBoxPort.Text = UIConfig.Get(UIConfig.SERVER_PORT, "");
             this.textBoxLoginName.Text = UIConfig.Get(UIConfig.LOGIN_NAME, "");
             this.textBoxLoginPassword.Text = UIConfig.Get(UIConfig.LOGIN_PASSWORD, "");
             this.textBoxUserName.Text = UIConfig.Get(UIConfig.DATA_SET_NAME, "My Data Set Name");
@@ -100,11 +101,13 @@ namespace SQLDep
             }
         }
 
-        private void BuildConnectionString (DBExecutor dbExecutor)
+        private string BuildConnectionString (DBExecutor dbExecutor)
         {
-            dbExecutor.BuildConnectionString(this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
+            return dbExecutor.BuildConnectionString(this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
                                                 this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex),
-                                                this.textBoxServerName.Text, this.textBoxDatabaseName.Text,
+                                                this.textBoxServerName.Text,
+                                                this.textBoxPort.Text, 
+                                                this.textBoxDatabaseName.Text,
                                                 this.textBoxLoginName.Text,
                                                 this.textBoxLoginPassword.Text);
         }
@@ -116,6 +119,7 @@ namespace SQLDep
             UIConfig.Set(UIConfig.DATA_SET_NAME, this.textBoxUserName.Text.ToString());
             UIConfig.Set(UIConfig.SQLDEP_KEY, this.textBoxKey.Text.ToString());
             UIConfig.Set(UIConfig.SERVER_NAME, this.textBoxServerName.Text.ToString());
+            UIConfig.Set(UIConfig.SERVER_PORT, this.textBoxPort.Text.ToString());
             UIConfig.Set(UIConfig.LOGIN_NAME, this.textBoxLoginName.Text.ToString());
             UIConfig.Set(UIConfig.LOGIN_PASSWORD, this.textBoxLoginPassword.Text.ToString());
             UIConfig.Set(UIConfig.DATABASE_NAME, this.textBoxDatabaseName.Text.ToString());
@@ -175,10 +179,6 @@ namespace SQLDep
             this.Text = form1Text;
         }
 
-        private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
         private void comboBoxAuthType_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.EnableAuthSettings();
@@ -186,11 +186,12 @@ namespace SQLDep
 
         private void buttonTestConnection_Click(object sender, EventArgs e)
         {
+            DBExecutor dbExecutor = new DBExecutor();
+            string connection = this.BuildConnectionString(dbExecutor);
+
             try
             {
 
-                DBExecutor dbExecutor = new DBExecutor();
-                this.BuildConnectionString(dbExecutor);
                 dbExecutor.Connect();
                 dbExecutor.Close();
                 this.buttonRun.Enabled = true;
@@ -199,7 +200,7 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Database not connected! Error: " + ex.ToString());
+                MessageBox.Show("Database not connected! \n\nConnection string:\n" + connection + "\n\nError: " + ex.ToString());
             }
         }
     }

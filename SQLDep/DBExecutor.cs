@@ -35,29 +35,22 @@ namespace SQLDep
 
         private OracleConnection OleDbConnection { get; set; }
 
-        public void BuildConnectionString(string dbType, string auth_type, string server, string database, string loginName, string loginpassword)
+        public string BuildConnectionString(string dbType, string auth_type, string server, string port, string database, string loginName, string loginpassword)
         {
             string ret = string.Empty;
 
             // native support
             if (dbType == "oracle")
             {
+                if (string.IsNullOrEmpty(port))
+                {
+                    port = "1521";
+                }
                 this.MyDriver = DBExecutor.UseDriver.OLEDB;
-                string[] hostport = new String[2];
-                if (server.Contains(":"))
-                {
-                    Char colon = ':';
-                    hostport = server.Split(colon);
-                    this.ConnectString = String.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={4})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={3})));User Id = {1}; Password = {2}; ",
-                        hostport[0], loginName, loginpassword, database, hostport[1]);
-                }
-                else
-                {
-                    this.ConnectString = String.Format("Data Source = {0}; User Id = {1}; Password = {2};",
-                    database, loginName, loginpassword);
-                }
+                this.ConnectString = String.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={4})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={3})));User Id = {1}; Password = {2}; ",
+                        server, loginName, loginpassword, database, port);
 
-                return;
+                return this.ConnectString;
             }
 
             // others
@@ -85,7 +78,12 @@ namespace SQLDep
             {
                 ret += "Driver={" + driverName + "};";
             }
-            ret += "Server=" + server + ";";
+            if (string.IsNullOrEmpty(port))
+            {
+                ret += "Server=" + server + ";";
+            } else {
+                ret += "Server=" + server + ":" + port + ";";
+            }
             ret += "Database=" + database + ";";
 
             switch (auth_type)
@@ -105,6 +103,7 @@ namespace SQLDep
             }
             this.MyDriver = DBExecutor.UseDriver.ODBC;
             this.ConnectString = ret;
+            return ret;
         }
 
         public void Connect ()
