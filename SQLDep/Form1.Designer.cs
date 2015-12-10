@@ -87,9 +87,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(8, 219);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(25, 13);
+            this.label3.Size = new System.Drawing.Size(45, 13);
             this.label3.TabIndex = 4;
-            this.label3.Text = "Key";
+            this.label3.Text = "API Key";
             // 
             // textBoxKey
             // 
@@ -97,7 +97,6 @@
             this.textBoxKey.Name = "textBoxKey";
             this.textBoxKey.Size = new System.Drawing.Size(234, 20);
             this.textBoxKey.TabIndex = 8;
-            this.textBoxKey.Text = "12345678-1234-1234-1234-123456789012";
             // 
             // textBoxUserName
             // 
@@ -262,7 +261,7 @@
             this.Controls.Add(this.comboBoxDatabase);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "SQLdep v0.7";
+            this.Text = "SQLdep v0.8";
             this.ResumeLayout(false);
             this.PerformLayout();
 

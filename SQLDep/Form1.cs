@@ -33,7 +33,7 @@ namespace SQLDep
             this.textBoxLoginPassword.Text = UIConfig.Get(UIConfig.LOGIN_PASSWORD, "");
             this.textBoxUserName.Text = UIConfig.Get(UIConfig.DATA_SET_NAME, "My Data Set Name");
             this.textBoxDatabaseName.Text = UIConfig.Get(UIConfig.DATABASE_NAME, "master");
-            this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "12345678-1234-1234-1234-123456789012");
+            this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "");
             this.buttonRun.Enabled = false;
             this.EnableAuthSettings();
         }
@@ -145,14 +145,6 @@ namespace SQLDep
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
 
 
-                // na test lze pouzit: "356d0c42-8717-495d-ad6b-339cd6e530fb"
-                // go!
-                //Guid myGuid;
-                //if (!Guid.TryParse(myKey, out myGuid))
-                //{
-                //    throw new Exception("Invalid key, it is not possible to handle as quide!");
-                //}
-
                 List<string> failedDbs = new List<string>();
                 Executor executor = new Executor(dbExecutor);
 
@@ -163,6 +155,13 @@ namespace SQLDep
 
                 if (answer == DialogResult.Yes)
                 {
+                    Guid myGuid;
+                    if (!Guid.TryParse(myKey, out myGuid))
+                    {
+                        throw new Exception("Invalid or missing API key! Get one at https://www.sqldep.com/browser/upload/api");
+                    }
+
+
                     executor.SendStructure();
                     MessageBox.Show("Completed succesfully. Data were sent!");
                 }
