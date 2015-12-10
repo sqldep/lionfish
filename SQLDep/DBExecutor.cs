@@ -35,9 +35,12 @@ namespace SQLDep
 
         private OracleConnection OleDbConnection { get; set; }
 
+        public string Hostname { get; set; }
+
         public string BuildConnectionString(string dbType, string auth_type, string server, string port, string database, string loginName, string loginpassword)
         {
             string ret = string.Empty;
+            this.Hostname = server;
 
             // native support
             if (dbType == "oracle")

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -15,7 +16,10 @@ namespace SQLDep
         public Executor(DBExecutor dbExecutor)
         {
             this.DBExecutor = dbExecutor;
+            this.runId = Guid.NewGuid().ToString();
         }
+
+        private string runId { get; set; }
 
         private DBExecutor DBExecutor { get; set; }
 
@@ -36,6 +40,9 @@ namespace SQLDep
         {
             try
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
                 this.LogFileName = "SQLdepLog.txt";
                 // pripoj se do databaze
                 this.Log("Before database open.");
@@ -57,6 +64,8 @@ namespace SQLDep
                 dbStructure.dialect = sqlDialect;
                 dbStructure.userAccountId = myKey;
                 dbStructure.customSqlSetName = customSqlSetName;
+                sw.Stop();
+                dbStructure.exportTime = sw.ElapsedMilliseconds.ToString();
                 myJson = this.SaveStructureToFile(dbStructure, exportFileName);
                 DBExecutor.Close();
             }
@@ -410,6 +419,10 @@ namespace SQLDep
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
+            querries.createdBy = "SQLdep v0.8";
+            querries.exportId = this.runId;
+            querries.instanceName = this.DBExecutor.Hostname;
+
             var jsonSerialiser = new JavaScriptSerializer();
             jsonSerialiser.MaxJsonLength = Int32.MaxValue;
             var json = jsonSerialiser.Serialize(querries);
