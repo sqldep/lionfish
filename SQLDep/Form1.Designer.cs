@@ -159,7 +159,7 @@
             // 
             this.comboBoxAuthType.FormattingEnabled = true;
             this.comboBoxAuthType.Items.AddRange(new object[] {
-            "SQL Server Authentication",
+            "Server Authentication",
             "Windows Authentication "});
             this.comboBoxAuthType.Location = new System.Drawing.Point(98, 94);
             this.comboBoxAuthType.Name = "comboBoxAuthType";

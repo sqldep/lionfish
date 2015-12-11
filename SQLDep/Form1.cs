@@ -163,7 +163,7 @@ namespace SQLDep
 
 
                     executor.SendStructure();
-                    MessageBox.Show("Completed succesfully. Data were sent!");
+                    MessageBox.Show("Completed succesfully. Check your dashboard at sqldep.com");
                 }
                 else
                 {
