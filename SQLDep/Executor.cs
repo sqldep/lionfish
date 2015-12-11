@@ -19,7 +19,7 @@ namespace SQLDep
             this.runId = Guid.NewGuid().ToString();
         }
 
-        private string runId { get; set; }
+        public string runId { get; set; }
 
         private DBExecutor DBExecutor { get; set; }
 
@@ -419,7 +419,7 @@ namespace SQLDep
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-            querries.createdBy = "SQLdep v0.8";
+            querries.createdBy = "SQLdep v0.9";
             querries.exportId = this.runId;
             querries.instanceName = this.DBExecutor.Hostname;
 
@@ -461,6 +461,14 @@ namespace SQLDep
             var baseAddress = "https://sqldep.com/api/rest/sqlset/create/";
 
             var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
+
+            string proxy = WebRequest.DefaultWebProxy.GetProxy(http.Address).AbsoluteUri;
+            if (proxy != string.Empty)
+            {
+                this.Log("Proxy URL: " + proxy);
+                http.Proxy = WebRequest.DefaultWebProxy;
+            }
+
             http.Accept = "application/json";
             http.ContentType = "application/json";
             http.Method = "POST";

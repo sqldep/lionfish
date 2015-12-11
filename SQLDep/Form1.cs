@@ -148,7 +148,7 @@ namespace SQLDep
                 List<string> failedDbs = new List<string>();
                 Executor executor = new Executor(dbExecutor);
 
-                string exportFileName = fbd.SelectedPath + "\\DBexport_" + this.textBoxServerName.Text + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
+                string exportFileName = fbd.SelectedPath + "\\DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
                 executor.Run(myName, myKey, sqlDialect, exportFileName);
 
                 DialogResult answer = MessageBox.Show("Send data to SQLdep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
