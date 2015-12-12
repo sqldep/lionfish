@@ -11,6 +11,7 @@ using System.Web.Script.Serialization;
 using System.Net;
 using System.IO;
 using System.Data.Odbc;
+using System.Threading;
 
 namespace SQLDep
 {
@@ -36,6 +37,8 @@ namespace SQLDep
             this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "");
             this.buttonRun.Enabled = false;
             this.EnableAuthSettings();
+            //
+            CheckForIllegalCrossThreadCalls = false;
         }
 
         public void EnableAuthSettings()
@@ -75,7 +78,6 @@ namespace SQLDep
                 return "mssql";
             }
         }
-
 
         private int GetAuthTypeIdx(string authType)
         {
@@ -125,15 +127,20 @@ namespace SQLDep
             UIConfig.Set(UIConfig.DATABASE_NAME, this.textBoxDatabaseName.Text.ToString());
         }
 
+        public AsyncExecutor AsyncExecutor { get; set; }
+        public Thread AsyncExecutorThread { get; set; }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            // only one execution at time is allowed, do nothing now
+            if (this.AsyncExecutor != null)
+            {
+                return;  
+            }
+
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             DialogResult result = fbd.ShowDialog();
 
-            this.buttonRun.Enabled = false;
-            string form1Text = this.Text;
-            this.Text = form1Text + " Running - Please Wait ... ";
             try
             {
                 this.SaveDialogSettings();
@@ -141,7 +148,12 @@ namespace SQLDep
                 this.BuildConnectionString(dbExecutor);
 
                 string myName = this.textBoxUserName.Text.ToString();
-                string myKey = this.textBoxKey.Text.ToString();
+                Guid myKey;
+                if (!Guid.TryParse(this.textBoxKey.Text.ToString(), out myKey))
+                {
+                    throw new Exception("Invalid or missing API key! Get one at https://www.sqldep.com/browser/upload/api");
+                }
+
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
 
 
@@ -149,39 +161,42 @@ namespace SQLDep
                 Executor executor = new Executor(dbExecutor);
 
                 string exportFileName = fbd.SelectedPath + "\\DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
-                executor.Run(myName, myKey, sqlDialect, exportFileName);
 
-                DialogResult answer = MessageBox.Show("Send data to SQLdep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
-
-                if (answer == DialogResult.Yes)
-                {
-                    Guid myGuid;
-                    if (!Guid.TryParse(myKey, out myGuid))
-                    {
-                        throw new Exception("Invalid or missing API key! Get one at https://www.sqldep.com/browser/upload/api");
-                    }
-
-
-                    executor.SendStructure();
-                    MessageBox.Show("Completed succesfully. Check your dashboard at sqldep.com");
-                }
-                else
-                {
-                    MessageBox.Show("Completed succesfully. Data are saved on disk! " + exportFileName);
-                }
-
-                executor = null; // zahod vysledky
+                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, executor);
+                this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
+                this.AsyncExecutorThread.Start();
+                new Thread(this.ShowProgress).Start();
             }
             catch (Exception ex)
             {
                 string msg = ex.Message;
                 MessageBox.Show(msg);
             }
-            this.buttonRun.Enabled = true;
-            this.Text = form1Text;
         }
 
-        private void comboBoxAuthType_SelectedIndexChanged(object sender, EventArgs e)
+        public void ShowProgress ()
+        {
+            this.buttonRun.Enabled = false;
+            string form1Text = this.Text;
+            this.Text = form1Text + " Running - Please Wait ... ";
+
+            while (this.AsyncExecutorThread.IsAlive)
+            {
+                Thread.Sleep(1000);
+
+
+            }
+
+            this.buttonRun.Enabled = true;
+            this.Text = form1Text;
+        //
+            this.AsyncExecutor = null;
+            this.AsyncExecutorThread = null;
+
+    }
+
+
+    private void comboBoxAuthType_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.EnableAuthSettings();
         }

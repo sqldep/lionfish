@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncExecutor.cs" />
     <Compile Include="ClassQuerries.cs" />
     <Compile Include="DBExecutor.cs" />
     <Compile Include="Executor.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormHelperClass.cs" />
     <Compile Include="ODBCUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace SQLDep
 {
-    class Executor
+    public class Executor
     {
 
         public Executor(DBExecutor dbExecutor)
@@ -36,7 +36,7 @@ namespace SQLDep
 
         private string myJson = string.Empty;
 
-        public void Run(string customSqlSetName, string myKey, string sqlDialect, string exportFileName)
+        public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace SQLDep
                 }
 
                 dbStructure.dialect = sqlDialect;
-                dbStructure.userAccountId = myKey;
+                dbStructure.userAccountId = myKey.ToString();
                 dbStructure.customSqlSetName = customSqlSetName;
                 sw.Stop();
                 dbStructure.exportTime = sw.ElapsedMilliseconds.ToString();
