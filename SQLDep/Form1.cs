@@ -162,7 +162,7 @@ namespace SQLDep
 
                 string exportFileName = fbd.SelectedPath + "\\DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
 
-                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, executor);
+                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor);
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
                 this.AsyncExecutorThread.Start();
                 new Thread(this.ShowProgress).Start();

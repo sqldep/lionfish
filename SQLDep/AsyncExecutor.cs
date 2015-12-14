@@ -9,12 +9,13 @@ namespace SQLDep
 {
     public class AsyncExecutor
     {
-        public AsyncExecutor(string myName, Guid myKey, string sqlDialect, Executor executor)
+        public AsyncExecutor(string myName, Guid myKey, string sqlDialect, string exportFileName, Executor executor)
         {
             this.MyName = myName;
             this.MyKey = myKey;
             this.SqlDialect = sqlDialect;
             this.MyExecutor = executor;
+            this.ExportFileName = exportFileName;
         }
 
         private string MyName { get; set; }
