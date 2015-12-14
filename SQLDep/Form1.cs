@@ -177,17 +177,39 @@ namespace SQLDep
         public void ShowProgress ()
         {
             this.buttonRun.Enabled = false;
+            this.buttonTestConnection.Enabled = false;
+            this.textBoxDatabaseName.Enabled = false;
+            this.textBoxKey.Enabled = false;
+            this.textBoxPort.Enabled = false;
+            this.textBoxServerName.Enabled = false;
+            this.textBoxUserName.Enabled = false;
+            this.comboBoxDatabase.Enabled = false;
+            this.comboBoxAuthType.Enabled = false;
+            this.textBoxLoginName.Enabled = false;
+            this.textBoxLoginPassword.Enabled = false;
+
             string form1Text = this.Text;
-            this.Text = form1Text + " Running - Please Wait ... ";
+            this.Text = form1Text + " - Running - Please Wait ... ";
 
             while (this.AsyncExecutorThread.IsAlive)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
 
 
             }
 
             this.buttonRun.Enabled = true;
+            this.buttonTestConnection.Enabled = true;
+            this.textBoxDatabaseName.Enabled = true;
+            this.textBoxKey.Enabled = true;
+            this.textBoxPort.Enabled = true;
+            this.textBoxServerName.Enabled = true;
+            this.textBoxUserName.Enabled = true;
+            this.comboBoxDatabase.Enabled = true;
+            this.comboBoxAuthType.Enabled = true;
+            this.textBoxLoginName.Enabled = true;
+            this.textBoxLoginPassword.Enabled = true;
+
             this.Text = form1Text;
         //
             this.AsyncExecutor = null;
