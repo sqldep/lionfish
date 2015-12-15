@@ -35,10 +35,6 @@ in C#.
 
 https://github.com/sqldep/lionfish
 
-## Prerequesities for Oracle
-
-Download and install the Oracle Instant Client for ODBC
-
 ## Troubleshooting
 
 Check the log file `SQLdepLog.txt` for detailed information.
