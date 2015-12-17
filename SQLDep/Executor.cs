@@ -17,6 +17,7 @@ namespace SQLDep
         {
             this.DBExecutor = dbExecutor;
             this.runId = Guid.NewGuid().ToString();
+            this.ProgressInfo = new ProgressInfo();
         }
 
         public string runId { get; set; }
@@ -24,6 +25,8 @@ namespace SQLDep
         private DBExecutor DBExecutor { get; set; }
 
         public string LogFileName { get; set; }
+
+        public ProgressInfo ProgressInfo { get; private set; }
 
         private void Log(string msg)
         {
@@ -38,6 +41,7 @@ namespace SQLDep
 
         public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName)
         {
+            this.ProgressInfo.CreateProgress();
             try
             {
                 Stopwatch sw = new Stopwatch();
@@ -48,7 +52,11 @@ namespace SQLDep
                 this.Log("Before database open.");
                 DBExecutor.Connect();
                 this.Log("Database open.");
+
+                this.ProgressInfo.SetProgressRatio(0.95, string.Empty);
                 SQLCompleteStructure dbStructure = this.Run(sqlDialect);
+
+                this.ProgressInfo.SetProgressRatio(0.05, string.Empty);
 
                 int totalTablesCount = 0;
                 foreach (var item in dbStructure.databaseModel.databases)
@@ -74,6 +82,11 @@ namespace SQLDep
                 this.Log("Error " + ex.Message + "\n" + ex.StackTrace);
                 throw;
             }
+            finally
+            {
+                this.ProgressInfo.RemoveProgress();
+            }
+
         }
 
         public void SendStructure()
@@ -91,6 +104,8 @@ namespace SQLDep
 
         private SQLCompleteStructure Run(string sqlDialect)
         {
+            this.ProgressInfo.CreateProgress();
+            
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
             this.Log("Getting list of databases");
@@ -150,6 +165,7 @@ namespace SQLDep
             // Expect columns in this order: Owner, Name, UserName, Host
 
             this.Log("Getting list of querries");
+            this.ProgressInfo.SetProgressRatio(0.45, "querries");
             if (sqlDialect == "oracle")
             {
                 this.Log("Using Oracle dialect");
@@ -161,12 +177,16 @@ namespace SQLDep
             }
             this.Log("List of querries has " + ret.queries.Count + " items.");
 
+            this.ProgressInfo.SetProgressRatio(0.35, "DB model");
             ret.databaseModel = new SQLDatabaseModel();
             ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
 
             this.Log("Getting list of dblinks");
+            this.ProgressInfo.SetProgressRatio(0.2, "dblinks");
             ret.dblinks = this.GetDBLinks(sqlDialect);
             this.Log("List of dblinks has " + ret.dblinks.Count + " items.");
+
+            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -195,8 +215,11 @@ namespace SQLDep
         {
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
+            this.ProgressInfo.CreateProgress();
+            int iiDbCounter = 0;
             foreach (var dbName in dbNames)
             {
+                this.ProgressInfo.SetProgressDone((double)100* ++iiDbCounter / dbNames.Count, dbName);
                 try
                 {
                     // sql commands
@@ -304,7 +327,7 @@ namespace SQLDep
                     throw;
                 }
             }
-
+            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -313,8 +336,13 @@ namespace SQLDep
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
             int count = 0;
+
+            this.ProgressInfo.CreateProgress();
+            int iiDbCounter = 0;
+
             foreach (var dbName in dbNames)
             {
+                this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
                 try
                 {
                     // sql commands
@@ -355,7 +383,7 @@ namespace SQLDep
                     throw;
                 }
             }
-
+            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -363,6 +391,7 @@ namespace SQLDep
         {
             List<SQLDBLink> ret = new List<SQLDBLink>();
 
+            this.ProgressInfo.CreateProgress();
             int count = 0;
             try
             {
@@ -371,8 +400,10 @@ namespace SQLDep
                 List<string> sqls = this.GetSQLCommands(sqlDialect, "dblinks", null);
 
                 List<SQLResult> result = new List<SQLResult>();
+                int iiItem = 0;
                 foreach (var item in sqls)
                 {
+                    this.ProgressInfo.SetProgressDone((double)100 * ++iiItem / sqls.Count, item);
                     DBExecutor.RunSql(result, item);
                 }
 
@@ -394,6 +425,7 @@ namespace SQLDep
             {
                 throw;
             }
+            this.ProgressInfo.RemoveProgress();
 
             return ret;
         }
@@ -498,11 +530,16 @@ namespace SQLDep
         {
             List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
 
+            this.ProgressInfo.CreateProgress();
+
             int tableCount = 0;
             int synonymsCount = 0;
 
+            int iiCounter = 0;
             foreach (var dbName in dbNames)
             {
+
+                this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
                 try
                 {
                     SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();

@@ -191,11 +191,12 @@ namespace SQLDep
             string form1Text = this.Text;
             this.Text = form1Text + " - Running - Please Wait ... ";
 
+            string workingOn = string.Empty;
+            double done = 0;
             while (this.AsyncExecutorThread.IsAlive)
             {
-                Thread.Sleep(500);
-
-
+                Thread.Sleep(50);
+                done = this.AsyncExecutor.MyExecutor.ProgressInfo.GetPercentDone(out workingOn);
             }
 
             this.buttonRun.Enabled = true;
