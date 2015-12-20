@@ -195,10 +195,12 @@ namespace SQLDep
             double done = 0;
             while (this.AsyncExecutorThread.IsAlive)
             {
-                Thread.Sleep(50);
+                Thread.Sleep(100);
                 done = this.AsyncExecutor.MyExecutor.ProgressInfo.GetPercentDone(out workingOn);
+                this.progressBarCalc.Value = (int)done;
+                this.Text = form1Text + " - Running " + workingOn;
             }
-
+            this.progressBarCalc.Value = 0;
             this.buttonRun.Enabled = true;
             this.buttonTestConnection.Enabled = true;
             this.textBoxDatabaseName.Enabled = true;

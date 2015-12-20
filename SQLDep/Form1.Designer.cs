@@ -49,6 +49,7 @@
             this.textBoxDatabaseName = new System.Windows.Forms.TextBox();
             this.textBoxPort = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.progressBarCalc = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // comboBoxDatabase
@@ -234,11 +235,19 @@
             this.label2.Text = "Port";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // progressBarCalc
+            // 
+            this.progressBarCalc.Location = new System.Drawing.Point(5, 276);
+            this.progressBarCalc.Name = "progressBarCalc";
+            this.progressBarCalc.Size = new System.Drawing.Size(455, 20);
+            this.progressBarCalc.TabIndex = 11;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(468, 273);
+            this.ClientSize = new System.Drawing.Size(468, 299);
+            this.Controls.Add(this.progressBarCalc);
             this.Controls.Add(this.textBoxPort);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBoxDatabaseName);
@@ -289,6 +298,7 @@
         private System.Windows.Forms.TextBox textBoxDatabaseName;
         private System.Windows.Forms.TextBox textBoxPort;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ProgressBar progressBarCalc;
     }
 }
 
