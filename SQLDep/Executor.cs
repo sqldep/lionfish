@@ -6,9 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Script.Serialization;
-using System.Windows.Forms;
 
-namespace SQLDep
+namespace SQLDepLib
 {
     public class Executor
     {
@@ -632,8 +631,7 @@ namespace SQLDep
                     }
                     else
                     {
-                        this.Log("Error " + ex.Message + "\n" + ex.StackTrace);
-                        MessageBox.Show(ex.Message);
+                        throw;
                     }
                 }
             }

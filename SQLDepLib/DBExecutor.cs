@@ -8,7 +8,7 @@ using Oracle.ManagedDataAccess.Types;
 
 
 
-namespace SQLDep
+namespace SQLDepLib
 {
     /// <summary>
     /// vse co jde do databaze by melo jit pres tuto tridu

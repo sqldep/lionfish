@@ -12,6 +12,7 @@ using System.Net;
 using System.IO;
 using System.Data.Odbc;
 using System.Threading;
+using SQLDepLib;
 
 namespace SQLDep
 {
