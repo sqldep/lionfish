@@ -207,6 +207,15 @@ namespace SQLDepLib
                 ret.Add(item.Column0);
             }
 
+#if DEBUG
+
+
+            ret = ret.Where(x => !x.StartsWith("Fle") && !x.StartsWith("Mu") && !x.StartsWith("Od") && !x.StartsWith("Poj") && !x.StartsWith("Rel") && !x.StartsWith("Te")).ToList();
+
+#endif
+
+
+
             return ret;
         }
 
