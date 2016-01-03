@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLDep", "SQLDep\SQLDep.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLDepLib", "SQLDepLib\SQLDepLib.csproj", "{716BFA53-4A0E-4C87-8703-E7FEE8B82387}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLDepCmd", "SQLDepCmd\SQLDepCmd.csproj", "{005EAC3E-2B16-40ED-BDED-EB34A17CF3C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{716BFA53-4A0E-4C87-8703-E7FEE8B82387}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{716BFA53-4A0E-4C87-8703-E7FEE8B82387}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{716BFA53-4A0E-4C87-8703-E7FEE8B82387}.Release|Any CPU.Build.0 = Release|Any CPU
+		{005EAC3E-2B16-40ED-BDED-EB34A17CF3C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{005EAC3E-2B16-40ED-BDED-EB34A17CF3C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{005EAC3E-2B16-40ED-BDED-EB34A17CF3C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{005EAC3E-2B16-40ED-BDED-EB34A17CF3C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
