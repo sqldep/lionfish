@@ -54,7 +54,6 @@ namespace SQLDepLib
                 if (lastProgress > done)
                 {
                     // bad implementation
-                    int ii = 0;
                 }
 
                 this.lastProgress = done;

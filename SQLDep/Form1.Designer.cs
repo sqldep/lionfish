@@ -50,6 +50,7 @@
             this.textBoxPort = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.progressBarCalc = new System.Windows.Forms.ProgressBar();
+            this.buttonSendFiles = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // comboBoxDatabase
@@ -75,7 +76,7 @@
             // 
             // buttonRun
             // 
-            this.buttonRun.Location = new System.Drawing.Point(350, 230);
+            this.buttonRun.Location = new System.Drawing.Point(350, 205);
             this.buttonRun.Name = "buttonRun";
             this.buttonRun.Size = new System.Drawing.Size(111, 32);
             this.buttonRun.TabIndex = 10;
@@ -192,7 +193,7 @@
             // 
             // buttonTestConnection
             // 
-            this.buttonTestConnection.Location = new System.Drawing.Point(350, 167);
+            this.buttonTestConnection.Location = new System.Drawing.Point(350, 168);
             this.buttonTestConnection.Name = "buttonTestConnection";
             this.buttonTestConnection.Size = new System.Drawing.Size(111, 32);
             this.buttonTestConnection.TabIndex = 7;
@@ -242,6 +243,16 @@
             this.progressBarCalc.Size = new System.Drawing.Size(455, 20);
             this.progressBarCalc.TabIndex = 11;
             // 
+            // buttonSendFiles
+            // 
+            this.buttonSendFiles.Location = new System.Drawing.Point(349, 242);
+            this.buttonSendFiles.Name = "buttonSendFiles";
+            this.buttonSendFiles.Size = new System.Drawing.Size(111, 32);
+            this.buttonSendFiles.TabIndex = 10;
+            this.buttonSendFiles.Text = "Send files";
+            this.buttonSendFiles.UseVisualStyleBackColor = true;
+            this.buttonSendFiles.Click += new System.EventHandler(this.buttonSendFiles_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -260,6 +271,7 @@
             this.Controls.Add(this.textBoxUserName);
             this.Controls.Add(this.textBoxKey);
             this.Controls.Add(this.buttonTestConnection);
+            this.Controls.Add(this.buttonSendFiles);
             this.Controls.Add(this.buttonRun);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
@@ -299,6 +311,7 @@
         private System.Windows.Forms.TextBox textBoxPort;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ProgressBar progressBarCalc;
+        private System.Windows.Forms.Button buttonSendFiles;
     }
 }
 

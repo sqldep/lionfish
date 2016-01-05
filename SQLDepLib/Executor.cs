@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Script.Serialization;
+using Ionic.Zip;
 
 namespace SQLDepLib
 {
@@ -29,11 +30,14 @@ namespace SQLDepLib
 
         private void Log(string msg)
         {
-            StreamWriter wr = File.AppendText(LogFileName);
-            wr.Write(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
-            wr.Write("\t");
-            wr.WriteLine(msg);
-            wr.Close();
+            if (this.LogFileName != null)
+            {
+                StreamWriter wr = File.AppendText(LogFileName);
+                wr.Write(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+                wr.Write("\t");
+                wr.WriteLine(msg);
+                wr.Close();
+            }
         }
 
         private string myJson = string.Empty;
@@ -99,6 +103,57 @@ namespace SQLDepLib
                 this.Log("Error " + ex.Message + "\n" + ex.StackTrace);
                 throw;
             }
+        }
+
+        public void SendFiles(List<string> files)
+        {
+            var ms = new MemoryStream();
+            {
+                ZipFile zip = new ZipFile();
+
+                foreach (var fileName in files)
+                {
+                    zip.AddFile(fileName);
+                }
+
+                // store to memory stream
+                ms.Seek(0, SeekOrigin.Begin);
+                zip.Save(ms);
+                zip.Dispose();
+            }
+
+            this.Log("Before sending zipped data.");
+            var baseAddress = "https://sqldep.com/api/rest/sqlset/create/OPRAVIT/";
+
+            var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
+
+            string proxy = WebRequest.DefaultWebProxy.GetProxy(http.Address).AbsoluteUri;
+            if (proxy != string.Empty)
+            {
+                this.Log("Proxy URL: " + proxy);
+                http.Proxy = WebRequest.DefaultWebProxy;
+            }
+
+            http.Accept = "application/json";
+            http.ContentType = "application/json";
+            http.Method = "POST";
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            Byte[] bytes = ms.ToArray();
+
+            Stream newStream = http.GetRequestStream();
+            newStream.Write(bytes, 0, bytes.Length);
+            newStream.Close();
+
+            var response = http.GetResponse();
+            var stream = response.GetResponseStream();
+            var sr = new StreamReader(stream);
+            var content = sr.ReadToEnd();
+
+            if (content.IndexOf("success") < 0)
+            {
+                throw new Exception("Unexpected returned message " + content);
+            }
+            this.Log("Data sent.");
         }
 
         private SQLCompleteStructure Run(string sqlDialect)

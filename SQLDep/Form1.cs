@@ -219,10 +219,30 @@ namespace SQLDep
             this.AsyncExecutor = null;
             this.AsyncExecutorThread = null;
 
-    }
+        }
 
 
-    private void comboBoxAuthType_SelectedIndexChanged(object sender, EventArgs e)
+        private void buttonSendFiles_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog fdlg = new OpenFileDialog();
+            fdlg.Multiselect = true;
+            fdlg.ShowDialog();
+            List<string> result = fdlg.FileNames.ToList();
+
+            if (result.Count > 0)
+            {
+                try
+                {
+                    new Executor(new DBExecutor()).SendFiles(result);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Files were not send!"+ ex.ToString());
+                }
+            }
+        }
+
+        private void comboBoxAuthType_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.EnableAuthSettings();
         }
