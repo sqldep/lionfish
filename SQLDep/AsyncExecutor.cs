@@ -35,18 +35,7 @@ namespace SQLDepLib
             try
             {
                 this.MyExecutor.Run(this.MyName, this.MyKey, this.SqlDialect, this.ExportFileName);
-                DialogResult answer = MessageBox.Show("Send data to SQLdep?", "Please confirm data sending.", MessageBoxButtons.YesNo);
-
-                if (answer == DialogResult.Yes)
-                {
-
-                    this.MyExecutor.SendStructure();
-                    MessageBox.Show("Completed succesfully. Check your dashboard at sqldep.com");
-                }
-                else
-                {
-                    MessageBox.Show("Completed succesfully. Data are saved on disk! " + this.ExportFileName);
-                }
+                MessageBox.Show("Completed succesfully. Data are saved on disk! " + this.ExportFileName);
 
             }
             catch (Exception ex)
