@@ -5,8 +5,7 @@ using System.Linq;
 using System.Text;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
-
-
+using Teradata.Client.Provider;
 
 namespace SQLDepLib
 {
@@ -34,6 +33,8 @@ namespace SQLDepLib
         private OdbcConnection ODBCConnection { get; set; }
 
         private OracleConnection OleDbConnection { get; set; }
+
+        private TdConnection TdConnection { get; set; }
 
         public string Hostname { get; set; }
 
