@@ -105,7 +105,7 @@ namespace SQLDepLib
             }
         }
 
-        public void SendFiles(List<string> files)
+        public void SendFiles(List<string> files, String apiKey)
         {
             var ms = new MemoryStream();
             {
@@ -136,6 +136,7 @@ namespace SQLDepLib
 
             http.Accept = "application/json";
             http.ContentType = "application/json";
+            http.Headers.Add( HttpRequestHeader.Authorization, "Token " + apiKey);
             http.Method = "POST";
             ASCIIEncoding encoding = new ASCIIEncoding();
             Byte[] bytes = ms.ToArray();

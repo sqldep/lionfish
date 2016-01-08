@@ -233,11 +233,11 @@ namespace SQLDep
             {
                 try
                 {
-                    new Executor(new DBExecutor()).SendFiles(result);
+                    new Executor(new DBExecutor()).SendFiles(result, this.textBoxKey.Text.ToString());
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Files were not send!"+ ex.ToString());
+                    MessageBox.Show("Files were not sent!"+ ex.ToString());
                 }
             }
         }

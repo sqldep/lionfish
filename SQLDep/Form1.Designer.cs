@@ -249,7 +249,7 @@
             this.buttonSendFiles.Name = "buttonSendFiles";
             this.buttonSendFiles.Size = new System.Drawing.Size(111, 32);
             this.buttonSendFiles.TabIndex = 10;
-            this.buttonSendFiles.Text = "Send files";
+            this.buttonSendFiles.Text = "Send file(s)";
             this.buttonSendFiles.UseVisualStyleBackColor = true;
             this.buttonSendFiles.Click += new System.EventHandler(this.buttonSendFiles_Click);
             // 
