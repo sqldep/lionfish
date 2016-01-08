@@ -20,7 +20,7 @@ namespace SQLDepLib
         public string createdBy { get; set; }
         public string exportTime { get; set; }
         public string exportId { get; set; }
-        public string instanceName { get; set; }
+        public string physicalInstance { get; set; }
 
     }
 }

@@ -518,7 +518,7 @@ namespace SQLDepLib
         {
             querries.createdBy = "SQLdep v1.0";
             querries.exportId = this.runId;
-            querries.instanceName = this.DBExecutor.Hostname;
+            querries.physicalInstance = this.DBExecutor.Hostname;
 
             var jsonSerialiser = new JavaScriptSerializer();
             jsonSerialiser.MaxJsonLength = Int32.MaxValue;
