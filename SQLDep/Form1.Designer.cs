@@ -58,7 +58,8 @@
             this.comboBoxDatabase.FormattingEnabled = true;
             this.comboBoxDatabase.Items.AddRange(new object[] {
             "Oracle",
-            "MsSQL"});
+            "MsSQL",
+            "Teradata"});
             this.comboBoxDatabase.Location = new System.Drawing.Point(98, 14);
             this.comboBoxDatabase.Name = "comboBoxDatabase";
             this.comboBoxDatabase.Size = new System.Drawing.Size(234, 21);

@@ -58,7 +58,11 @@ namespace SQLDep
 
         private int GetDatabaseTypeIdx (string sqlDialect)
         {
-            if (sqlDialect == "oracle")
+            if (sqlDialect == "teradata")
+            {
+                return 2;
+            }
+            else if (sqlDialect == "oracle")
             {
                 return 0;
             }
@@ -73,6 +77,10 @@ namespace SQLDep
             if (idx == 0)
             {
                 return "oracle";
+            }
+            else if (idx == 2)
+            {
+                return "teradata";
             }
             else
             {
