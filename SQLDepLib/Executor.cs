@@ -124,7 +124,7 @@ namespace SQLDepLib
 
             this.Log("Before sending zipped data.");
             //var baseAddress = "http://192.168.1.13:8000/api/batch/zip/";
-            var baseAddress = "https://www.sqldep.com/api/batch/zip/";
+            var baseAddress = "https://sqldep.com/api/batch/zip/";
 
             var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
 
@@ -137,7 +137,7 @@ namespace SQLDepLib
 
             http.Accept = "application/json";
             http.ContentType = "application/zip";
-            http.Headers.Add( HttpRequestHeader.Authorization, "Token " + apiKey);
+            http.Headers["Authorization"] = "Token " + apiKey;
             http.Method = "POST";
             ASCIIEncoding encoding = new ASCIIEncoding();
             Byte[] bytes = ms.ToArray();
