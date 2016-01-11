@@ -113,7 +113,7 @@ namespace SQLDepLib
 
                 foreach (var fileName in files)
                 {
-                    zip.AddFile(fileName);
+                    zip.AddFile(fileName, "");
                 }
 
                 // store to memory stream
