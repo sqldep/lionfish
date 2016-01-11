@@ -239,14 +239,20 @@ namespace SQLDep
 
             if (result.Count > 0)
             {
+                string form1Text = this.Text;
+
+                this.Text = form1Text + " - sending...";
                 try
                 {
                     new Executor(new DBExecutor()).SendFiles(result, this.textBoxKey.Text.ToString());
+                    MessageBox.Show("Files sent successfully");
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Files were not sent!"+ ex.ToString());
                 }
+                this.Text = form1Text;
+
             }
         }
 
