@@ -141,6 +141,8 @@ namespace SQLDepLib
             http.Method = "POST";
             ASCIIEncoding encoding = new ASCIIEncoding();
             Byte[] bytes = ms.ToArray();
+            http.ReadWriteTimeout = 1800 * 1000;
+            http.Timeout = 1800 * 1000;
 
             Stream newStream = http.GetRequestStream();
             newStream.Write(bytes, 0, bytes.Length);
