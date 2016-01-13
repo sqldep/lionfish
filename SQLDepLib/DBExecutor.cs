@@ -136,6 +136,7 @@ namespace SQLDepLib
             else if (this.MyDriver == UseDriver.TERADATA)
             {
                 TdConnection connection = new TdConnection(this.ConnectString);
+                connection.Open();
                 this.TdConnection = connection;
             }
         }
