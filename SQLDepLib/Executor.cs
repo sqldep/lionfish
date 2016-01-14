@@ -534,6 +534,11 @@ namespace SQLDepLib
                             }
 
                             // TODO: zkontrolovat co to vraci a to dat do vysledku
+
+                            // result ma 3 sloupce a je treba je spojit mezerou. Vysledny string je sourceCode v JSONu.
+                            // prvni sloupec je REPLACE PROCEDURE
+                            // druhy sloupec je nazev procedury/tabulky
+                            // treti sloupec je zdrojak
                             foreach (var item in result)
                             {
                                 SQLQuerry querryItem = new SQLQuerry()
