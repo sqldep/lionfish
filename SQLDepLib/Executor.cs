@@ -519,6 +519,7 @@ namespace SQLDepLib
                                 // copy result to list to be processed
                                 procedures.Add(item.Column0);
                             }
+                            iiRun++;
                         }
                         else if (iiRun == 1)
                         {
