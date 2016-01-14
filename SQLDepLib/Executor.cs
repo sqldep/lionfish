@@ -818,12 +818,7 @@ namespace SQLDepLib
         }
         private List<SQLDatabaseModelItem> GetTeradataDatabaseModels(string sqlDialect, List<string> dbNames)
         {
-
-            throw new NotImplementedException();
-
-
             List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
-
             this.ProgressInfo.CreateProgress();
 
             int tableCount = 0;
@@ -839,14 +834,55 @@ namespace SQLDepLib
                     SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
                     modelItem.name = dbName;
 
-                    this.Log("Getting tables in database" + dbName + ".");
+                    this.Log("Getting columns, tables and views in database" + dbName + ".");
 
-                    List<string> tables = new List<string>();
-                    List<string> views = new List<string>();
+                    List<SQLResult> allColumns = new List<SQLResult>();
+                    List<string> allTables = new List<string>();
+                    List<string> allViews = new List<string>();
 
-                    for (int iiRun = 0; iiRun < 2;)
+                    // prepare all columns, tables and views
+                    {
+                        List<StrReplace> replaces = new List<StrReplace>();
+                        StrReplace itemForReplace = new StrReplace()
+                        {
+                            SearchText = "##DBNAME##",
+                            ReplaceText = dbName
+                        };
+                        replaces.Add(itemForReplace);
+                        List<string> sqls = this.GetSQLCommands(sqlDialect, "tables", replaces);
+
+                        
+                        {
+                            // tabulky
+                            List<SQLResult> results = new List<SQLResult>();
+                            DBExecutor.RunSql(results, sqls.ElementAt(0));
+                            foreach (var item in results)
+                            {
+                                allTables.Add(item.Column2);
+                            }
+                            results.Clear();
+
+                            // viewcka
+                            DBExecutor.RunSql(results, sqls.ElementAt(1));
+                            foreach (var item in results)
+                            {
+                                allViews.Add(item.Column2);
+                            }
+                            results.Clear();
+
+                            // sloupce
+                            DBExecutor.RunSql(allColumns, sqls.ElementAt(1));
+                        }
+                    }
+
+
+                    this.Log("Getting tables and views structure in database" + dbName + ".");
+
+                    for (int iiRun = 0; allTables.Count + allViews.Count > 0; )
                     {
 
+                        string tableOrViewName;
+                        
                         // sql commands
                         List<StrReplace> replaces = new List<StrReplace>();
                         StrReplace itemForReplace = new StrReplace()
@@ -856,14 +892,67 @@ namespace SQLDepLib
                         };
                         replaces.Add(itemForReplace);
 
-                        // tabulky a viecka se sloupci dohromady
-                        modelItem.tables = new List<SQLTableModelItem>();
-                        List<string> sqlsTablesWithColumns = this.GetSQLCommands(sqlDialect, "tables", replaces);
-                        List<SQLResult> tablesWithColumns = new List<SQLResult>();
-                        foreach (var item in sqlsTablesWithColumns)
+                        if (iiRun == 0)
                         {
-                            DBExecutor.RunSql(tablesWithColumns, item);
+                            if (allTables.Count == 0)
+                            {
+                                iiRun++;
+                                continue;
+                            }
+                            else
+                            {
+                                tableOrViewName = allTables.ElementAt(0);
+                                allTables.RemoveAt(0);
+                            }
                         }
+                        else
+                        {
+                            if (allViews.Count == 0)
+                            {
+                                iiRun++;
+                                continue;
+                            }
+                            else
+                            {
+                                tableOrViewName = allViews.ElementAt(0);
+                                allViews.RemoveAt(0);
+                            }
+
+                        }
+
+                        StrReplace itemForReplace2 = new StrReplace()
+                        {
+                            SearchText = "##TABLENAME##",
+                            ReplaceText = tableOrViewName
+                        };
+                        replaces.Add(itemForReplace2);
+
+                        StrReplace itemForReplace3 = new StrReplace()
+                        {
+                            SearchText = "##VIEWNAME##",
+                            ReplaceText = tableOrViewName
+                        };
+                        replaces.Add(itemForReplace3);
+
+                        // we need only the last two
+
+                        string theSql = string.Empty;
+                        if (iiRun == 0)
+                        {
+                            theSql = this.GetSQLCommands(sqlDialect, "tables", replaces).ElementAt(3);
+                        }
+                        else
+                        {
+                            theSql = this.GetSQLCommands(sqlDialect, "tables", replaces).ElementAt(4);
+                        }
+
+                        modelItem.tables = new List<SQLTableModelItem>();
+
+                        // call show for the given table or view
+                        List<SQLResult> tablesWithColumns = new List<SQLResult>();
+                        DBExecutor.RunSql(tablesWithColumns, theSql);
+
+                        // TODO merge results
 
                         foreach (var item in tablesWithColumns)
                         {
@@ -896,6 +985,7 @@ namespace SQLDepLib
                         this.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
 
 
+                        /*
                         // synonyms
                         this.Log("Getting synonyms in database" + dbName + ".");
 
@@ -922,6 +1012,9 @@ namespace SQLDepLib
                         }
                         ret.Add(modelItem);
                         this.Log("Synonyms #[" + sqlsSynonyms.Count + "] in database" + dbName + "processed.");
+                        */
+
+
                     }
                 }
                 catch (Exception ex)

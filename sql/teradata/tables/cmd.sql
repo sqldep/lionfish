@@ -1,9 +1,13 @@
 -- 1. seznam vsech tabulek, view a procedur - kvuli creatorname, coz je schema a kvuli rozeznani, co je Table, View a Procedure
 SELECT '##DBNAME##', creatorname, tablename from dbc.tables WHERE TABLEKIND = 'T';
+
+--split
+
 SELECT '##DBNAME##', creatorname, tablename from dbc.tables WHERE TABLEKIND = 'V';
-SELECT '##DBNAME##', creatorname, tablename from dbc.tables WHERE TABLEKIND = 'P';
 
 -- 2. vytahnout datove typy sloupcu
+--split
+
 SELECT
 '##DBNAME##',
 TABLENAME,
@@ -34,8 +38,11 @@ FROM DBC.COLUMNS
 WHERE DATABASENAME='##DBNAME##' ) TBL;
 
 -- 3. ziskat zdrojove kody - zavolat na vsechno SHOW prikaz (vraci jeden sloupec, jeden radek)
+--split
 
 SHOW TABLE '##DBNAME##'.'##TABLENAME##';
+
+--split
+
 SHOW VIEW '##DBNAME##'.'##VIEWNAME##';
-SHOW PROCEDURE '##DBNAME##'.'##PROCEDURENAME##';
 
