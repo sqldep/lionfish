@@ -875,6 +875,16 @@ namespace SQLDepLib
                         }
                     }
 
+                    if (allTables.Count > 0)
+                    {
+                        modelItem.tables = new List<SQLTableModelItem>();
+                    }
+
+                    if (allViews.Count > 0)
+                    {
+                        modelItem.synonyms = new List<SQLSynonymModelItem>();
+                    }
+
 
                     this.Log("Getting tables and views structure in database" + dbName + ".");
 
@@ -917,7 +927,6 @@ namespace SQLDepLib
                                 tableOrViewName = allViews.ElementAt(0);
                                 allViews.RemoveAt(0);
                             }
-
                         }
 
                         StrReplace itemForReplace2 = new StrReplace()
@@ -935,7 +944,6 @@ namespace SQLDepLib
                         replaces.Add(itemForReplace3);
 
                         // we need only the last two
-
                         string theSql = string.Empty;
                         if (iiRun == 0)
                         {
@@ -946,7 +954,6 @@ namespace SQLDepLib
                             theSql = this.GetSQLCommands(sqlDialect, "tables", replaces).ElementAt(4);
                         }
 
-                        modelItem.tables = new List<SQLTableModelItem>();
 
                         // call show for the given table or view
                         List<SQLResult> tablesWithColumns = new List<SQLResult>();
@@ -956,31 +963,44 @@ namespace SQLDepLib
 
                         foreach (var item in tablesWithColumns)
                         {
-                            string tableName = item.Column2;
+                            List<SQLResult> columns = allColumns.Where(x => x.Column1 == tableOrViewName).ToList();
 
-                            SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.name == tableName);
-
-                            if (tableModelItem == null)
+                            if (iiRun==0)
                             {
-                                tableModelItem = new SQLTableModelItem()
+                                // table
+                                SQLTableModelItem tableModelItem = new SQLTableModelItem()
                                 {
-                                    database = item.Column0,
-                                    schema = item.Column1,
-                                    name = item.Column2,
-                                    isView = item.Column3,
+                                    database = dbName,
+                                    schema = dbName,
+                                    name = tableOrViewName,
+                                    isView = "false",
                                     columns = new List<SQLColumnModelItem>()
                                 };
                                 modelItem.tables.Add(tableModelItem);
                                 tableCount++;
+                            
+                                // TODO add columns
+                                SQLColumnModelItem columnModelItem = new SQLColumnModelItem()
+                                {
+                                    name = item.Column4,
+                                    dataType = item.Column5,
+                                    comment = "" // item.Column6
+                                };
+                                tableModelItem.columns.Add(columnModelItem);
                             }
-
-                            SQLColumnModelItem columnModelItem = new SQLColumnModelItem()
+                            else if(iiRun==1)
                             {
-                                name = item.Column4,
-                                dataType = item.Column5,
-                                comment = "" // item.Column6
-                            };
-                            tableModelItem.columns.Add(columnModelItem);
+                                // view
+                                SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
+                                {
+                                    database = dbName,
+                                    schema = dbName,
+                                    name = tableOrViewName,
+                                    sourceName = item.Column4,
+                                    sourceSchema = item.Column3,
+                                    sourceDbLinkName = item.Column5
+                                };
+                            }
                         }
                         this.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
 
