@@ -79,8 +79,8 @@ namespace SQLDepLib
     public class SQLDBLink
     {
         public string owner { get; set; }
-        public string db_link { get; set; }
-        public string username { get; set; }
+        public string name { get; set; }
+        public string userName { get; set; }
         public string host { get; set; }
     }
 

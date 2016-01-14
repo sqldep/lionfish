@@ -479,8 +479,8 @@ namespace SQLDepLib
                     SQLDBLink dblinkItem = new SQLDBLink()
                     {
                         owner = item.Column0,
-                        db_link = item.Column1,
-                        username = item.Column2,
+                        name = item.Column1,
+                        userName = item.Column2,
                         host = item.Column3,
                     };
 
@@ -518,7 +518,7 @@ namespace SQLDepLib
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-            querries.createdBy = "SQLdep v1.1";
+            querries.createdBy = "SQLdep v1.2";
             querries.exportId = this.runId;
             querries.physicalInstance = this.DBExecutor.Hostname;
 
