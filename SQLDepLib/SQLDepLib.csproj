@@ -58,7 +58,9 @@
     <Compile Include="SQLData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Settings.StyleCop" />
+    <None Include="Settings.StyleCop">
+      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
