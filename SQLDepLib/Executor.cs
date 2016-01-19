@@ -231,7 +231,12 @@ namespace SQLDepLib
             }
             else if (sqlDialect == "teradata")
             {
+#if DEBUG
+                // ted preskocime at se lepe ladi
+                ret.queries = new List<SQLQuerry>();
+#else
                 ret.queries = this.GetTeradataQuerries(sqlDialect, dbNames);
+#endif
             }
             else
             {
@@ -274,8 +279,21 @@ namespace SQLDepLib
             List<string> ret = new List<string>();
             foreach (var item in result)
             {
+                if (sqlDialect == "teradata")
+                {
+                    // trimm outer spaces
+                    string dbName = item.Column0.Trim();
+                    if (dbName == "DBC")
+                    {
+                        continue;
+                    }
 
-                ret.Add(item.Column0);
+                    ret.Add(dbName);
+                }
+                else
+                {
+                    ret.Add(item.Column0);
+                }
             }
 #if DEBUG
             ret = ret.Where(x => !x.StartsWith("Fle") && !x.StartsWith("Mu") && !x.StartsWith("Od") && !x.StartsWith("Poj") && !x.StartsWith("Rel") && !x.StartsWith("Te")).ToList();
@@ -473,6 +491,7 @@ namespace SQLDepLib
                 {
                     // let us run this script two times, first run returns list of procedures, the second loads its definition
                     List<string> procedures = new List<string>();
+                    string currentProcedure = string.Empty;
                     for (int iiRun = 0; iiRun < 2;)
                     {
                         // sql commands with replace
@@ -494,14 +513,15 @@ namespace SQLDepLib
                             }
                             else
                             {
+                                currentProcedure = procedures.ElementAt(0);
+                                procedures.RemoveAt(0);
                                 // add next procedure to run script
                                 StrReplace itemForReplace2 = new StrReplace()
                                 {
                                     SearchText = "##PROCEDURENAME##",
-                                    ReplaceText = dbName
+                                    ReplaceText = currentProcedure
                                 };
                                 replaces.Add(itemForReplace2);
-                                procedures.RemoveAt(0);
                             }
                         }
 
@@ -513,11 +533,10 @@ namespace SQLDepLib
                             // first command is list of procedures
                             List<SQLResult> result = new List<SQLResult>();
                             DBExecutor.RunSql(result, sqls.ElementAt(0));
-                            sqls.RemoveRange(1, sqls.Count - 1);
                             foreach (var item in result)
                             {
                                 // copy result to list to be processed
-                                procedures.Add(item.Column0);
+                                procedures.Add(item.Column2);
                             }
                             iiRun++;
                         }
@@ -527,10 +546,19 @@ namespace SQLDepLib
 
                             // procedure definition
                             List<SQLResult> result = new List<SQLResult>();
-                            foreach (var item in sqls)
+
+                            try
                             {
-                                // pobezi nam show prikaz, vrati to data?
-                                DBExecutor.RunSql(result, item);
+                                foreach (var item in sqls)
+                                {
+                                    // pobezi nam show prikaz, vrati to data?
+                                    DBExecutor.RunSql(result, item);
+                                }
+                            }
+                            catch(Exception)
+                            {
+                                // todo nektere procedury nelze cist
+                                continue;
                             }
 
                             // TODO: zkontrolovat co to vraci a to dat do vysledku
@@ -539,22 +567,24 @@ namespace SQLDepLib
                             // prvni sloupec je REPLACE PROCEDURE
                             // druhy sloupec je nazev procedury/tabulky
                             // treti sloupec je zdrojak
+                            SQLQuerry querryItem = new SQLQuerry()
+                            {
+                                sourceCode = string.Empty,
+                                name = currentProcedure.Trim(),
+                                groupName = string.Empty,
+                                database = dbName,
+                                schema = string.Empty
+                            };
                             foreach (var item in result)
                             {
-                                SQLQuerry querryItem = new SQLQuerry()
-                                {
-                                    sourceCode = item.Column0,
-                                    name = item.Column1,
-                                    groupName = item.Column2,
-                                    database = item.Column3,
-                                    schema = item.Column4
-                                };
-                                ret.Add(querryItem);
+                                querryItem.sourceCode += item.Column0;
                             }
+
+                            ret.Add(querryItem);
                         }
                         else
                         {
-                            break;
+                            iiRun++;
                         }
                     }
                 }
@@ -822,8 +852,6 @@ namespace SQLDepLib
             this.ProgressInfo.CreateProgress();
 
             int tableCount = 0;
-            int synonymsCount = 0;
-
             int iiCounter = 0;
             foreach (var dbName in dbNames)
             {
@@ -833,6 +861,7 @@ namespace SQLDepLib
                 {
                     SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
                     modelItem.name = dbName;
+                    ret.Add(modelItem);
 
                     this.Log("Getting columns, tables and views in database" + dbName + ".");
 
@@ -858,7 +887,7 @@ namespace SQLDepLib
                             DBExecutor.RunSql(results, sqls.ElementAt(0));
                             foreach (var item in results)
                             {
-                                allTables.Add(item.Column2);
+                                allTables.Add(item.Column2.Trim());
                             }
                             results.Clear();
 
@@ -866,32 +895,26 @@ namespace SQLDepLib
                             DBExecutor.RunSql(results, sqls.ElementAt(1));
                             foreach (var item in results)
                             {
-                                allViews.Add(item.Column2);
+                                allViews.Add(item.Column2.Trim());
                             }
                             results.Clear();
 
                             // sloupce
-                            DBExecutor.RunSql(allColumns, sqls.ElementAt(1));
+                            DBExecutor.RunSql(allColumns, sqls.ElementAt(2).Trim());
                         }
                     }
 
-                    if (allTables.Count > 0)
-                    {
-                        modelItem.tables = new List<SQLTableModelItem>();
-                    }
+                    modelItem.tables = new List<SQLTableModelItem>();
 
-                    if (allViews.Count > 0)
-                    {
-                        modelItem.synonyms = new List<SQLSynonymModelItem>();
-                    }
-
+                    // zatim se neplni
+                    // modelItem.synonyms = new List<SQLSynonymModelItem>();
 
                     this.Log("Getting tables and views structure in database" + dbName + ".");
 
                     for (int iiRun = 0; allTables.Count + allViews.Count > 0; )
                     {
 
-                        string tableOrViewName;
+                        string tableOrViewName = string.Empty;
                         
                         // sql commands
                         List<StrReplace> replaces = new List<StrReplace>();
@@ -915,7 +938,8 @@ namespace SQLDepLib
                                 allTables.RemoveAt(0);
                             }
                         }
-                        else
+                        
+                        if (iiRun == 1)
                         {
                             if (allViews.Count == 0)
                             {
@@ -949,92 +973,56 @@ namespace SQLDepLib
                         {
                             theSql = this.GetSQLCommands(sqlDialect, "tables", replaces).ElementAt(3);
                         }
-                        else
+                        else if(iiRun == 1)
                         {
                             theSql = this.GetSQLCommands(sqlDialect, "tables", replaces).ElementAt(4);
                         }
-
+                        else
+                        {
+                            continue;
+                        }
 
                         // call show for the given table or view
                         List<SQLResult> tablesWithColumns = new List<SQLResult>();
-                        DBExecutor.RunSql(tablesWithColumns, theSql);
+
+                        {
+                            DBExecutor.RunSql(tablesWithColumns, theSql);
+                        }
 
                         // TODO merge results
 
                         foreach (var item in tablesWithColumns)
                         {
-                            List<SQLResult> columns = allColumns.Where(x => x.Column1 == tableOrViewName).ToList();
+                            List<SQLResult> columns = allColumns.Where(x => x.Column1.Trim()== tableOrViewName).ToList();
 
-                            if (iiRun==0)
+                            if (iiRun == 0 || iiRun == 1)
                             {
                                 // table
                                 SQLTableModelItem tableModelItem = new SQLTableModelItem()
                                 {
                                     database = dbName,
-                                    schema = dbName,
+                                    schema = string.Empty,
                                     name = tableOrViewName,
-                                    isView = "false",
+                                    isView = (iiRun==0) ? "false" : "true",
                                     columns = new List<SQLColumnModelItem>()
                                 };
                                 modelItem.tables.Add(tableModelItem);
                                 tableCount++;
-                            
-                                // TODO add columns
-                                SQLColumnModelItem columnModelItem = new SQLColumnModelItem()
+
+                                // columns
+                                foreach (var column in columns)
                                 {
-                                    name = item.Column4,
-                                    dataType = item.Column5,
-                                    comment = "" // item.Column6
-                                };
-                                tableModelItem.columns.Add(columnModelItem);
-                            }
-                            else if(iiRun==1)
-                            {
-                                // view
-                                SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
-                                {
-                                    database = dbName,
-                                    schema = dbName,
-                                    name = tableOrViewName,
-                                    sourceName = item.Column4,
-                                    sourceSchema = item.Column3,
-                                    sourceDbLinkName = item.Column5
-                                };
+                                    SQLColumnModelItem columnModelItem = new SQLColumnModelItem()
+                                    {
+                                        name = column.Column2,
+                                        dataType = column.Column3,
+                                        comment = "" // item.Column6
+                                    };
+                                    tableModelItem.columns.Add(columnModelItem);
+                                }
                             }
                         }
                         this.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
-
-
-                        /*
-                        // synonyms
-                        this.Log("Getting synonyms in database" + dbName + ".");
-
-                        modelItem.synonyms = new List<SQLSynonymModelItem>();
-                        List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, "synonyms", replaces);
-                        List<SQLResult> synonyms = new List<SQLResult>();
-                        foreach (var item in sqlsSynonyms)
-                        {
-                            DBExecutor.RunSql(synonyms, item);
-                        }
-                        foreach (var item in synonyms)
-                        {
-                            SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
-                            {
-                                database = item.Column0,
-                                schema = item.Column1,
-                                name = item.Column2,
-                                sourceName = item.Column4,
-                                sourceSchema = item.Column3,
-                                sourceDbLinkName = item.Column5
-                            };
-                            modelItem.synonyms.Add(synonymModelItem);
-                            synonymsCount++;
-                        }
-                        ret.Add(modelItem);
-                        this.Log("Synonyms #[" + sqlsSynonyms.Count + "] in database" + dbName + "processed.");
-                        */
-
-
                     }
                 }
                 catch (Exception ex)
