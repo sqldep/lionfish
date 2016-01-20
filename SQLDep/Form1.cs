@@ -167,7 +167,7 @@ namespace SQLDep
 
 
                 List<string> failedDbs = new List<string>();
-                Executor executor = new Executor(dbExecutor);
+                Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, sqlDialect);
 
                 string exportFileName = fbd.SelectedPath + "\\DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
 
@@ -244,7 +244,7 @@ namespace SQLDep
                 this.Text = form1Text + " - sending...";
                 try
                 {
-                    new Executor(new DBExecutor()).SendFiles(result, this.textBoxKey.Text.ToString());
+                    ExecutorFactory.CreateExecutor(new DBExecutor(), string.Empty).SendFiles(result, this.textBoxKey.Text.ToString());
                     MessageBox.Show("Files sent successfully");
                 }
                 catch (Exception ex)

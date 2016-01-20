@@ -50,7 +50,7 @@ namespace SQLDepCmd
                 dbExecutor.Hostname = hostName;
                 dbExecutor.Connect();
 
-                Executor executor = new Executor(dbExecutor);
+                Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, dbType);
                 executor.Run(customSqlSetName, myKey, dbType, exportFileName);
 
 

@@ -22,13 +22,13 @@ namespace SQLDepLib
 
         public string runId { get; set; }
 
-        private DBExecutor DBExecutor { get; set; }
+        protected DBExecutor DBExecutor { get; set; }
 
         public string LogFileName { get; set; }
 
         public ProgressInfo ProgressInfo { get; private set; }
 
-        private void Log(string msg)
+        protected void Log(string msg)
         {
             if (this.LogFileName != null)
             {
@@ -160,7 +160,7 @@ namespace SQLDepLib
             this.Log("Data sent.");
         }
 
-        private SQLCompleteStructure Run(string sqlDialect)
+        public virtual SQLCompleteStructure Run(string sqlDialect)
         {
             this.ProgressInfo.CreateProgress();
             
@@ -229,15 +229,6 @@ namespace SQLDepLib
                 this.Log("Using Oracle dialect");
                 ret.queries = this.GetOracleQuerries(sqlDialect, dbNames);
             }
-            else if (sqlDialect == "teradata")
-            {
-#if DEBUG
-                // ted preskocime at se lepe ladi
-                ret.queries = new List<SQLQuerry>();
-#else
-                ret.queries = this.GetTeradataQuerries(sqlDialect, dbNames);
-#endif
-            }
             else
             {
                 ret.queries = this.GetQuerries(sqlDialect, dbNames);
@@ -247,14 +238,7 @@ namespace SQLDepLib
             this.ProgressInfo.SetProgressRatio(0.35, "DB model");
 
             ret.databaseModel = new SQLDatabaseModel();
-            if (sqlDialect == "teradata")
-            {
-                ret.databaseModel.databases = this.GetTeradataDatabaseModels(sqlDialect, dbNames);
-            }
-            else
-            {
                 ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
-            }
 
             this.Log("Getting list of dblinks");
             this.ProgressInfo.SetProgressRatio(0.2, "dblinks");
@@ -279,21 +263,7 @@ namespace SQLDepLib
             List<string> ret = new List<string>();
             foreach (var item in result)
             {
-                if (sqlDialect == "teradata")
-                {
-                    // trimm outer spaces
-                    string dbName = item.Column0.Trim();
-                    if (dbName == "DBC")
-                    {
-                        continue;
-                    }
-
-                    ret.Add(dbName);
-                }
-                else
-                {
-                    ret.Add(item.Column0);
-                }
+                ret.Add(item.Column0);
             }
 #if DEBUG
             ret = ret.Where(x => !x.StartsWith("Fle") && !x.StartsWith("Mu") && !x.StartsWith("Od") && !x.StartsWith("Poj") && !x.StartsWith("Rel") && !x.StartsWith("Te")).ToList();
@@ -477,125 +447,6 @@ namespace SQLDepLib
             return ret;
         }
 
-        private List<SQLQuerry> GetTeradataQuerries(string sqlDialect, List<string> dbNames)
-        {
-            List<SQLQuerry> ret = new List<SQLQuerry>();
-
-            this.ProgressInfo.CreateProgress();
-            int iiDbCounter = 0;
-
-            foreach (var dbName in dbNames)
-            {
-                this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
-                try
-                {
-                    // let us run this script two times, first run returns list of procedures, the second loads its definition
-                    List<string> procedures = new List<string>();
-                    string currentProcedure = string.Empty;
-                    for (int iiRun = 0; iiRun < 2;)
-                    {
-                        // sql commands with replace
-                        List<StrReplace> replaces = new List<StrReplace>();
-                        StrReplace itemForReplace = new StrReplace()
-                        {
-                            SearchText = "##DBNAME##",
-                            ReplaceText = dbName
-                        };
-                        replaces.Add(itemForReplace);
-
-                        //
-                        if(iiRun == 1)
-                        {
-                            if(procedures.Count == 0)
-                            {
-                                iiRun++;
-                                break;
-                            }
-                            else
-                            {
-                                currentProcedure = procedures.ElementAt(0);
-                                procedures.RemoveAt(0);
-                                // add next procedure to run script
-                                StrReplace itemForReplace2 = new StrReplace()
-                                {
-                                    SearchText = "##PROCEDURENAME##",
-                                    ReplaceText = currentProcedure
-                                };
-                                replaces.Add(itemForReplace2);
-                            }
-                        }
-
-                        // load script with replaces for the given database/procedure
-                        List<string> sqls = this.GetSQLCommands(sqlDialect, "queries", replaces);
-
-                        if (iiRun == 0)
-                        {
-                            // first command is list of procedures
-                            List<SQLResult> result = new List<SQLResult>();
-                            DBExecutor.RunSql(result, sqls.ElementAt(0));
-                            foreach (var item in result)
-                            {
-                                // copy result to list to be processed
-                                procedures.Add(item.Column2);
-                            }
-                            iiRun++;
-                        }
-                        else if (iiRun == 1)
-                        {
-                            sqls.RemoveRange(0, 1);
-
-                            // procedure definition
-                            List<SQLResult> result = new List<SQLResult>();
-
-                            try
-                            {
-                                foreach (var item in sqls)
-                                {
-                                    // pobezi nam show prikaz, vrati to data?
-                                    DBExecutor.RunSql(result, item);
-                                }
-                            }
-                            catch(Exception)
-                            {
-                                // todo nektere procedury nelze cist
-                                continue;
-                            }
-
-                            // TODO: zkontrolovat co to vraci a to dat do vysledku
-
-                            // result ma 3 sloupce a je treba je spojit mezerou. Vysledny string je sourceCode v JSONu.
-                            // prvni sloupec je REPLACE PROCEDURE
-                            // druhy sloupec je nazev procedury/tabulky
-                            // treti sloupec je zdrojak
-                            SQLQuerry querryItem = new SQLQuerry()
-                            {
-                                sourceCode = string.Empty,
-                                name = currentProcedure.Trim(),
-                                groupName = string.Empty,
-                                database = dbName,
-                                schema = string.Empty
-                            };
-                            foreach (var item in result)
-                            {
-                                querryItem.sourceCode += item.Column0;
-                            }
-
-                            ret.Add(querryItem);
-                        }
-                        else
-                        {
-                            iiRun++;
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-            this.ProgressInfo.RemoveProgress();
-            return ret;
-        }
 
         private List<SQLDBLink> GetDBLinks (string sqlDialect)
         {
@@ -640,7 +491,7 @@ namespace SQLDepLib
             return ret;
         }
 
-        private List<string> GetSQLCommands(string sqlDialect, string purpose, List<StrReplace> list)
+        protected List<string> GetSQLCommands(string sqlDialect, string purpose, List<StrReplace> list)
         {
 
             string sqlCommands = System.IO.File.ReadAllText("./sql/" + sqlDialect + "/" + purpose + "/cmd.sql");
@@ -830,200 +681,6 @@ namespace SQLDepLib
                     }
                     ret.Add(modelItem);
                     this.Log("Synonyms #["+ sqlsSynonyms .Count + "] in database" + dbName + "processed.");
-                }
-                catch (Exception ex)
-                {
-
-                    if (ex.Message.IndexOf("offline") >= 0)
-                    {
-                        ;//knonw error - databse is offline, ignore
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-            }
-            return ret;
-        }
-        private List<SQLDatabaseModelItem> GetTeradataDatabaseModels(string sqlDialect, List<string> dbNames)
-        {
-            List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
-            this.ProgressInfo.CreateProgress();
-
-            int tableCount = 0;
-            int iiCounter = 0;
-            foreach (var dbName in dbNames)
-            {
-
-                this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
-                try
-                {
-                    SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
-                    modelItem.name = dbName;
-                    ret.Add(modelItem);
-
-                    this.Log("Getting columns, tables and views in database" + dbName + ".");
-
-                    List<SQLResult> allColumns = new List<SQLResult>();
-                    List<string> allTables = new List<string>();
-                    List<string> allViews = new List<string>();
-
-                    // prepare all columns, tables and views
-                    {
-                        List<StrReplace> replaces = new List<StrReplace>();
-                        StrReplace itemForReplace = new StrReplace()
-                        {
-                            SearchText = "##DBNAME##",
-                            ReplaceText = dbName
-                        };
-                        replaces.Add(itemForReplace);
-                        List<string> sqls = this.GetSQLCommands(sqlDialect, "tables", replaces);
-
-                        
-                        {
-                            // tabulky
-                            List<SQLResult> results = new List<SQLResult>();
-                            DBExecutor.RunSql(results, sqls.ElementAt(0));
-                            foreach (var item in results)
-                            {
-                                allTables.Add(item.Column2.Trim());
-                            }
-                            results.Clear();
-
-                            // viewcka
-                            DBExecutor.RunSql(results, sqls.ElementAt(1));
-                            foreach (var item in results)
-                            {
-                                allViews.Add(item.Column2.Trim());
-                            }
-                            results.Clear();
-
-                            // sloupce
-                            DBExecutor.RunSql(allColumns, sqls.ElementAt(2).Trim());
-                        }
-                    }
-
-                    modelItem.tables = new List<SQLTableModelItem>();
-
-                    // zatim se neplni
-                    // modelItem.synonyms = new List<SQLSynonymModelItem>();
-
-                    this.Log("Getting tables and views structure in database" + dbName + ".");
-
-                    for (int iiRun = 0; allTables.Count + allViews.Count > 0; )
-                    {
-
-                        string tableOrViewName = string.Empty;
-                        
-                        // sql commands
-                        List<StrReplace> replaces = new List<StrReplace>();
-                        StrReplace itemForReplace = new StrReplace()
-                        {
-                            SearchText = "##DBNAME##",
-                            ReplaceText = dbName
-                        };
-                        replaces.Add(itemForReplace);
-
-                        if (iiRun == 0)
-                        {
-                            if (allTables.Count == 0)
-                            {
-                                iiRun++;
-                                continue;
-                            }
-                            else
-                            {
-                                tableOrViewName = allTables.ElementAt(0);
-                                allTables.RemoveAt(0);
-                            }
-                        }
-                        
-                        if (iiRun == 1)
-                        {
-                            if (allViews.Count == 0)
-                            {
-                                iiRun++;
-                                continue;
-                            }
-                            else
-                            {
-                                tableOrViewName = allViews.ElementAt(0);
-                                allViews.RemoveAt(0);
-                            }
-                        }
-
-                        StrReplace itemForReplace2 = new StrReplace()
-                        {
-                            SearchText = "##TABLENAME##",
-                            ReplaceText = tableOrViewName
-                        };
-                        replaces.Add(itemForReplace2);
-
-                        StrReplace itemForReplace3 = new StrReplace()
-                        {
-                            SearchText = "##VIEWNAME##",
-                            ReplaceText = tableOrViewName
-                        };
-                        replaces.Add(itemForReplace3);
-
-                        // we need only the last two
-                        string theSql = string.Empty;
-                        if (iiRun == 0)
-                        {
-                            theSql = this.GetSQLCommands(sqlDialect, "tables", replaces).ElementAt(3);
-                        }
-                        else if(iiRun == 1)
-                        {
-                            theSql = this.GetSQLCommands(sqlDialect, "tables", replaces).ElementAt(4);
-                        }
-                        else
-                        {
-                            continue;
-                        }
-
-                        // call show for the given table or view
-                        List<SQLResult> tablesWithColumns = new List<SQLResult>();
-
-                        {
-                            DBExecutor.RunSql(tablesWithColumns, theSql);
-                        }
-
-                        // TODO merge results
-
-                        foreach (var item in tablesWithColumns)
-                        {
-                            List<SQLResult> columns = allColumns.Where(x => x.Column1.Trim()== tableOrViewName).ToList();
-
-                            if (iiRun == 0 || iiRun == 1)
-                            {
-                                // table
-                                SQLTableModelItem tableModelItem = new SQLTableModelItem()
-                                {
-                                    database = dbName,
-                                    schema = string.Empty,
-                                    name = tableOrViewName,
-                                    isView = (iiRun==0) ? "false" : "true",
-                                    columns = new List<SQLColumnModelItem>()
-                                };
-                                modelItem.tables.Add(tableModelItem);
-                                tableCount++;
-
-                                // columns
-                                foreach (var column in columns)
-                                {
-                                    SQLColumnModelItem columnModelItem = new SQLColumnModelItem()
-                                    {
-                                        name = column.Column2,
-                                        dataType = column.Column3,
-                                        comment = "" // item.Column6
-                                    };
-                                    tableModelItem.columns.Add(columnModelItem);
-                                }
-                            }
-                        }
-                        this.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
-                    }
                 }
                 catch (Exception ex)
                 {

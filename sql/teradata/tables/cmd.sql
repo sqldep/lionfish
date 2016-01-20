@@ -1,4 +1,4 @@
-SELECT '##DBNAME##', tablekind, creatorname, tablename from dbc.tables WHERE TABLEKIND = 'T' OR TABLEKIND = 'V';
+SELECT '##DBNAME##', tablekind, creatorname, tablename from dbc.tables WHERE (TABLEKIND = 'T' OR TABLEKIND = 'V') and DatabaseName = '##DBNAME##';
 
 --split
 
@@ -30,3 +30,20 @@ CASE WHEN COLUMNTYPE='CF' THEN COLUMNLENGTH
 END AS COLUMNNUM
 FROM DBC.COLUMNS
 WHERE DATABASENAME='##DBNAME##' ) TBL;
+
+--split
+
+SELECT '##DBNAME##', creatorname, tablename from dbc.tables WHERE TABLEKIND = 'P' and DatabaseName = '##DBNAME##';
+
+--split
+
+SHOW PROCEDURE ##DBNAME##.##PROCEDURENAME##;
+
+--split
+
+SHOW TABLE ##DBNAME##.##TABLENAME##;
+
+--split
+
+SHOW VIEW ##DBNAME##.##VIEWNAME##;
+
