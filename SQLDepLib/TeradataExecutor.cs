@@ -177,20 +177,16 @@ namespace SQLDepLib
                     // load script with replaces for the given database/procedure
                     List<string> sqls = this.GetSQLCommands(sqlDialect, "tables", replaces);
 
-                    // first command is list of procedures
+                    // first command is list of procedures and views
                     List<SQLResult> result = new List<SQLResult>();
                     DBExecutor.RunSql(result, sqls.ElementAt(2));
+
                     foreach (var item in result)
                     {
-                        // copy result to list to be processed
-                        procedures.Add(item.Column2);
-                    }
-
-                    foreach (var item in procedures)
-                    {
+                        string procedureOrViewName = item.Column2;
                         try
                         {
-                            SQLQuerry querryItem = this.GetQuerry(dbName, item, ItemType.PROCEDURE);
+                            SQLQuerry querryItem = this.GetQuerry(dbName, procedureOrViewName, (item.Column3.Trim()=="P") ? ItemType.PROCEDURE : ItemType.VIEW);
                             ret.Add(querryItem);
                         }
                         catch(Exception ex)
