@@ -33,7 +33,7 @@ WHERE DATABASENAME='##DBNAME##' ) TBL;
 
 --split
 
-SELECT '##DBNAME##', creatorname, tablename, TABLEKIND  from dbc.tables WHERE (TABLEKIND = 'P' OR TABLEKIND = 'V') and DatabaseName = '##DBNAME##';
+SELECT '##DBNAME##', creatorname, tablename, TABLEKIND  from dbc.tables WHERE (TABLEKIND = 'P' OR TABLEKIND = 'V' OR TABLEKIND = 'T') and DatabaseName = '##DBNAME##';
 
 --split
 

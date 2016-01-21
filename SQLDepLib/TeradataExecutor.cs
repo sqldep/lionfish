@@ -60,73 +60,6 @@ namespace SQLDepLib
             return querryItem;
         }
 
-
-
-
-
-
-
-        /*
-
-
-                      DBExecutor.RunSql(result, sqls.ElementAt(0));
-                            foreach (var item in result)
-                            {
-                                // copy result to list to be processed
-                                procedures.Add(item.Column2);
-                            }
-                            iiRun++;
-                        }
-                        else if (iiRun == 1)
-                        {
-                            sqls.RemoveRange(0, 1);
-
-                            // procedure definition
-                            List<SQLResult> result = new List<SQLResult>();
-
-                            try
-                            {
-                                foreach (var item in sqls)
-                                {
-                                    // pobezi nam show prikaz, vrati to data?
-                                    DBExecutor.RunSql(result, item);
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                // todo nektere procedury nelze cist
-                                continue;
-                            }
-
-                            // TODO: zkontrolovat co to vraci a to dat do vysledku
-
-                            // result ma 3 sloupce a je treba je spojit mezerou. Vysledny string je sourceCode v JSONu.
-                            // prvni sloupec je REPLACE PROCEDURE
-                            // druhy sloupec je nazev procedury/tabulky
-                            // treti sloupec je zdrojak
-                            SQLQuerry querryItem = new SQLQuerry()
-                            {
-                                sourceCode = string.Empty,
-                                name = currentProcedure.Trim(),
-                                groupName = string.Empty,
-                                database = dbName,
-                                schema = string.Empty
-                            };
-                            foreach (var item in result)
-                            {
-                                querryItem.sourceCode += item.Column0;
-                            }
-
-                            ret.Add(querryItem);
-                        }
-
-        */
-
-
-
-
-
-
         public override SQLCompleteStructure Run(string sqlDialect)
         {
             this.ProgressInfo.CreateProgress();
@@ -184,9 +117,27 @@ namespace SQLDepLib
                     foreach (var item in result)
                     {
                         string procedureOrViewName = item.Column2;
+
+                        ItemType itemType = ItemType.PROCEDURE;
+
+                        switch (item.Column3.Trim())
+                        {
+                            case "T":
+                                itemType = ItemType.TABLE;
+                                break;
+                            case "V":
+                                itemType = ItemType.VIEW;
+                                break;
+                            case "P":
+                                itemType = ItemType.PROCEDURE;
+                                break;
+                            default: throw new Exception("NYI");
+                        }
+
                         try
                         {
-                            SQLQuerry querryItem = this.GetQuerry(dbName, procedureOrViewName, (item.Column3.Trim()=="P") ? ItemType.PROCEDURE : ItemType.VIEW);
+            
+                            SQLQuerry querryItem = this.GetQuerry(dbName, procedureOrViewName, itemType);
                             ret.Add(querryItem);
                         }
                         catch(Exception ex)
