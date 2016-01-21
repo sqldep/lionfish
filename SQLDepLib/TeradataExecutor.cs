@@ -43,8 +43,8 @@ namespace SQLDepLib
                 sourceCode = string.Empty,
                 name = name,
                 groupName = string.Empty,
-                database = dbName,
-                schema = string.Empty
+                database = string.Empty,
+                schema = dbName  // workaround for Teradata parser
             };
 
             List<SQLResult> result = new List<SQLResult>();
@@ -183,14 +183,16 @@ namespace SQLDepLib
             List<SQLDatabaseModelItem> modelItems = new List<SQLDatabaseModelItem>();
             this.ProgressInfo.CreateProgress();
 
+            SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
+            modelItem.name = "";
+            modelItem.tables = new List<SQLTableModelItem>();
+
+
             int iiCounter = 0;
             foreach (var dbName in dbNames)
             {
 
                 this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
-                SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
-                modelItem.name = dbName;
-                modelItem.tables = new List<SQLTableModelItem>();
 
                 List<StrReplace> replaces = new List<StrReplace>();
                 StrReplace itemForReplace = new StrReplace()
@@ -240,8 +242,8 @@ namespace SQLDepLib
 
                         SQLTableModelItem tableModelItem = new SQLTableModelItem()
                         {
-                            database = dbName,
-                            schema = string.Empty,
+                            database = string.Empty,
+                            schema = dbName,  // because Teradata parser treats DB as schema
                             name = tableOrViewName,
                             isView = (isView) ? "true" : "false",
                             columns = new List<SQLColumnModelItem>()
@@ -266,10 +268,11 @@ namespace SQLDepLib
                         this.Log("Ignored error for table/view " + tableOrViewName + ", error:" + ex.Message);// ignore
                     }
                 }
-                modelItems.Add(modelItem);
 
                 this.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
             }
+            modelItems.Add(modelItem);
+
             return modelItems;
         }
     }
