@@ -49,9 +49,12 @@ namespace SQLDepLib
 
             List<SQLResult> result = new List<SQLResult>();
             DBExecutor.RunSql(result, sql);
+            string sourceCodeLine = string.Empty;
             foreach (var item in result)
             {
-                querryItem.sourceCode += item.Column0;
+                // teradata ma zvlastni oddelovac radku
+                sourceCodeLine = item.Column0.Replace('\r', '\n');
+                querryItem.sourceCode += sourceCodeLine;
             }
 
             return querryItem;
