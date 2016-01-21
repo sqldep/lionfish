@@ -239,6 +239,7 @@ namespace SQLDepLib
 
                 this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
                 SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
+                modelItem.name = dbName;
                 modelItem.tables = new List<SQLTableModelItem>();
 
                 List<StrReplace> replaces = new List<StrReplace>();
