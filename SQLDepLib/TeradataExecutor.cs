@@ -167,11 +167,6 @@ namespace SQLDepLib
             {
                 // trimm outer spaces
                 string dbName = item.Column0.Trim();
-                if (dbName == "DBC")
-                {
-                    continue;
-                }
-
                 ret.Add(dbName);
             }
 
