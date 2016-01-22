@@ -5,5 +5,16 @@ SELECT DISTINCT(databasename) FROM dbc.tables WHERE databasename NOT IN (
 	'tdwm',
 	'sqlj',
 	'syslib',
-	'tdstats'
+	'tdstats',
+	'dbcmngr',
+	'locklogshredder',
+	'sysadmin',
+	'sysbar',
+	'sysspatial',
+	'sysuif',
+	'tdqcd',
+	'td_sysxml',
+	'sysudtlib',
+	'td_sysgpl',
+	'td_sysfnlib'
 );
