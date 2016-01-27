@@ -1,7 +1,11 @@
+/* Select a list of all views and tables                                           */
 SELECT '##DBNAME##', tablekind, creatorname, tablename from dbc.tables WHERE (TABLEKIND = 'T' OR TABLEKIND = 'V') and DatabaseName = '##DBNAME##';
 
 --split
 
+/* Select a list of all columns of tables and views                                */
+/* Together with the result of previous SELECT the result will be used to fill     */
+/* "databaseModel" key in JSON                                                     */
 SELECT
 '##DBNAME##',
 TABLENAME,
@@ -67,21 +71,36 @@ CASE WHEN COLUMNTYPE='CF' THEN COLUMNLENGTH
 	ELSE NULL
 END AS COLUMNNUM
 FROM DBC.COLUMNS
-WHERE DATABASENAME='##DBNAME##' ) TBL;
+WHERE DATABASENAME='##DBNAME##'
+/* Add custom filter here */
+) TBL;
 
 --split
 
-SELECT '##DBNAME##', creatorname, tablename, TABLEKIND  from dbc.tables WHERE (TABLEKIND = 'P' OR TABLEKIND = 'V' OR TABLEKIND = 'T') and DatabaseName = '##DBNAME##';
+/* Select a list of all tables, views and procedures - the list will be used       */
+/* for generating SHOW .... statements that fetcg corresponding source codes       */
+/* that will be filled in the "queries" key in JSON                                */
+SELECT '##DBNAME##', creatorname, tablename, TABLEKIND
+FROM dbc.tables
+WHERE (
+	TABLEKIND = 'P' OR
+	TABLEKIND = 'V' OR
+	TABLEKIND = 'T') AND
+	DatabaseName = '##DBNAME##';
+/* Modify the WHERE statemen to fit your needs                                     */
 
 --split
 
+/* Teradata way of getting complete source code of a procedure                     */
 SHOW PROCEDURE ##DBNAME##.##PROCEDURENAME##;
 
 --split
 
+/* Teradata way of getting CREATE TABLE statement                                  */
 SHOW TABLE ##DBNAME##.##TABLENAME##;
 
 --split
 
+/* Teradata way of getting CREATE VIEW statement                                   */
 SHOW VIEW ##DBNAME##.##VIEWNAME##;
 

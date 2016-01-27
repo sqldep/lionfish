@@ -1,3 +1,4 @@
+/* Select databases to export                                                      */
 SELECT DISTINCT(databasename) FROM dbc.tables WHERE databasename NOT IN (
 	'dbc',
 	'sys_calendar',
@@ -17,4 +18,6 @@ SELECT DISTINCT(databasename) FROM dbc.tables WHERE databasename NOT IN (
 	'sysudtlib',
 	'td_sysgpl',
 	'td_sysfnlib'
+/* You can add more databases here */
+
 );
