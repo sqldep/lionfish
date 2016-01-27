@@ -36,8 +36,8 @@ select
 	v.text sourceCode,
 	v.VIEW_NAME as name,
 	v.OWNER||'.'||v.VIEW_NAME as groupName,
-	v.OWNER as schemaName,
-	'##DBNAME##' as databaseName
+	'##DBNAME##' as databaseName,
+	v.OWNER as schemaName
 from all_views v
 where v.OWNER NOT IN (
 	'APEX_040200',
@@ -66,8 +66,8 @@ select
 	mv.QUERY sourceCode,
 	mv.MVIEW_NAME as name,
 	mv.OWNER||'.'||mv.MVIEW_NAME as groupName,
-	mv.OWNER as schemaName,
-	'##DBNAME##' as databaseName
+	'##DBNAME##' as databaseName,
+	mv.OWNER as schemaName
 from all_mviews mv
 where  mv.OWNER NOT IN (
 	'APEX_040200',
