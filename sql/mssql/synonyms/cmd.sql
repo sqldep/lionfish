@@ -1,3 +1,4 @@
+/* Select synonyms to export                                                       */
 SELECT
 	'##DBNAME##' as mydatabase,
 	sch.name as myschema,
@@ -31,5 +32,7 @@ SELECT
 FROM
 	[##DBNAME##].sys.synonyms s
 	INNER JOIN
-	[##DBNAME##].sys.schemas sch on s.schema_id = sch.schema_id;
-
+	[##DBNAME##].sys.schemas sch on s.schema_id = sch.schema_id
+/* Uncomment following line to filter out synonyms:                                */
+/* WHERE name LIKE '%MyPattern%'                                                   */
+;

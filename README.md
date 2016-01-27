@@ -35,6 +35,46 @@ in C#.
 
 https://github.com/sqldep/lionfish
 
+## How to limit what is being exported?
+
+It is possible to manually adjust SQL queries that extract metadata.
+You can limit the export only to certain databases, schemas or even 
+to views that match a given pattern like:
+
+```
+name LIKE '%pattern%'
+```
+
+So it is completely in your hands. We have prepared `WHERE` statements
+which you just comment out.
+
+### MS SQL
+Edit these files:
+```
+sql/mssql/tables/cmd.sql
+sql/mssql/queries/cmd.sql
+sql/mssql/dblinks/cmd.sql
+sql/mssql/databases/cmd.sql
+sql/mssql/synonyms/cmd.sql
+```
+
+### Oracle
+Edit these files:
+```
+sql/oracle/tables/cmd.sql
+sql/oracle/queries/cmd.sql
+sql/oracle/dblinks/cmd.sql
+sql/oracle/databases/cmd.sql
+sql/oracle/synonyms/cmd.sql
+```
+
+### Teradata
+Edit these files:
+```
+sql/teradata/tables/cmd.sql
+sql/teradata/databases/cmd.sql
+```
+
 ## Troubleshooting
 
 Check the log file `SQLdepLog.txt` for detailed information.

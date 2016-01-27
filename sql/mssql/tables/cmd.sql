@@ -1,3 +1,6 @@
+/* Result of this query will be used to fill the databaseModel key in JSON         */
+/* which contains a list of all tables and views and their columns.                */
+
 SELECT
 	'##DBNAME##' as mydatabase,
 	s.name as myschema,
@@ -16,6 +19,8 @@ FROM
 	[##DBNAME##].sys.types tp on c.system_type_id = tp.system_type_id
 WHERE
 	t.type in ('U','V')
+/* Uncomment following line to filter out tables or views:                         */
+/* AND tableName LIKE '%MyPattern%'                                                */
 ORDER BY
 	myschema,
 	tableName,
