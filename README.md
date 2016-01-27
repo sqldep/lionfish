@@ -48,8 +48,12 @@ name LIKE '%pattern%'
 So it is completely in your hands. We have prepared `WHERE` statements
 which you just comment out.
 
+Please note that limiting the export might result in incomplete lineage
+and/or errors during analysis. Without complete knowledge of your DB schema
+it is impossible to disambiguate some SQL statements correctly.
+
 ### MS SQL
-Edit these files:
+Edit these files if you want to limit your export:
 ```
 sql/mssql/tables/cmd.sql
 sql/mssql/queries/cmd.sql
@@ -59,7 +63,7 @@ sql/mssql/synonyms/cmd.sql
 ```
 
 ### Oracle
-Edit these files:
+Edit these files if you want to limit your export:
 ```
 sql/oracle/tables/cmd.sql
 sql/oracle/queries/cmd.sql
@@ -69,7 +73,7 @@ sql/oracle/synonyms/cmd.sql
 ```
 
 ### Teradata
-Edit these files:
+Edit these files if you want to limit your export:
 ```
 sql/teradata/tables/cmd.sql
 sql/teradata/databases/cmd.sql
