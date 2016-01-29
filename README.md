@@ -52,32 +52,14 @@ Please note that limiting the export might result in incomplete lineage
 and/or errors during analysis. Without complete knowledge of your DB schema
 it is impossible to disambiguate some SQL statements correctly.
 
-### MS SQL
-Edit these files if you want to limit your export:
-```
-sql/mssql/tables/cmd.sql
-sql/mssql/queries/cmd.sql
-sql/mssql/dblinks/cmd.sql
-sql/mssql/databases/cmd.sql
-sql/mssql/synonyms/cmd.sql
-```
+##### Limiting MS SQL exports
+Edit file `sql/mssql/queries/cmd.sql`
 
-### Oracle
-Edit these files if you want to limit your export:
-```
-sql/oracle/tables/cmd.sql
-sql/oracle/queries/cmd.sql
-sql/oracle/dblinks/cmd.sql
-sql/oracle/databases/cmd.sql
-sql/oracle/synonyms/cmd.sql
-```
+##### Limiting Oracle exports
+Edit file `sql/oracle/queries/cmd.sql`
 
-### Teradata
-Edit these files if you want to limit your export:
-```
-sql/teradata/tables/cmd.sql
-sql/teradata/databases/cmd.sql
-```
+##### Limiting Teradata exports
+Edit file `sql/teradata/tables/cmd.sql`
 
 ## Troubleshooting
 
