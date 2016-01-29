@@ -512,7 +512,7 @@ namespace SQLDepLib
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-            querries.createdBy = "SQLdep v1.2";
+            querries.createdBy = "SQLdep v1.4";
             querries.exportId = this.runId;
             querries.physicalInstance = this.DBExecutor.Hostname;
 
