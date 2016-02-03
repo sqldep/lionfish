@@ -19,6 +19,7 @@ namespace SQLDepLib
             TABLE,
             VIEW,
             PROCEDURE,
+            MACRO
         }
 
         public SQLQuerry GetQuerry (string dbName, string name, ItemType type)
@@ -35,6 +36,9 @@ namespace SQLDepLib
                     break;
                 case ItemType.VIEW:
                     sql = string.Format("SHOW VIEW {0}.{1}", dbName, name);
+                    break;
+                case ItemType.MACRO:
+                    sql = string.Format("SHOW MACRO {0}.{1}", dbName, name);
                     break;
             }
 
@@ -130,6 +134,9 @@ namespace SQLDepLib
                                 break;
                             case "P":
                                 itemType = ItemType.PROCEDURE;
+                                break;
+                            case "M":
+                                itemType = ItemType.MACRO;
                                 break;
                             default: throw new Exception("NYI");
                         }

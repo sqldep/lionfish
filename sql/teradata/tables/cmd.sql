@@ -85,7 +85,7 @@ FROM dbc.tables
 WHERE (
 	TABLEKIND = 'P' OR
 	TABLEKIND = 'V' OR
-	TABLEKIND = 'T') AND
+	TABLEKIND = 'M') AND
 	DatabaseName = '##DBNAME##';
 /* Modify the WHERE statemen to fit your needs                                     */
 
