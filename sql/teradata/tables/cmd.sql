@@ -9,7 +9,7 @@ SELECT '##DBNAME##', tablekind, creatorname, tablename from dbc.tables WHERE (TA
 SELECT
 '##DBNAME##',
 TABLENAME,
-COLUMNNAME,
+TRIM(COLUMNNAME),
 TRIM(COLUMNTYPE)||'('||TRIM(COLUMNNUM)||')'
 FROM (
 SELECT
