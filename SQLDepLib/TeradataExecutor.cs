@@ -47,7 +47,7 @@ namespace SQLDepLib
                 sourceCode = string.Empty,
                 name = name,
                 groupName = string.Empty,
-                database = string.Empty,
+                database = "default",
                 schema = dbName  // workaround for Teradata parser
             };
 
@@ -186,7 +186,7 @@ namespace SQLDepLib
             this.ProgressInfo.CreateProgress();
 
             SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
-            modelItem.name = "";
+            modelItem.name = "default";
             modelItem.tables = new List<SQLTableModelItem>();
 
 
