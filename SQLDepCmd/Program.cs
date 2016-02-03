@@ -22,6 +22,7 @@ namespace SQLDepCmd
             string customSqlSetName = string.Empty;
             string exportFileName = string.Empty;
             string sMyKey = string.Empty;
+            string sendFile = string.Empty;
             Guid myKey;
 
             var p = new OptionSet() {
@@ -36,6 +37,7 @@ namespace SQLDepCmd
                 { "n|name=",  "name", v => customSqlSetName = v },
                 { "f|file=",  "file", v => exportFileName = v },
                 { "k|key=",  "key (Guid)", v => sMyKey = v },
+                { "send=",  "SEND or SENDONLY, default do not send", v => sendFile = v.ToUpper() },
             };
 
             try
@@ -45,15 +47,31 @@ namespace SQLDepCmd
                 myKey = Guid.Parse(sMyKey);
 
                 DBExecutor dbExecutor = new DBExecutor();
-                string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword);
-                dbExecutor.ConnectString = connectString;
-                dbExecutor.Hostname = hostName;
-                dbExecutor.Connect();
+
+                bool runDb = (sendFile != "SENDONLY");
+                bool sendIt = (sendFile == "SEND" || sendFile == "SENDONLY");
+
+                if (runDb)
+                {
+                    string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword);
+                    dbExecutor.ConnectString = connectString;
+                    dbExecutor.Hostname = hostName;
+                    dbExecutor.Connect();
+                }
 
                 Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, dbType);
-                executor.Run(customSqlSetName, myKey, dbType, exportFileName);
 
+                if (runDb)
+                {
+                    executor.Run(customSqlSetName, myKey, dbType, exportFileName);
+                }
 
+                if (sendIt)
+                {
+                    List<string> sendFiles = new List<string>();
+                    sendFiles.Add(exportFileName);
+                    executor.SendFiles(sendFiles, sMyKey);
+                }
             }
             catch (Exception e)
             {
