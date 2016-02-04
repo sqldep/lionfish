@@ -1,5 +1,9 @@
 /* Select a list of all views and tables                                           */
-SELECT '##DBNAME##', tablekind, creatorname, tablename from dbc.tables WHERE (TABLEKIND = 'T' OR TABLEKIND = 'V') and DatabaseName = '##DBNAME##';
+SELECT '##DBNAME##', tablekind, creatorname, tablename
+FROM dbc.tables
+WHERE (TABLEKIND = 'T' OR TABLEKIND = 'V') AND
+    DatabaseName = '##DBNAME##'
+/* AND tablename IN ('view_to_export', 'table_to_export')                          */
 
 --split
 
@@ -72,7 +76,9 @@ CASE WHEN COLUMNTYPE='CF' THEN COLUMNLENGTH
 END AS COLUMNNUM
 FROM DBC.COLUMNS
 WHERE DATABASENAME='##DBNAME##'
-/* Add custom filter here */
+
+/* AND tablename IN ('view_to_export', 'table_to_export')                          */
+
 ) TBL;
 
 --split
@@ -86,21 +92,7 @@ WHERE (
 	TABLEKIND = 'P' OR
 	TABLEKIND = 'V' OR
 	TABLEKIND = 'M') AND
-	DatabaseName = '##DBNAME##';
-/* Modify the WHERE statemen to fit your needs                                     */
+	DatabaseName = '##DBNAME##'
 
---split
-
-/* Teradata way of getting complete source code of a procedure                     */
-SHOW PROCEDURE ##DBNAME##.##PROCEDURENAME##;
-
---split
-
-/* Teradata way of getting CREATE TABLE statement                                  */
-SHOW TABLE ##DBNAME##.##TABLENAME##;
-
---split
-
-/* Teradata way of getting CREATE VIEW statement                                   */
-SHOW VIEW ##DBNAME##.##VIEWNAME##;
+/* AND tablename IN ('view_to_export', 'table_to_export')                          */
 

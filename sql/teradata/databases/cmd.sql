@@ -20,4 +20,8 @@ SELECT DISTINCT(databasename) FROM dbc.tables WHERE databasename NOT IN (
 	'td_sysfnlib'
 /* You can add more databases here */
 
-);
+)
+
+/* AND databasename IN ('db_to_export')                                           */
+
+;
