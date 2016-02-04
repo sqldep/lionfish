@@ -1,12 +1,12 @@
-select
+SELECT
   src.TEXT as sourceCode,
   src.NAME as name,
   src.TYPE as groupName,
   '##DBNAME##' as databaseName,
   src.OWNER as schemaName,
   src.line as lineNumber
-from all_source src
-where
+FROM all_source src
+WHERE
   src.TYPE in ('FUNCTION','PROCEDURE','PACKAGE BODY','PACKAGE')
   and src.OWNER NOT IN (
 	'APEX_040200',
@@ -28,18 +28,20 @@ where
 	'WMSYS',
 	'XDB'
 	)
-order by src.OWNER,src.name,src.TYPE,src.line
+/* Uncomment following line to narrow the export only to some schemas                  */
+/* AND src.OWNER IN ('schema_to _export')                                              */
+ORDER BY src.OWNER,src.name,src.TYPE,src.line
 
 --split
 
-select
+SELECT
 	v.text sourceCode,
 	v.VIEW_NAME as name,
 	v.OWNER||'.'||v.VIEW_NAME as groupName,
 	'##DBNAME##' as databaseName,
 	v.OWNER as schemaName
-from all_views v
-where v.OWNER NOT IN (
+FROM all_views v
+WHERE v.OWNER NOT IN (
 	'APEX_040200',
 	'CTXSYS',
 	'DVF',
@@ -59,17 +61,19 @@ where v.OWNER NOT IN (
 	'WMSYS',
 	'XDB'
 	)
+/* Uncomment following line to narrow the export only to some schemas                  */
+/* AND v.OWNER IN ('schema_to _export')                                                */
 
 --split
 
-select
+SELECT
 	mv.QUERY sourceCode,
 	mv.MVIEW_NAME as name,
 	mv.OWNER||'.'||mv.MVIEW_NAME as groupName,
 	'##DBNAME##' as databaseName,
 	mv.OWNER as schemaName
-from all_mviews mv
-where  mv.OWNER NOT IN (
+FROM all_mviews mv
+WHERE  mv.OWNER NOT IN (
 	'APEX_040200',
 	'CTXSYS',
 	'DVF',
@@ -89,4 +93,6 @@ where  mv.OWNER NOT IN (
 	'WMSYS',
 	'XDB'
 	)
+/* Uncomment following line to narrow the export only to some schemas                  */
+/* AND mv.OWNER IN ('schema_to _export')                                               */
 
