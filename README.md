@@ -41,21 +41,21 @@ After unpacking SQLdep.zip you will find an `sql` directory which contains all S
 
 ##### MS SQL - only export some databases
 1. open file `sql/mssql/databases/cmd.sql`
-2. find and uncomment and edit this statement:
+2. find, uncomment and edit this statement:
 ```sql
 AND d.name IN ('db_to_export')
 ```
 
 ##### MS SQL - only export some views/tables
 1. open file `sql/mssql/queries/cmd.sql`
-2. find this section and modify WHERE clause at your will
+2. uncomment and edit this statement
 ```sql
 WHERE v.name IN ('view_to_export')
 ```
 
 ##### MS SQL - only export some procedures
 1. open file `sql/mssql/queries/cmd.sql`
-2. find this section and modify WHERE clause at your will
+2. uncomment and edit this statement
 ```sql
 WHERE p.name IN ('procedure_to_export')
 ```
