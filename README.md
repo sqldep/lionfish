@@ -41,80 +41,69 @@ After unpacking SQLdep.zip you will find an `sql` directory which contains all S
 
 ##### MS SQL - only export some databases
 1. open file `sql/mssql/databases/cmd.sql`
-2. find this section and modify WHERE clause at your will
+2. find and uncomment and edit this statement:
 ```sql
-        WHERE
-        		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
-        /* Uncomment following line to filter out databases:                               */
-        /* AND d.name NOT IN ('pattern')                                                   */
+AND d.name IN ('db_to_export')
 ```
 
 ##### MS SQL - only export some views/tables
 1. open file `sql/mssql/queries/cmd.sql`
 2. find this section and modify WHERE clause at your will
 ```sql
-        /* Uncomment following line to filter out views:                                   */
-        /* WHERE name LIKE '%MyPattern%'                                                   */
+WHERE v.name IN ('view_to_export')
 ```
 
 ##### MS SQL - only export some procedures
 1. open file `sql/mssql/queries/cmd.sql`
 2. find this section and modify WHERE clause at your will
 ```sql
-        /* Uncomment following line to filter out procedures:                              */
-        /* WHERE name LIKE '%MyPattern%'                                                   */
+WHERE p.name IN ('procedure_to_export')
 ```
 
 ##### Oracle - only export some schemas
 1. open file `sql/oracle/databases/cmd.sql`
-2. uncomment and edit at 3 places
+2. uncomment and edit at all 3 places
 ```sql
-/* Uncomment following line to narrow the export only to some schemas                     */
-/* AND src.OWNER IN ('schema_to _export')                                                 */
+AND src.OWNER IN ('schema_to _export')
 ```
 
 ```sql
-/* Uncomment following line to narrow the export only to some schemas                     */
-/* AND v.OWNER IN ('schema_to _export')                                                   */
+AND v.OWNER IN ('schema_to _export')
 ```
 
 ```sql
-/* Uncomment following line to narrow the export only to some schemas                    */
-/* AND mv.OWNER IN ('schema_to _export')                                                 */
+AND mv.OWNER IN ('schema_to _export')
 ```
 
 ##### Oracle - only export some views
 1. open file `sql/oracle/queries/cmd.sql`
 2. uncomment and edit at these 2 places:
 ```sql
-/* Uncomment following line to narrow the export only to some views                    */
-/* AND v.VIEW_NAME IN ('view_to _export')                                              */
+AND v.VIEW_NAME IN ('view_to _export')
 ```
 ```sql
-/* Uncomment following line to narrow the export only to some views                    */
-/* AND mv.VIEW_NAME IN ('view_to _export')                                             */
+AND mv.VIEW_NAME IN ('view_to _export')
 ```
 
 ##### Oracle - only export some procedures
 1. open file `sql/oracle/queries/cmd.sql`
 2. uncomment and edit this section
 ```sql
-/* Uncomment following line to narrow the export only to procedures                    */
-/* AND src.NAME IN ('procedure_to _export')                                            */
+AND src.NAME IN ('procedure_to _export')
 ```
 
 ##### Teradata - only export some databases
 1. open file `sql/teradata/databases/cmd.sql`
 2. uncomment and edit following section
 ```sql
-/* AND databasename IN ('db_to_export')                                           */
+AND databasename IN ('db_to_export')
 ```
 
 ##### Teradata - only export some views
 1. open file `sql/teradata/tables/cmd.sql`
 2. find and edit all 3! occurencies of:
 ```sql
-/* AND tablename IN ('view_to_export', 'table_to_export')                          */
+AND tablename IN ('view_to_export', 'table_to_export')
 ```
 
 ## Troubleshooting
