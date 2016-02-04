@@ -30,6 +30,10 @@ WHERE
 	)
 /* Uncomment following line to narrow the export only to some schemas                  */
 /* AND src.OWNER IN ('schema_to _export')                                              */
+
+/* Uncomment following line to narrow the export only to procedures                    */
+/* AND src.NAME IN ('procedure_to _export')                                            */
+
 ORDER BY src.OWNER,src.name,src.TYPE,src.line
 
 --split
@@ -64,6 +68,9 @@ WHERE v.OWNER NOT IN (
 /* Uncomment following line to narrow the export only to some schemas                  */
 /* AND v.OWNER IN ('schema_to _export')                                                */
 
+/* Uncomment following line to narrow the export only to some views                    */
+/* AND v.VIEW_NAME IN ('view_to _export')                                              */
+
 --split
 
 SELECT
@@ -95,4 +102,7 @@ WHERE  mv.OWNER NOT IN (
 	)
 /* Uncomment following line to narrow the export only to some schemas                  */
 /* AND mv.OWNER IN ('schema_to _export')                                               */
+
+/* Uncomment following line to narrow the export only to some views                    */
+/* AND mv.VIEW_NAME IN ('view_to _export')                                             */
 
