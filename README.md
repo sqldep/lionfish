@@ -37,6 +37,8 @@ https://github.com/sqldep/lionfish
 
 ## How to limit what is being exported?
 
+After unpacking SQLdep.zip you will find an `sql` directory which contains all SQL code being executed by Lionfish. It is possible to edit these files as follows.
+
 ##### MS SQL - only export some databases
 1. open file `sql/mssql/databases/cmd.sql`
 2. find this section and modify WHERE clause at your will
@@ -63,8 +65,45 @@ https://github.com/sqldep/lionfish
         /* WHERE name LIKE '%MyPattern%'                                                   */
 ```
 
-##### Limiting Oracle exports
-Edit file `sql/oracle/queries/cmd.sql`
+##### Oracle - only export some schemas
+1. open file `sql/oracle/databases/cmd.sql`
+2. uncomment and edit at 3 places
+```sql
+/* Uncomment following line to narrow the export only to some schemas                     */
+/* AND src.OWNER IN ('schema_to _export')                                                 */
+```
+
+```sql
+/* Uncomment following line to narrow the export only to some schemas                     */
+/* AND v.OWNER IN ('schema_to _export')                                                   */
+```
+
+```sql
+/* Uncomment following line to narrow the export only to some schemas                    */
+/* AND mv.OWNER IN ('schema_to _export')                                                 */
+```
+
+##### Oracle - only export some views
+1. open file `sql/oracle/queries/cmd.sql`
+2. uncomment and edit at these 2 places:
+```sql
+/* Uncomment following line to narrow the export only to some views                    */
+/* AND v.VIEW_NAME IN ('view_to _export')                                              */
+```
+```sql
+/* Uncomment following line to narrow the export only to some views                    */
+/* AND mv.VIEW_NAME IN ('view_to _export')                                             */
+```
+
+##### Oracle - only export some procedures
+1. open file `sql/oracle/queries/cmd.sql`
+2. uncomment and edit this section
+```sql
+/* Uncomment following line to narrow the export only to procedures                    */
+/* AND src.NAME IN ('procedure_to _export')                                            */
+```
+
+
 
 ##### Limiting Teradata exports
 Edit file `sql/teradata/tables/cmd.sql`
