@@ -37,12 +37,12 @@ namespace SQLDepLib
 
         private TdConnection TdConnection { get; set; }
 
-        public string Hostname { get; set; }
+        public string Server { get; private set; }
 
         public string BuildConnectionString(string dbType, string auth_type, string server, string port, string database, string loginName, string loginpassword)
         {
             string ret = string.Empty;
-            this.Hostname = server;
+            this.Server = server;
 
             // native support
             if (dbType == "oracle")

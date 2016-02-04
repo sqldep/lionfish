@@ -22,7 +22,7 @@ namespace SQLDepLib
 
         public string runId { get; set; }
 
-        protected DBExecutor DBExecutor { get; set; }
+        public DBExecutor DBExecutor { get; private set; }
 
         public string LogFileName { get; set; }
 
@@ -514,7 +514,7 @@ namespace SQLDepLib
         {
             querries.createdBy = "SQLdep v1.4.2";
             querries.exportId = this.runId;
-            querries.physicalInstance = this.DBExecutor.Hostname;
+            querries.physicalInstance = this.DBExecutor.Server;
 
             var jsonSerialiser = new JavaScriptSerializer();
             jsonSerialiser.MaxJsonLength = Int32.MaxValue;

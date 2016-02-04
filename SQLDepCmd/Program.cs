@@ -12,7 +12,6 @@ namespace SQLDepCmd
         static int Main(string[] args)
         {
             string dbType = string.Empty;
-            string hostName = string.Empty;
             string auth_type = "sql_auth";
             string server = string.Empty;
             string port = string.Empty;
@@ -27,7 +26,6 @@ namespace SQLDepCmd
 
             var p = new OptionSet() {
                 { "db|dbType=", "database type MsSQL(mssql)/Oracle(oracle)", v => dbType = v },
-                { "h|hostName=",  "hostname", v => hostName = v },
                 { "a|auth=",  "authorization SQL(default: sql_auth)/Windows (win_auth)", v => { if (v != null) auth_type = v; } },
                 { "s|server=",  "server", v => server = v },
                 { "p|port=",  "port", v => { if ( v != null) port = v; } },
@@ -51,11 +49,10 @@ namespace SQLDepCmd
                 bool runDb = (sendFile != "SENDONLY");
                 bool sendIt = (sendFile == "SEND" || sendFile == "SENDONLY");
 
+                string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword);
+                dbExecutor.ConnectString = connectString;
                 if (runDb)
                 {
-                    string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword);
-                    dbExecutor.ConnectString = connectString;
-                    dbExecutor.Hostname = hostName;
                     dbExecutor.Connect();
                 }
 
