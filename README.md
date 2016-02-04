@@ -103,10 +103,19 @@ After unpacking SQLdep.zip you will find an `sql` directory which contains all S
 /* AND src.NAME IN ('procedure_to _export')                                            */
 ```
 
+##### Teradata - only export some databases
+1. open file `sql/teradata/databases/cmd.sql`
+2. uncomment and edit following section
+```sql
+/* AND databasename IN ('db_to_export')                                           */
+```
 
-
-##### Limiting Teradata exports
-Edit file `sql/teradata/tables/cmd.sql`
+##### Teradata - only export some views
+1. open file `sql/teradata/tables/cmd.sql`
+2. find and edit all 3! occurencies of:
+```sql
+/* AND tablename IN ('view_to_export', 'table_to_export')                          */
+```
 
 ## Troubleshooting
 
