@@ -37,23 +37,31 @@ https://github.com/sqldep/lionfish
 
 ## How to limit what is being exported?
 
-It is possible to manually adjust SQL queries that extract metadata.
-You can limit the export only to certain databases, schemas or even 
-to views that match a given pattern like:
-
+##### MS SQL - only export some databases
+1. open file `sql/mssql/databases/cmd.sql`
+2. find this section and modify WHERE clause at your will
+```sql
+        WHERE
+        		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+        /* Uncomment following line to filter out databases:                               */
+        /* AND d.name NOT IN ('pattern')                                                   */
 ```
-name LIKE '%pattern%'
+
+##### MS SQL - only export some views/tables
+1. open file `sql/mssql/queries/cmd.sql`
+2. find this section and modify WHERE clause at your will
+```sql
+        /* Uncomment following line to filter out views:                                   */
+        /* WHERE name LIKE '%MyPattern%'                                                   */
 ```
 
-So it is completely in your hands. We have prepared `WHERE` statements
-which you just comment out.
-
-Please note that limiting the export might result in incomplete lineage
-and/or errors during analysis. Without complete knowledge of your DB schema
-it is impossible to disambiguate some SQL statements correctly.
-
-##### Limiting MS SQL exports
-Edit file `sql/mssql/queries/cmd.sql`
+##### MS SQL - only export some procedures
+1. open file `sql/mssql/queries/cmd.sql`
+2. find this section and modify WHERE clause at your will
+```sql
+        /* Uncomment following line to filter out procedures:                              */
+        /* WHERE name LIKE '%MyPattern%'                                                   */
+```
 
 ##### Limiting Oracle exports
 Edit file `sql/oracle/queries/cmd.sql`
