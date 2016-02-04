@@ -12,7 +12,7 @@ FROM
 	[##DBNAME##].sys.schemas s on p.schema_id = s.schema_id
 	INNER JOIN
 	[##DBNAME##].sys.sql_modules d on p.object_id = d.object_id
-/* Uncomment followinf line to filter out views:                                   */
+/* Uncomment following line to filter out procedures:                                   */
 /* WHERE name LIKE '%MyPattern%'                                                   */
 
 --split
@@ -31,7 +31,7 @@ FROM
 		[##DBNAME##].sys.schemas s2 on v.schema_id = s2.schema_id
 	INNER JOIN
 		[##DBNAME##].sys.sql_modules d2 on v.object_id = d2.object_id
-/* Uncomment followinf line to filter out views:                                   */
+/* Uncomment following line to filter out views:                                   */
 /* WHERE name LIKE '%MyPattern%'                                                   */
 
 
