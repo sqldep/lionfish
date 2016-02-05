@@ -529,7 +529,7 @@ namespace SQLDepLib
             //    string HtmlResult = wc.UploadString(URI, myParameters);
             //}
 
-            StreamWriter wr = File.AppendText(logJSONName);
+            StreamWriter wr = File.CreateText(logJSONName);
             wr.Write(json);
             wr.Close();
 

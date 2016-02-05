@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Mono.Options;
@@ -66,6 +67,26 @@ namespace SQLDepCmd
                 if (sendIt)
                 {
                     List<string> sendFiles = new List<string>();
+
+                    FileAttributes fileattr;
+                    foreach (var item in exportFileName.Split(','))
+                    {
+                        fileattr = File.GetAttributes(item);
+
+                        if((fileattr & FileAttributes.Directory) == FileAttributes.Directory)
+                        {
+                            // add whole directory content
+                            foreach (string fileName in Directory.EnumerateFiles(item, "*.*"))
+                            {
+                                sendFiles.Add(fileName);
+                            }
+                        }
+                        else
+                        {
+                            sendFiles.Add(item);
+                        }
+                    }
+
                     sendFiles.Add(exportFileName);
                     executor.SendFiles(sendFiles, sMyKey);
                 }
