@@ -62,7 +62,12 @@ namespace SQLDepLib
             if (dbType == "teradata")
             {
                 this.MyDriver = DBExecutor.UseDriver.TERADATA;
-                this.ConnectString = String.Format("Data Source = {0}; User ID = {1}; Password = {2};", server, loginName, loginpassword);
+                TdConnectionStringBuilder builder = new TdConnectionStringBuilder();
+                builder.SessionCharacterSet = "UTF8";
+                builder.DataSource = server;
+                builder.UserId = loginName;
+                builder.Password = loginpassword;
+                this.ConnectString = builder.ToString();
                 return this.ConnectString;
             }
 
