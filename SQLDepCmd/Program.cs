@@ -23,6 +23,7 @@ namespace SQLDepCmd
             string exportFileName = string.Empty;
             string sMyKey = string.Empty;
             string sendFile = string.Empty;
+            string help = string.Empty;
             Guid myKey;
 
             var p = new OptionSet() {
@@ -36,6 +37,7 @@ namespace SQLDepCmd
                 { "n|name=",  "name", v => customSqlSetName = v },
                 { "f|file=",  "file", v => exportFileName = v },
                 { "k|key=",  "key (Guid)", v => sMyKey = v },
+                { "h|help=",  "show help", v => help = v },
                 { "send=",  "SEND or SENDONLY, default do not send", v => sendFile = v.ToUpper() },
             };
 
@@ -43,57 +45,64 @@ namespace SQLDepCmd
             {
                 p.Parse(args);
 
-                myKey = Guid.Parse(sMyKey);
-
-                DBExecutor dbExecutor = new DBExecutor();
-
-                bool runDb = (sendFile != "SENDONLY");
-                bool sendIt = (sendFile == "SEND" || sendFile == "SENDONLY");
-
-                string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword);
-                dbExecutor.ConnectString = connectString;
-                if (runDb)
+                if (help.Length > 0)
                 {
-                    dbExecutor.Connect();
+                    ShowHelp(p);
                 }
-
-                Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, dbType);
-
-                if (runDb)
+                else
                 {
-                    executor.Run(customSqlSetName, myKey, dbType, exportFileName);
-                }
+                    myKey = Guid.Parse(sMyKey);
 
-                if (sendIt)
-                {
-                    List<string> sendFiles = new List<string>();
+                    DBExecutor dbExecutor = new DBExecutor();
 
-                    FileAttributes fileattr;
-                    foreach (var item in exportFileName.Split(','))
+                    bool runDb = (sendFile != "SENDONLY");
+                    bool sendIt = (sendFile == "SEND" || sendFile == "SENDONLY");
+
+                    string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword);
+                    dbExecutor.ConnectString = connectString;
+                    if (runDb)
                     {
-                        fileattr = File.GetAttributes(item);
-
-                        if ((fileattr & FileAttributes.Directory) == FileAttributes.Directory)
-                        {
-                            // add whole directory content
-                            foreach (string fileName in Directory.EnumerateFiles(item, "*.*"))
-                            {
-                                // skip inner directories
-                                fileattr = File.GetAttributes(fileName);
-
-                                if ((fileattr & FileAttributes.Directory) == 0)
-                                {
-                                    sendFiles.Add(fileName);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            sendFiles.Add(item);
-                        }
+                        dbExecutor.Connect();
                     }
 
-                    executor.SendFiles(sendFiles, sMyKey);
+                    Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, dbType);
+
+                    if (runDb)
+                    {
+                        executor.Run(customSqlSetName, myKey, dbType, exportFileName);
+                    }
+
+                    if (sendIt)
+                    {
+                        List<string> sendFiles = new List<string>();
+
+                        FileAttributes fileattr;
+                        foreach (var item in exportFileName.Split(','))
+                        {
+                            fileattr = File.GetAttributes(item);
+
+                            if ((fileattr & FileAttributes.Directory) == FileAttributes.Directory)
+                            {
+                                // add whole directory content
+                                foreach (string fileName in Directory.EnumerateFiles(item, "*.*"))
+                                {
+                                    // skip inner directories
+                                    fileattr = File.GetAttributes(fileName);
+
+                                    if ((fileattr & FileAttributes.Directory) == 0)
+                                    {
+                                        sendFiles.Add(fileName);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                sendFiles.Add(item);
+                            }
+                        }
+
+                        executor.SendFiles(sendFiles, sMyKey);
+                    }
                 }
             }
             catch (Exception e)
@@ -101,8 +110,17 @@ namespace SQLDepCmd
                 Console.WriteLine(e.Message);
                 return -1;
             }
-
             return 0; // standard success
+        }
+
+        static void ShowHelp(OptionSet p)
+        {
+            Console.WriteLine("Usage: greet [OPTIONS]+ message");
+            Console.WriteLine("Greet a list of individuals with an optional message.");
+            Console.WriteLine("If no message is specified, a generic greeting is used.");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(Console.Out);
         }
     }
 }
