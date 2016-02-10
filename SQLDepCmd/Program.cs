@@ -73,12 +73,18 @@ namespace SQLDepCmd
                     {
                         fileattr = File.GetAttributes(item);
 
-                        if((fileattr & FileAttributes.Directory) == FileAttributes.Directory)
+                        if ((fileattr & FileAttributes.Directory) == FileAttributes.Directory)
                         {
                             // add whole directory content
                             foreach (string fileName in Directory.EnumerateFiles(item, "*.*"))
                             {
-                                sendFiles.Add(fileName);
+                                // skip inner directories
+                                fileattr = File.GetAttributes(fileName);
+
+                                if ((fileattr & FileAttributes.Directory) == 0)
+                                {
+                                    sendFiles.Add(fileName);
+                                }
                             }
                         }
                         else
