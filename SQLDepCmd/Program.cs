@@ -93,7 +93,6 @@ namespace SQLDepCmd
                         }
                     }
 
-                    sendFiles.Add(exportFileName);
                     executor.SendFiles(sendFiles, sMyKey);
                 }
             }
