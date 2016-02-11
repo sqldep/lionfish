@@ -27,25 +27,25 @@ namespace SQLDepCmd
             Guid myKey;
 
             var p = new OptionSet() {
-                { "db|dbType=", "database type MsSQL(mssql)/Oracle(oracle)", v => dbType = v },
+                { "dialect=", "database type MsSQL(mssql)/Oracle(oracle)", v => dbType = v },
                 { "a|auth=",  "authorization SQL(default: sql_auth)/Windows (win_auth)", v => { if (v != null) auth_type = v; } },
                 { "s|server=",  "server", v => server = v },
                 { "p|port=",  "port", v => { if ( v != null) port = v; } },
-                { "d|database=",  "database", v => database = v },
+                { "d|database=",  "database (SID for Oracle)", v => database = v },
                 { "u|user=",  "loginName", v => { if ( v != null) loginName = v; } },
                 { "pwd|password=",  "loginpassword", v => { if (v != null) loginpassword = v; } },
-                { "n|name=",  "name", v => customSqlSetName = v },
-                { "f|file=",  "file", v => exportFileName = v },
-                { "k|key=",  "key (Guid)", v => sMyKey = v },
-                { "h|help=",  "show help", v => help = v },
+                { "n|name=",  "name of export", v => customSqlSetName = v },
+                { "f|file=",  "output file", v => exportFileName = v },
+                { "k|key=",  "api key (Guid)", v => sMyKey = v },
+                { "h|help",  "show help", v => help = "set" },
                 { "send=",  "SEND or SENDONLY, default do not send", v => sendFile = v.ToUpper() },
             };
 
             try
             {
                 p.Parse(args);
-
-                if (help.Length > 0)
+                
+                if (help.Equals("set") || (args.Length == 0))
                 {
                     ShowHelp(p);
                 }
