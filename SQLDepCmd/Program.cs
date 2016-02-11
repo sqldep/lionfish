@@ -27,7 +27,7 @@ namespace SQLDepCmd
             Guid myKey;
 
             var p = new OptionSet() {
-                { "dialect=", "database type MsSQL(mssql)/Oracle(oracle)", v => dbType = v },
+                { "dbType=", "database type MsSQL(mssql)/Oracle(oracle)", v => dbType = v },
                 { "a|auth=",  "authorization SQL(default: sql_auth)/Windows (win_auth)", v => { if (v != null) auth_type = v; } },
                 { "s|server=",  "server", v => server = v },
                 { "p|port=",  "port", v => { if ( v != null) port = v; } },
