@@ -106,6 +106,33 @@ AND databasename IN ('db_to_export')
 AND tablename IN ('view_to_export', 'table_to_export')
 ```
 
+## Scheduling Exports
+
+Since version 1.5.0. it is possible to use SQLDepCmd.exe to
+schedule exports. See `export.bat` file for an example
+batch file that exports 3 databases and sends them off
+at once.
+
+SQLDepCmd.exe is the command line interface to Lionfish
+with these parameters:
+
+```shell
+Options:
+      --dbType=VALUE         database type: mssql|oracle|teradata
+  -a, --auth=VALUE           authorization (default is sql_auth): sql_auth|win_auth
+  -s, --server=VALUE         server name or hostname
+  -p, --port=VALUE           port
+  -d, --database=VALUE       database (SID for Oracle)
+  -u, --user=VALUE           loginName
+      --pwd, --password=VALUE
+                             password
+  -n, --name=VALUE           custom name of export
+  -f, --file=VALUE           output file
+  -k, --key=VALUE            api key (Guid)
+  -h, --help                 show help
+      --send=VALUE           SEND or SENDONLY, if omitted nothing is sent
+```
+
 ## Troubleshooting
 
 Check the log file `SQLdepLog.txt` for detailed information.
