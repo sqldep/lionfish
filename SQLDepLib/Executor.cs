@@ -139,6 +139,10 @@ namespace SQLDepLib
             http.ContentType = "application/zip";
             http.Headers["Authorization"] = "Token " + apiKey;
             http.Method = "POST";
+
+            // experinemt with proxy setting
+            http.Proxy.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
+
             ASCIIEncoding encoding = new ASCIIEncoding();
             Byte[] bytes = ms.ToArray();
             http.ReadWriteTimeout = 1800 * 1000;
