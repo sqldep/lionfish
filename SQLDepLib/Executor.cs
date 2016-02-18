@@ -133,15 +133,15 @@ namespace SQLDepLib
             {
                 this.Log("Proxy URL: " + proxy);
                 http.Proxy = WebRequest.DefaultWebProxy;
+
+                // experinemt with proxy setting
+                http.Proxy.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
             }
 
             http.Accept = "application/json";
             http.ContentType = "application/zip";
             http.Headers["Authorization"] = "Token " + apiKey;
             http.Method = "POST";
-
-            // experinemt with proxy setting
-            http.Proxy.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
 
             ASCIIEncoding encoding = new ASCIIEncoding();
             Byte[] bytes = ms.ToArray();
