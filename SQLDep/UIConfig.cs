@@ -19,6 +19,9 @@ namespace SQLDep
         public const string LOGIN_PASSWORD = "login_password";
         public const string AUTH_TYPE = "auth_type";
         public const string DATABASE_NAME = "database_name";
+        public const string DRIVER_NAME = "driver_name";
+
+        public const string DRIVER_NAME_NATIVE = "Native Driver";
 
         static public string Get (string key, string defaultValue)
         {

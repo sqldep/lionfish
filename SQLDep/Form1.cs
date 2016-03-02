@@ -37,9 +37,78 @@ namespace SQLDep
             this.textBoxDatabaseName.Text = UIConfig.Get(UIConfig.DATABASE_NAME, "master");
             this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "");
             this.buttonRun.Enabled = false;
+            this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
+
             this.EnableAuthSettings();
             //
             CheckForIllegalCrossThreadCalls = false;
+        }
+
+        private void InitializeDrivers(string defaultDriverName)
+        {
+            string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
+
+            List<string> odbcDrivers = null;
+
+            bool addNative = false;
+            switch (sqlDialect)
+            {
+                case "oracle":
+                    addNative = true;
+                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("oracle", StringComparison.InvariantCultureIgnoreCase) >= 0).ToList();
+                    break;
+                case "teradata":
+                    addNative = true;
+                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("teradata", StringComparison.InvariantCultureIgnoreCase) >= 0).ToList();
+                    break;
+                case "mssql":
+                    addNative = false;
+                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("SQL", StringComparison.InvariantCultureIgnoreCase) >=0).ToList();
+                    break;
+                default:
+                    odbcDrivers = new List<string>();
+                    break;
+            }
+
+            List<ComboBoxDriverItem> comboItems = new List<ComboBoxDriverItem>();
+            if (addNative)
+            {
+                comboItems.Add(new ComboBoxDriverItem() { Text = UIConfig.DRIVER_NAME_NATIVE, Value = "NATIVE" });
+            }
+
+            foreach (var item in odbcDrivers)
+            {
+                comboItems.Add(new ComboBoxDriverItem() { Text = item, Value = "ODBC" });
+            }
+
+            this.comboBoxDriverName.Items.Clear();
+
+            foreach (var item in comboItems)
+            {
+                this.comboBoxDriverName.Items.Add(item);
+            }
+
+            comboBoxDriverName.DisplayMember = "Text";
+            comboBoxDriverName.ValueMember = "Value";
+
+            comboBoxDriverName.SelectedIndex = -1;
+
+            // preselect driver
+            int idx = 0;
+            foreach(ComboBoxDriverItem item in comboBoxDriverName.Items)
+            {
+                if(defaultDriverName == item.Text)
+                {
+                    comboBoxDriverName.SelectedIndex = idx;
+                }
+
+                idx++;
+            }
+
+            if(comboBoxDriverName.SelectedIndex < 0)
+            {
+                comboBoxDriverName.SelectedIndex = 0;
+            }
         }
 
         public void EnableAuthSettings()
@@ -88,6 +157,13 @@ namespace SQLDep
             }
         }
 
+        private string GetDriverName(out string value)
+        {
+            int idx = this.comboBoxDriverName.SelectedIndex;
+            value = this.comboBoxDriverName.SelectedValue.ToString();
+            return this.comboBoxDriverName.SelectedText;
+        }
+
         private int GetAuthTypeIdx(string authType)
         {
             if (authType == "sql_auth")
@@ -125,6 +201,7 @@ namespace SQLDep
 
         private void SaveDialogSettings ()
         {
+            string str;
             UIConfig.Set(UIConfig.AUTH_TYPE, this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex));
             UIConfig.Set(UIConfig.SQL_DIALECT, this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex));
             UIConfig.Set(UIConfig.DATA_SET_NAME, this.textBoxUserName.Text.ToString());
@@ -134,6 +211,7 @@ namespace SQLDep
             UIConfig.Set(UIConfig.LOGIN_NAME, this.textBoxLoginName.Text.ToString());
             UIConfig.Set(UIConfig.LOGIN_PASSWORD, this.textBoxLoginPassword.Text.ToString());
             UIConfig.Set(UIConfig.DATABASE_NAME, this.textBoxDatabaseName.Text.ToString());
+            UIConfig.Set(UIConfig.DRIVER_NAME, this.GetDriverName(out str));
         }
 
         public AsyncExecutor AsyncExecutor { get; set; }
@@ -279,6 +357,16 @@ namespace SQLDep
             {
                 MessageBox.Show("Database not connected! \n\nConnection string:\n" + connection + "\n\nError: " + ex.ToString());
             }
+        }
+
+        private void comboBoxDriverName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
         }
     }
 }
