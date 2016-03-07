@@ -39,55 +39,67 @@ namespace SQLDepLib
 
         public string Server { get; private set; }
 
-        public string BuildConnectionString(string dbType, string auth_type, string server, string port, string database, string loginName, string loginpassword)
+        public string BuildConnectionString(string dbType, string auth_type, string server, string port, string database, string loginName, string loginpassword, string userDefinedDriverName)
         {
             string ret = string.Empty;
             this.Server = server;
 
-            // native support
-            if (dbType == "oracle")
+            if (userDefinedDriverName == string.Empty)
             {
-                if (string.IsNullOrEmpty(port))
+                // native support
+                if (dbType == "oracle")
                 {
-                    port = "1521";
+                    if (string.IsNullOrEmpty(port))
+                    {
+                        port = "1521";
+                    }
+                    this.MyDriver = DBExecutor.UseDriver.OLEDB;
+                    this.ConnectString = String.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={4})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={3})));User Id = {1}; Password = {2}; ",
+                            server, loginName, loginpassword, database, port);
+
+                    return this.ConnectString;
                 }
-                this.MyDriver = DBExecutor.UseDriver.OLEDB;
-                this.ConnectString = String.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={4})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={3})));User Id = {1}; Password = {2}; ",
-                        server, loginName, loginpassword, database, port);
 
-                return this.ConnectString;
+                // teradata - we have own driver
+                if (dbType == "teradata")
+                {
+                    this.MyDriver = DBExecutor.UseDriver.TERADATA;
+                    TdConnectionStringBuilder builder = new TdConnectionStringBuilder();
+                    builder.SessionCharacterSet = "UTF8";
+                    builder.DataSource = server;
+                    builder.UserId = loginName;
+                    builder.Password = loginpassword;
+                    this.ConnectString = builder.ToString();
+                    return this.ConnectString;
+                }
             }
 
-            // teradata - we have own driver
-            if (dbType == "teradata")
-            {
-                this.MyDriver = DBExecutor.UseDriver.TERADATA;
-                TdConnectionStringBuilder builder = new TdConnectionStringBuilder();
-                builder.SessionCharacterSet = "UTF8";
-                builder.DataSource = server;
-                builder.UserId = loginName;
-                builder.Password = loginpassword;
-                this.ConnectString = builder.ToString();
-                return this.ConnectString;
-            }
-
-            // others
-            List<string> drivers = ODBCUtils.GetSystemDriverList();
+            // ODBC
             string driverName = string.Empty;
-            switch (dbType)
+
+            if (userDefinedDriverName == string.Empty)
             {
-                case "oracle":
-                    {
-                        driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
-                        break;
-                    }
-                case "mssql":
-                default:
-                    {
-                        driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
-                        break;
-                    }
+                List<string> drivers = ODBCUtils.GetSystemDriverList();
+                switch (dbType)
+                {
+                    case "oracle":
+                        {
+                            driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
+                            break;
+                        }
+                    case "mssql":
+                    default:
+                        {
+                            driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
+                            break;
+                        }
+                }
             }
+            else
+            {
+                driverName = userDefinedDriverName;
+            }
+
             if (string.IsNullOrEmpty(driverName))
             {
                 throw new Exception("No ODBC driver found, please install and try again");
@@ -96,10 +108,13 @@ namespace SQLDepLib
             {
                 ret += "Driver={" + driverName + "};";
             }
+
             if (string.IsNullOrEmpty(port))
             {
                 ret += "Server=" + server + ";";
-            } else {
+            }
+            else
+            {
                 ret += "Server=" + server + ":" + port + ";";
             }
             ret += "Database=" + database + ";";
@@ -119,6 +134,7 @@ namespace SQLDepLib
                     break;
                 }
             }
+
             this.MyDriver = DBExecutor.UseDriver.ODBC;
             this.ConnectString = ret;
             return ret;

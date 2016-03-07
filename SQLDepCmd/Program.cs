@@ -24,6 +24,7 @@ namespace SQLDepCmd
             string sMyKey = string.Empty;
             string sendFile = string.Empty;
             string help = string.Empty;
+            string driverName = string.Empty;
             Guid myKey;
 
             var p = new OptionSet() {
@@ -38,6 +39,7 @@ namespace SQLDepCmd
                 { "f|file=",  "output file", v => exportFileName = v },
                 { "k|key=",  "api key (Guid)", v => sMyKey = v },
                 { "h|help",  "show help", v => help = "set" },
+                { "driver",  "driver name", v => driverName = v },
                 { "send=",  "SEND or SENDONLY, default do not send", v => sendFile = v.ToUpper() },
             };
 
@@ -58,7 +60,7 @@ namespace SQLDepCmd
                     bool runDb = (sendFile != "SENDONLY");
                     bool sendIt = (sendFile == "SEND" || sendFile == "SENDONLY");
 
-                    string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword);
+                    string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword, driverName);
                     dbExecutor.ConnectString = connectString;
                     if (runDb)
                     {

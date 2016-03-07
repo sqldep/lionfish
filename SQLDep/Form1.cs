@@ -160,8 +160,19 @@ namespace SQLDep
         private string GetDriverName(out string value)
         {
             int idx = this.comboBoxDriverName.SelectedIndex;
-            value = this.comboBoxDriverName.SelectedValue.ToString();
-            return this.comboBoxDriverName.SelectedText;
+
+            if (idx >= 0 && idx < this.comboBoxDriverName.Items.Count)
+            {
+                SQLDep.ComboBoxDriverItem item = (SQLDep.ComboBoxDriverItem) this.comboBoxDriverName.Items[idx];
+                value = item.Value;
+                return item.Text;
+
+            }
+            else
+            {
+                value = string.Empty;
+                return string.Empty;
+            }
         }
 
         private int GetAuthTypeIdx(string authType)
@@ -190,13 +201,29 @@ namespace SQLDep
 
         private string BuildConnectionString (DBExecutor dbExecutor)
         {
+            string str;
+            string driverName = this.GetDriverName(out str);
+            if (str == "NATIVE" || str == string.Empty)
+            {
+                driverName = string.Empty;
+            }
+            else if (str == "ODBC")
+            {
+
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+
             return dbExecutor.BuildConnectionString(this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
                                                 this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex),
                                                 this.textBoxServerName.Text,
                                                 this.textBoxPort.Text, 
                                                 this.textBoxDatabaseName.Text,
                                                 this.textBoxLoginName.Text,
-                                                this.textBoxLoginPassword.Text);
+                                                this.textBoxLoginPassword.Text,
+                                                driverName);
         }
 
         private void SaveDialogSettings ()
@@ -346,7 +373,6 @@ namespace SQLDep
 
             try
             {
-
                 dbExecutor.Connect();
                 dbExecutor.Close();
                 this.buttonRun.Enabled = true;
