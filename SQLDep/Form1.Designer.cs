@@ -307,7 +307,7 @@
             this.Controls.Add(this.comboBoxDatabase);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "SQLdep v1.5.1_rc2";
+            this.Text = "SQLdep v1.5.2";
             this.ResumeLayout(false);
             this.PerformLayout();
 
