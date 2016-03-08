@@ -60,7 +60,7 @@ namespace SQLDepCmd
                     bool runDb = (sendFile != "SENDONLY");
                     bool sendIt = (sendFile == "SEND" || sendFile == "SENDONLY");
 
-                    string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword, driverName);
+                    string connectString = dbExecutor.BuildConnectionString(dbType, auth_type, server, port, database, loginName, loginpassword, driverName, DBExecutor.UseDriver.DEFAULT);
                     dbExecutor.ConnectString = connectString;
                     if (runDb)
                     {

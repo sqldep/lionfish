@@ -15,17 +15,17 @@ namespace SQLDepLib
     public class DBExecutor
     {
 
-        private enum UseDriver
+        public enum UseDriver
         {
-            UNDEF_TYPE = 0,
+            DEFAULT = 0,
             ODBC = 1,
-            OLEDB = 2,
+            ORACLE = 2,
             TERADATA = 3,
         };
 
         public DBExecutor ()
         {
-            MyDriver = DBExecutor.UseDriver.UNDEF_TYPE;
+            MyDriver = DBExecutor.UseDriver.DEFAULT;
         }
 
         private UseDriver MyDriver { get; set; }
@@ -39,27 +39,30 @@ namespace SQLDepLib
 
         public string Server { get; private set; }
 
-        public string BuildConnectionString(string dbType, string auth_type, string server, string port, string database, string loginName, string loginpassword, string userDefinedDriverName)
+        public string BuildConnectionString(string dbType, string auth_type, string server, string port, string database, string loginName, string loginpassword, string userDefinedDriverName, UseDriver useDriverType)
         {
             string ret = string.Empty;
             this.Server = server;
 
-            if (userDefinedDriverName == string.Empty)
+            if (useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.ORACLE)
             {
-                // native support
+                // built in native support for oracle and teradata
                 if (dbType == "oracle")
                 {
                     if (string.IsNullOrEmpty(port))
                     {
                         port = "1521";
                     }
-                    this.MyDriver = DBExecutor.UseDriver.OLEDB;
+                    this.MyDriver = DBExecutor.UseDriver.ORACLE;
                     this.ConnectString = String.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={4})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={3})));User Id = {1}; Password = {2}; ",
                             server, loginName, loginpassword, database, port);
 
                     return this.ConnectString;
                 }
+            }
 
+            if(useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.TERADATA)
+            { 
                 // teradata - we have own driver
                 if (dbType == "teradata")
                 {
@@ -74,7 +77,7 @@ namespace SQLDepLib
                 }
             }
 
-            // ODBC
+            // the only solution is find an ODBC driver
             string driverName = string.Empty;
 
             if (userDefinedDriverName == string.Empty)
@@ -83,16 +86,12 @@ namespace SQLDepLib
                 switch (dbType)
                 {
                     case "oracle":
-                        {
-                            driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
-                            break;
-                        }
+                        driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
+                        break;
                     case "mssql":
                     default:
-                        {
-                            driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
-                            break;
-                        }
+                        driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
+                        break;
                 }
             }
             else
@@ -148,7 +147,7 @@ namespace SQLDepLib
                 connection.Open();
                 this.ODBCConnection = connection;
             }
-            else if (this.MyDriver == UseDriver.OLEDB)
+            else if (this.MyDriver == UseDriver.ORACLE)
             {
                 OracleConnection connection = new OracleConnection(this.ConnectString);
                 connection.Open();
@@ -167,7 +166,7 @@ namespace SQLDepLib
             {
                 this.ODBCConnection.Close();
             }
-            else if (this.MyDriver == UseDriver.OLEDB)
+            else if (this.MyDriver == UseDriver.ORACLE)
             {
                 this.OleDbConnection.Close();
             }
@@ -182,7 +181,7 @@ namespace SQLDepLib
             {
                 this.RunSqlODBC(result, cmd);
             }
-            else if (this.MyDriver == UseDriver.OLEDB)
+            else if (this.MyDriver == UseDriver.ORACLE)
             {
                 this.RunSqlOLEDB(result, cmd, false);
             }
@@ -197,7 +196,7 @@ namespace SQLDepLib
             {
                 this.RunSqlODBC(result, cmd);
             }
-            else if (this.MyDriver == UseDriver.OLEDB)
+            else if (this.MyDriver == UseDriver.ORACLE)
             {
                 this.RunSqlOLEDB(result, cmd, true);
             }
