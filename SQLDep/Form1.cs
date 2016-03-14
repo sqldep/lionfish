@@ -37,6 +37,7 @@ namespace SQLDep
             this.textBoxDatabaseName.Text = UIConfig.Get(UIConfig.DATABASE_NAME, "master");
             this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "");
             this.buttonRun.Enabled = false;
+            this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
 
             this.EnableAuthSettings();
@@ -44,9 +45,65 @@ namespace SQLDep
             CheckForIllegalCrossThreadCalls = false;
         }
 
+        private void InitializeDSNNames (string defaultDSNName)
+        {
+            string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
+
+            List<ComboBoxDSNItem> comboItems = new List<ComboBoxDSNItem>();
+            List<string> dsnNames = ODBCUtils.GetDSNNames();
+
+            comboItems.Add(new ComboBoxDSNItem() { Text = "Undefined", IsDSN = false });
+
+            // add ODBC drivers 
+            foreach (var item in dsnNames)
+            {
+                comboItems.Add(new ComboBoxDSNItem() { Text = item, IsDSN = true });
+            }
+
+            this.comboBoxDSNName.Items.Clear();
+
+            foreach (var item in comboItems)
+            {
+                this.comboBoxDSNName.Items.Add(item);
+            }
+
+            comboBoxDSNName.DisplayMember = "Text";
+            comboBoxDSNName.ValueMember = "IsDSN";
+
+            comboBoxDSNName.SelectedIndex = 0;
+
+            // preselect driver
+            int idx = 0;
+            foreach (ComboBoxDSNItem item in comboBoxDSNName.Items)
+            {
+                if (defaultDSNName == item.Text)
+                {
+                    comboBoxDSNName.SelectedIndex = idx;
+                }
+
+                idx++;
+            }
+
+            if (comboBoxDSNName.SelectedIndex < 0)
+            {
+                comboBoxDSNName.SelectedIndex = 0;
+            }
+        }
+
         private void InitializeDrivers(string defaultDriverName)
         {
             string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
+            ComboBoxDSNItem dsnItem = this.GetSelectedDSNName();
+            this.comboBoxDriverName.Items.Clear();
+
+            if (dsnItem.IsDSN)
+            {
+                this.comboBoxDriverName.Enabled = false;
+            }
+            else
+            {
+                this.comboBoxDriverName.Enabled = true;
+            }
 
             List<ComboBoxDriverItem> comboItems = new List<ComboBoxDriverItem>();
             List<string> odbcDrivers = null;
@@ -75,8 +132,6 @@ namespace SQLDep
                 comboItems.Add(new ComboBoxDriverItem() { Text = item, UseDriverType = DBExecutor.UseDriver.ODBC });
             }
 
-            this.comboBoxDriverName.Items.Clear();
-
             foreach (var item in comboItems)
             {
                 this.comboBoxDriverName.Items.Add(item);
@@ -93,7 +148,11 @@ namespace SQLDep
             {
                 if(defaultDriverName == item.Text)
                 {
-                    comboBoxDriverName.SelectedIndex = idx;
+                    if (idx != comboBoxDriverName.SelectedIndex)
+                    {
+                        comboBoxDriverName.SelectedIndex = idx;
+                    }
+                    else break;
                 }
 
                 idx++;
@@ -166,6 +225,20 @@ namespace SQLDep
             {
                 value = DBExecutor.UseDriver.DEFAULT;
                 return string.Empty;
+            }
+        }
+
+        private ComboBoxDSNItem GetSelectedDSNName()
+        {
+            int idx = this.comboBoxDSNName.SelectedIndex;
+
+            if (idx >= 0 && idx < this.comboBoxDSNName.Items.Count)
+            {
+                return (ComboBoxDSNItem)this.comboBoxDSNName.Items[idx];
+            }
+            else
+            {
+                return new ComboBoxDSNItem() { Text = string.Empty, IsDSN = false };
             }
         }
 
@@ -368,12 +441,17 @@ namespace SQLDep
         }
 
         private void comboBoxDriverName_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        { 
+        }
 
+        private void comboBoxDSNName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
         }
 
         private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
         {
+            this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
         }
     }

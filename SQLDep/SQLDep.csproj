@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="AsyncExecutor.cs" />
     <Compile Include="ComboBoxDriverItem.cs" />
+    <Compile Include="ComboBoxDSNItem.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
