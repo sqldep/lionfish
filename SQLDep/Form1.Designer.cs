@@ -168,7 +168,8 @@
             this.comboBoxAuthType.FormattingEnabled = true;
             this.comboBoxAuthType.Items.AddRange(new object[] {
             "Server Authentication",
-            "Windows Authentication "});
+            "Windows Authentication ",
+            "Authentication DSN"});
             this.comboBoxAuthType.Location = new System.Drawing.Point(98, 151);
             this.comboBoxAuthType.Name = "comboBoxAuthType";
             this.comboBoxAuthType.Size = new System.Drawing.Size(234, 21);

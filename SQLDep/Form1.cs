@@ -52,7 +52,7 @@ namespace SQLDep
             List<ComboBoxDSNItem> comboItems = new List<ComboBoxDSNItem>();
             List<string> dsnNames = ODBCUtils.GetDSNNames();
 
-            comboItems.Add(new ComboBoxDSNItem() { Text = "Undefined", IsDSN = false });
+            comboItems.Add(new ComboBoxDSNItem() { Text = "", IsDSN = false });
 
             // add ODBC drivers 
             foreach (var item in dsnNames)
@@ -99,10 +99,16 @@ namespace SQLDep
             if (dsnItem.IsDSN)
             {
                 this.comboBoxDriverName.Enabled = false;
+                this.textBoxDatabaseName.Enabled = false;
+                this.textBoxPort.Enabled = false;
+                this.textBoxServerName.Enabled = false;
             }
             else
             {
                 this.comboBoxDriverName.Enabled = true;
+                this.textBoxDatabaseName.Enabled = true;
+                this.textBoxPort.Enabled = true;
+                this.textBoxServerName.Enabled = true;
             }
 
             List<ComboBoxDriverItem> comboItems = new List<ComboBoxDriverItem>();
@@ -170,6 +176,11 @@ namespace SQLDep
             {
                 this.textBoxLoginName.Enabled = true;
                 this.textBoxLoginPassword.Enabled = true;
+            }
+            else if (this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex) == "win_auth")
+            {
+                this.textBoxLoginName.Enabled = false;
+                this.textBoxLoginPassword.Enabled = false;
             }
             else
             {
@@ -248,10 +259,11 @@ namespace SQLDep
             {
                 return 0;
             }
-            else
+            else if (authType == "win_auth")
             {
                 return 1;
             }
+            else return 2;
         }
 
         private string GetAuthTypeName(int idx)
@@ -260,9 +272,13 @@ namespace SQLDep
             {
                 return "sql_auth";
             }
-            else
+            else if (idx == 1)
             {
                 return "win_auth";
+            }
+            else
+            {
+                return "dsn_auth";
             }
         }
 
@@ -271,7 +287,10 @@ namespace SQLDep
             DBExecutor.UseDriver useDriverType;
             string driverName = this.GetDriverName(out useDriverType);
 
+            ComboBoxDSNItem dsnItem = this.GetSelectedDSNName();
+            string dsn = dsnItem.IsDSN ? dsnItem.Text : string.Empty;
             return dbExecutor.BuildConnectionString(this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
+                                                dsn,
                                                 this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex),
                                                 this.textBoxServerName.Text,
                                                 this.textBoxPort.Text, 

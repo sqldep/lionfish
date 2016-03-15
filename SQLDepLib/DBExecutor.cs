@@ -39,10 +39,16 @@ namespace SQLDepLib
 
         public string Server { get; private set; }
 
-        public string BuildConnectionString(string dbType, string auth_type, string server, string port, string database, string loginName, string loginpassword, string userDefinedDriverName, UseDriver useDriverType)
+        public string BuildConnectionString(string dbType, string dsnName, string auth_type, string server, string port, string database, string loginName, string loginpassword, string userDefinedDriverName, UseDriver useDriverType)
         {
             string ret = string.Empty;
             this.Server = server;
+
+            if (dsnName != string.Empty)
+            {
+                // I wish to connect through named DSN, ODBC only
+                useDriverType = UseDriver.ODBC;
+            }
 
             if (useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.ORACLE)
             {
@@ -61,8 +67,8 @@ namespace SQLDepLib
                 }
             }
 
-            if(useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.TERADATA)
-            { 
+            if (useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.TERADATA)
+            {
                 // teradata - we have own driver
                 if (dbType == "teradata")
                 {
@@ -78,60 +84,71 @@ namespace SQLDepLib
             }
 
             // the only solution is find an ODBC driver
-            string driverName = string.Empty;
-
-            if (userDefinedDriverName == string.Empty)
+            if (string.IsNullOrEmpty(dsnName))
             {
-                List<string> drivers = ODBCUtils.GetSystemDriverList();
-                switch (dbType)
+                // I wish to go through driver
+                string driverName = string.Empty;
+
+                if (userDefinedDriverName == string.Empty)
                 {
-                    case "oracle":
-                        driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
-                        break;
-                    case "mssql":
-                    default:
-                        driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
-                        break;
+                    List<string> drivers = ODBCUtils.GetSystemDriverList();
+                    switch (dbType)
+                    {
+                        case "oracle":
+                            driverName = drivers.Where(x => x.IndexOf("Oracle") >= 0).FirstOrDefault();
+                            break;
+                        case "mssql":
+                        default:
+                            driverName = drivers.Where(x => x.IndexOf("SQL Server") >= 0).FirstOrDefault();
+                            break;
+                    }
+                }
+                else
+                {
+                    driverName = userDefinedDriverName;
+                }
+
+                if (string.IsNullOrEmpty(driverName))
+                {
+                    throw new Exception("No ODBC driver found, please install and try again");
+                }
+                else
+                {
+                    ret += "Driver={" + driverName + "};";
+                }
+
+                if (string.IsNullOrEmpty(port))
+                {
+                    ret += "Server=" + server + ";";
+                }
+                else
+                {
+                    ret += "Server=" + server + ":" + port + ";";
+                }
+
+                if (!string.IsNullOrEmpty(database))
+                {
+                    ret += "Database=" + database + ";";
                 }
             }
             else
             {
-                driverName = userDefinedDriverName;
+                // I wish to go through named DSN
+                ret = "DSN=" + dsnName + ";";
             }
 
-            if (string.IsNullOrEmpty(driverName))
-            {
-                throw new Exception("No ODBC driver found, please install and try again");
-            }
-            else
-            {
-                ret += "Driver={" + driverName + "};";
-            }
-
-            if (string.IsNullOrEmpty(port))
-            {
-                ret += "Server=" + server + ";";
-            }
-            else
-            {
-                ret += "Server=" + server + ":" + port + ";";
-            }
-            ret += "Database=" + database + ";";
-
+            // add properties both for DSN or driver
             switch (auth_type)
             {
                 case "win_auth":
-                {
                     ret += "Authentication=Windows Authentication;";
                     break;
-                }
-                default:
                 case "sql_auth":
-                {
                     ret += "UID=" + loginName + ";";
                     ret += "PWD=" + loginpassword + ";";
                     break;
-                }
+                case "dsn_auth":
+                default: break;
             }
 
             this.MyDriver = DBExecutor.UseDriver.ODBC;
