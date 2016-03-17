@@ -1,15 +1,15 @@
-/* Select a list of all views and tables                                           */
+-- Select a list of all views and tables
 SELECT '##DBNAME##', tablekind, creatorname, tablename
 FROM dbc.tables
 WHERE (TABLEKIND = 'T' OR TABLEKIND = 'V') AND
     DatabaseName = '##DBNAME##'
-/* AND tablename IN ('view_to_export', 'table_to_export')                          */
+-- AND tablename IN ('view_to_export', 'table_to_export')
 
 --split
 
-/* Select a list of all columns of tables and views                                */
-/* Together with the result of previous SELECT the result will be used to fill     */
-/* "databaseModel" key in JSON                                                     */
+-- Select a list of all columns of tables and views
+-- Together with the result of previous SELECT the result will be used to fill
+-- "databaseModel" key in JSON
 SELECT
 '##DBNAME##',
 TABLENAME,
@@ -77,15 +77,15 @@ END AS COLUMNNUM
 FROM DBC.COLUMNS
 WHERE DATABASENAME='##DBNAME##'
 
-/* AND tablename IN ('view_to_export', 'table_to_export')                          */
+-- AND tablename IN ('view_to_export', 'table_to_export')
 
 ) TBL;
 
 --split
 
-/* Select a list of all tables, views and procedures - the list will be used       */
-/* for generating SHOW .... statements that fetcg corresponding source codes       */
-/* that will be filled in the "queries" key in JSON                                */
+-- Select a list of all tables, views and procedures - the list will be used
+-- for generating SHOW .... statements that fetcg corresponding source codes
+-- that will be filled in the "queries" key in JSON
 SELECT '##DBNAME##', creatorname, tablename, TABLEKIND
 FROM dbc.tables
 WHERE (
@@ -94,5 +94,5 @@ WHERE (
 	TABLEKIND = 'M') AND
 	DatabaseName = '##DBNAME##'
 
-/* AND tablename IN ('view_to_export', 'table_to_export')                          */
+-- AND tablename IN ('view_to_export', 'table_to_export')
 
