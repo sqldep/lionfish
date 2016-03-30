@@ -58,6 +58,7 @@
             this.tabControlMain = new System.Windows.Forms.TabControl();
             this.tabPageBasic = new System.Windows.Forms.TabPage();
             this.tabPageAdvanced = new System.Windows.Forms.TabPage();
+            this.label12 = new System.Windows.Forms.Label();
             this.tabControlMain.SuspendLayout();
             this.tabPageBasic.SuspendLayout();
             this.tabPageAdvanced.SuspendLayout();
@@ -347,6 +348,7 @@
             // 
             // tabPageAdvanced
             // 
+            this.tabPageAdvanced.Controls.Add(this.label12);
             this.tabPageAdvanced.Controls.Add(this.comboBoxDSNName);
             this.tabPageAdvanced.Controls.Add(this.comboBoxDriverName);
             this.tabPageAdvanced.Controls.Add(this.label10);
@@ -358,6 +360,16 @@
             this.tabPageAdvanced.TabIndex = 1;
             this.tabPageAdvanced.Text = "Advanced";
             this.tabPageAdvanced.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            this.label12.Location = new System.Drawing.Point(13, 108);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(336, 100);
+            this.label12.TabIndex = 2;
+            this.label12.Text = "Setting these values is optional. Fill them out only if the basic setting does no" +
+    "t work. For example if you want to use a different driver or a preconfigured DSN" +
+    " connection.";
             // 
             // Form1
             // 
@@ -409,6 +421,7 @@
         private System.Windows.Forms.TabControl tabControlMain;
         private System.Windows.Forms.TabPage tabPageBasic;
         private System.Windows.Forms.TabPage tabPageAdvanced;
+        private System.Windows.Forms.Label label12;
     }
 }
 
