@@ -98,7 +98,7 @@ namespace SQLDepLib
 
             foreach (var dbName in dbNames)
             {
-                this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
+                // this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
                 {
                     // let us run this script two times, first run returns list of procedures, the second loads its definition
                     List<string> procedures = new List<string>();
@@ -194,7 +194,7 @@ namespace SQLDepLib
             foreach (var dbName in dbNames)
             {
 
-                this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
+                // this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
 
                 List<StrReplace> replaces = new List<StrReplace>();
                 StrReplace itemForReplace = new StrReplace()

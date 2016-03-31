@@ -283,7 +283,7 @@ namespace SQLDepLib
             int iiDbCounter = 0;
             foreach (var dbName in dbNames)
             {
-                this.ProgressInfo.SetProgressDone((double)100* ++iiDbCounter / dbNames.Count, dbName);
+                //this.ProgressInfo.SetProgressDone((double)100* ++iiDbCounter / dbNames.Count, dbName);
                 try
                 {
                     // sql commands
@@ -406,7 +406,7 @@ namespace SQLDepLib
 
             foreach (var dbName in dbNames)
             {
-                this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
+                //this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
                 try
                 {
                     // sql commands
@@ -468,7 +468,7 @@ namespace SQLDepLib
                 int iiItem = 0;
                 foreach (var item in sqls)
                 {
-                    this.ProgressInfo.SetProgressDone((double)100 * ++iiItem / sqls.Count, item);
+                    //this.ProgressInfo.SetProgressDone((double)100 * ++iiItem / sqls.Count, item);
                     DBExecutor.RunSql(result, item);
                 }
 
@@ -602,7 +602,7 @@ namespace SQLDepLib
             foreach (var dbName in dbNames)
             {
 
-                this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
+                //this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
                 try
                 {
                     SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
