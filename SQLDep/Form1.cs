@@ -357,7 +357,7 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                string msg = ex.Message;
+                string msg = ex.Message + ex.StackTrace;
                 MessageBox.Show(msg);
             }
         }
@@ -428,7 +428,7 @@ namespace SQLDep
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Files were not sent!"+ ex.ToString());
+                    MessageBox.Show("Files were not sent!"+ ex.ToString() + ex.StackTrace);
                 }
                 this.Text = form1Text;
 
