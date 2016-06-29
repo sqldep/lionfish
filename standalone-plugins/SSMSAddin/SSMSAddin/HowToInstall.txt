@@ -1,0 +1,31 @@
+This sample is brought to you by developers of
+
+SSMSBoost add-in for SSMS (2008, 2008R2, 2012)
+
+www.ssmsboost.com
+
+SSMSBoost adds quick source code navigation, connection management and much more !
+------------------------------------------------------
+To compile the project you will need to update the reference to SqlPackageBase.dll
+it is installed along with SQL Server Management Studio and is located under following path:
+%PROGRAMFILES%\Microsoft SQL Server\110\Tools\Binn\ManagementStudio\SqlPackageBase.dll
+(C:\Program Files\Microsoft SQL Server\110\Tools\Binn\ManagementStudio\SqlPackageBase.dll)
+
+After you have compiled the sample code you have to let SSMS 2012 know that you want it to load your add-in.
+SSMSAddin.addin file provides information about location of compiled add-in dll. So check it and update path 
+mentioned by <Assembly> element to location where newly created dll resides (probably bin\debug folder)
+
+Next step - you have to put SSMSAddin.addin to one of "known" folders, where SSMS looks for .addin files. These
+folders are listed under this registry key:
+HKEY_CURRENT_USER\Software\Microsoft\SQL Server Management Studio\11.0_Config\AutomationOptions\LookInFolders
+
+For example:
+- Putting SSMSAddin.addin into %PROGRAMDATA%\Application Data\Microsoft\MSEnvShared\Addins\ 
+  (C:\ProgramData\Application Data\Microsoft\MSEnvShared\Addins\)
+  Will install add-in for all users on the machine.
+
+- Putting SSMSAddin.addin into %APPDATA%\Microsoft\MSEnvShared\Addins\ 
+  (C:\Users\UserName\AppData\Roaming\Microsoft\MSEnvShared\Addins\) 
+  will install for specific user only. 
+  
+Pay attention that MSEnvShared\Addins\ folder might not exist and you will have to create it yourself.
