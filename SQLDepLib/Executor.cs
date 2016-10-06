@@ -143,6 +143,9 @@ namespace SQLDepLib
             http.Headers["Authorization"] = "Token " + apiKey;
             http.Method = "POST";
 
+            // vyssi verze protokolu
+            http.ProtocolVersion = HttpVersion.Version11;
+
             ASCIIEncoding encoding = new ASCIIEncoding();
             Byte[] bytes = ms.ToArray();
             http.ReadWriteTimeout = 1800 * 1000;
