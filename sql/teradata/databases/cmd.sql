@@ -1,5 +1,5 @@
 -- Select databases to export
-SELECT DISTINCT(databasename) FROM dbc.tables WHERE databasename NOT IN (
+SELECT DISTINCT(databasename) FROM dbc.tablesv WHERE databasename NOT IN (
 	'dbc',
 	'sys_calendar',
 	'systemfe',

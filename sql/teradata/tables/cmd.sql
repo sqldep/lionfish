@@ -1,6 +1,6 @@
 -- Select a list of all views and tables
 SELECT '##DBNAME##', tablekind, creatorname, tablename
-FROM dbc.tables
+FROM dbc.tablesv
 WHERE (TABLEKIND = 'T' OR TABLEKIND = 'V') AND
     DatabaseName = '##DBNAME##'
 -- AND tablename IN ('view_to_export', 'table_to_export')
@@ -74,7 +74,7 @@ CASE WHEN COLUMNTYPE='CF' THEN COLUMNLENGTH
      WHEN COLUMNTYPE='DA' THEN NULL
 	ELSE NULL
 END AS COLUMNNUM
-FROM DBC.COLUMNS
+FROM DBC.COLUMNSV
 WHERE DATABASENAME='##DBNAME##'
 
 -- AND tablename IN ('view_to_export', 'table_to_export')
@@ -87,7 +87,7 @@ WHERE DATABASENAME='##DBNAME##'
 -- for generating SHOW .... statements that fetcg corresponding source codes
 -- that will be filled in the "queries" key in JSON
 SELECT '##DBNAME##', creatorname, tablename, TABLEKIND
-FROM dbc.tables
+FROM dbc.tablesv
 WHERE (
 	TABLEKIND = 'P' OR
 	TABLEKIND = 'V' OR
@@ -95,4 +95,3 @@ WHERE (
 	DatabaseName = '##DBNAME##'
 
 -- AND tablename IN ('view_to_export', 'table_to_export')
-
