@@ -381,7 +381,7 @@
             this.Controls.Add(this.progressBarCalc);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "SQLdep v1.5.7-beta";
+            this.Text = "SQLdep v1.5.8-beta";
             this.tabControlMain.ResumeLayout(false);
             this.tabPageBasic.ResumeLayout(false);
             this.tabPageBasic.PerformLayout();
