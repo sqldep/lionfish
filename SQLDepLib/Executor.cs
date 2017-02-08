@@ -274,9 +274,6 @@ namespace SQLDepLib
                 this.Log(string.Format("GetDBNames - adding {0}", item));
                 ret.Add(item.Column0);
             }
-#if DEBUG
-            ret = ret.Where(x => !x.StartsWith("Fle") && !x.StartsWith("Mu") && !x.StartsWith("Od") && !x.StartsWith("Poj") && !x.StartsWith("Rel") && !x.StartsWith("Te")).ToList();
-#endif
 
             this.Log(string.Format("GetDBNames - count {0}", ret != null ? (ret.Count).ToString() : "null"));
 
