@@ -18,6 +18,8 @@ namespace SQLDepLib
             this.DBExecutor = dbExecutor;
             this.runId = Guid.NewGuid().ToString();
             this.ProgressInfo = new ProgressInfo();
+            ServicePointManager.SecurityProtocol =
+                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
         }
 
         public string runId { get; set; }
@@ -521,7 +523,7 @@ namespace SQLDepLib
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-            querries.createdBy = "SQLdep v1.5.5";
+            querries.createdBy = "SQLdep v1.5.9-beta";
             querries.exportId = this.runId;
             querries.physicalInstance = this.DBExecutor.Server;
 
