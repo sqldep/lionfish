@@ -53,6 +53,10 @@ namespace SQLDepLib
                 sw.Start();
 
                 this.LogFileName = "SQLdepLog.txt";
+                
+                // muze se hodit
+                this.Log(Environment.Is64BitOperatingSystem ? "64bit system" : "32bit system");
+
                 // pripoj se do databaze
                 this.Log("Before database open.");
                 DBExecutor.Connect();
