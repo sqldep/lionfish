@@ -263,7 +263,7 @@ namespace SQLDepLib
                 reader.Close();
                 toGo.Dispose();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

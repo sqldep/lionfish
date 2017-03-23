@@ -246,6 +246,7 @@ namespace SQLDepLib
             {
                 ret.queries = this.GetQuerries(sqlDialect, dbNames);
             }
+
             this.Log("List of querries has " + ret.queries.Count + " items.");
 
             this.ProgressInfo.SetProgressRatio(0.35, "DB model");
@@ -291,7 +292,6 @@ namespace SQLDepLib
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
             this.ProgressInfo.CreateProgress();
-            int iiDbCounter = 0;
             foreach (var dbName in dbNames)
             {
                 //this.ProgressInfo.SetProgressDone((double)100* ++iiDbCounter / dbNames.Count, dbName);
@@ -359,8 +359,6 @@ namespace SQLDepLib
                         counter++;
                     }
 
-                        
-
                     sqls.RemoveAt(0);
                     List<SQLResult> secondBlock = new List<SQLResult>();
                     DBExecutor.RunQuerySql(secondBlock, sqls.FirstOrDefault());
@@ -413,8 +411,6 @@ namespace SQLDepLib
             int count = 0;
 
             this.ProgressInfo.CreateProgress();
-            int iiDbCounter = 0;
-
             foreach (var dbName in dbNames)
             {
                 //this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
@@ -476,7 +472,7 @@ namespace SQLDepLib
                 List<string> sqls = this.GetSQLCommands(sqlDialect, "dblinks", null);
 
                 List<SQLResult> result = new List<SQLResult>();
-                int iiItem = 0;
+
                 foreach (var item in sqls)
                 {
                     //this.ProgressInfo.SetProgressDone((double)100 * ++iiItem / sqls.Count, item);
@@ -508,9 +504,49 @@ namespace SQLDepLib
 
         protected List<string> GetSQLCommands(string sqlDialect, string purpose, List<StrReplace> list)
         {
-
+            // tyto jsou povinne
             string sqlCommands = System.IO.File.ReadAllText("./sql/" + sqlDialect + "/" + purpose + "/cmd.sql");
 
+            //  Ted se sekce Queries v JSONu plni tak, ze se nacte napriklad definice procedury a ta se vlozi do Queries.Potrebujeme uzivatelum dat moznost, aby meli moznost vlozit vlastni SQL prikaz z jine tabulku a nejen databazoveho katalogu. A to by se ulozilo do Queries.
+            // Navrhuju to resit tak, ze by vznikl v kazdem adresari s dialektemadresar custom, cili / sql / teradata / custom
+            // Tam by se lionfish vzdy koukl a pokud by tam existoval nejaky fajl, tak by ho spustil.
+            // Uvnitr by byl takovyhle nejaky dotaz, ktery by rovnou vracel vsechny fieldy, ktere jsou treba vyplnit v Queries.
+            // SELECT
+            //  sql_query_stmt as sourceCode,
+            //  sql_name as name, --can be left empty
+            //  sql_group_name as groupName, --can be empty
+            //  'my-database-name' as databaseName
+            //  'SCOTT' as schemaName
+            // FROM
+            //  ETL_LOG
+
+            string customPath = "./sql/" + sqlDialect + "/" + purpose + "/custom";
+
+            if (Directory.Exists(customPath))
+            {
+                this.Log(string.Format("Checked custom sql files in {0} - directory exists.", customPath));
+                foreach (var file in Directory.GetFiles(customPath))
+                {
+                    if (file.EndsWith("sql", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        string customSqlCommands = System.IO.File.ReadAllText(file);
+
+                        // pridame ke standardu
+                        sqlCommands += "\n--split\n";
+                        sqlCommands += customSqlCommands;
+                    }
+                    else
+                    {
+                        this.Log(string.Format("File {0} in custom directory ignored - expected extension sql.", customPath));
+                    }
+                }
+            }
+            else
+            {
+                this.Log(string.Format("Checked custom sql files in {0} - directory does not exist.", customPath));
+            }
+
+            // a dale jedeme jako posledne
             if (list != null)
             {
                 foreach (var item in list)
@@ -609,7 +645,6 @@ namespace SQLDepLib
             int tableCount = 0;
             int synonymsCount = 0;
 
-            int iiCounter = 0;
             foreach (var dbName in dbNames)
             {
 

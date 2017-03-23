@@ -94,8 +94,6 @@ namespace SQLDepLib
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
             this.ProgressInfo.CreateProgress();
-            int iiDbCounter = 0;
-
             foreach (var dbName in dbNames)
             {
                 // this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
@@ -189,8 +187,6 @@ namespace SQLDepLib
             modelItem.name = "default";
             modelItem.tables = new List<SQLTableModelItem>();
 
-
-            int iiCounter = 0;
             foreach (var dbName in dbNames)
             {
 
