@@ -94,6 +94,7 @@ namespace SQLDepLib
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
             this.ProgressInfo.CreateProgress();
+            bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
             {
                 // this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
@@ -110,7 +111,8 @@ namespace SQLDepLib
                     replaces.Add(itemForReplace);
 
                     // load script with replaces for the given database/procedure
-                    List<string> sqls = this.GetSQLCommands(sqlDialect, "tables", replaces);
+                    List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.TABLES, firstSqlCommands, replaces);
+                    firstSqlCommands = false;
 
                     // first command is list of procedures and views
                     List<SQLResult> result = new List<SQLResult>();
@@ -158,7 +160,7 @@ namespace SQLDepLib
 
         private List<string> GetTeradataDbNames(string sqlDialect)
         {
-            List<string> sqls = this.GetSQLCommands(sqlDialect, "databases", null);
+            List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.DATABASES, true, null);
 
             List<SQLResult> result = new List<SQLResult>();
 
@@ -186,7 +188,7 @@ namespace SQLDepLib
             SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
             modelItem.name = "default";
             modelItem.tables = new List<SQLTableModelItem>();
-
+            bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
             {
 
@@ -199,7 +201,8 @@ namespace SQLDepLib
                     ReplaceText = dbName
                 };
                 replaces.Add(itemForReplace);
-                List<string> sqls = this.GetSQLCommands(sqlDialect, "tables", replaces);
+                List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.TABLES, firstSqlCommands, replaces);
+                firstSqlCommands = false;
 
                 // tabulky a viecka
                 List<SQLResult> tablesAndViews = new List<SQLResult>();

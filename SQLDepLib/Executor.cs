@@ -265,7 +265,7 @@ namespace SQLDepLib
 
         private List<string> GetDbNames(string sqlDialect)
         {
-            List<string> sqls = this.GetSQLCommands(sqlDialect, "databases", null);
+            List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.DATABASES, true, null);
 
             List<SQLResult> result = new List<SQLResult>();
 
@@ -291,6 +291,7 @@ namespace SQLDepLib
         {
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
+            bool firstSqlCommands = true;
             this.ProgressInfo.CreateProgress();
             foreach (var dbName in dbNames)
             {
@@ -306,7 +307,8 @@ namespace SQLDepLib
                     };
                     replaces.Add(itemForReplace);
 
-                    List<string> sqls = this.GetSQLCommands(sqlDialect, "queries", replaces);
+                    List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
+                    firstSqlCommands = false;
 
                     // vem prvni select, procedury spojime dle cisla radku
 
@@ -409,7 +411,7 @@ namespace SQLDepLib
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
             int count = 0;
-
+            bool firstSqlCommands = true;
             this.ProgressInfo.CreateProgress();
             foreach (var dbName in dbNames)
             {
@@ -425,7 +427,8 @@ namespace SQLDepLib
                     };
                     replaces.Add(itemForReplace);
 
-                    List<string> sqls = this.GetSQLCommands(sqlDialect, "queries", replaces);
+                    List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
+                    firstSqlCommands = false;
 
                     List<SQLResult> result = new List<SQLResult>();
                     foreach (var item in sqls)
@@ -469,7 +472,7 @@ namespace SQLDepLib
             {
                 // sql commands
 
-                List<string> sqls = this.GetSQLCommands(sqlDialect, "dblinks", null);
+                List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.DBLINKS, true, null);
 
                 List<SQLResult> result = new List<SQLResult>();
 
@@ -502,8 +505,19 @@ namespace SQLDepLib
             return ret;
         }
 
-        protected List<string> GetSQLCommands(string sqlDialect, string purpose, List<StrReplace> list)
+        public enum Purpose
         {
+            QUERIES = 1,
+            DATABASES = 2,
+            DBLINKS = 3,
+            TABLES = 4,
+            SYNONYMS = 5,
+        }
+
+        protected List<string> GetSQLCommands(string sqlDialect, Purpose enumPurpose, bool isFirstOfThisType, List<StrReplace> list)
+        {
+            string purpose = enumPurpose.ToString().ToLower();
+
             // tyto jsou povinne
             string sqlCommands = System.IO.File.ReadAllText("./sql/" + sqlDialect + "/" + purpose + "/cmd.sql");
 
@@ -520,30 +534,36 @@ namespace SQLDepLib
             // FROM
             //  ETL_LOG
 
-            string customPath = "./sql/" + sqlDialect + "/" + purpose + "/custom";
-
-            if (Directory.Exists(customPath))
+            if (enumPurpose == Purpose.QUERIES)
             {
-                this.Log(string.Format("Checked custom sql files in {0} - directory exists.", customPath));
-                foreach (var file in Directory.GetFiles(customPath))
+                if (isFirstOfThisType)
                 {
-                    if (file.EndsWith("sql", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        string customSqlCommands = System.IO.File.ReadAllText(file);
+                    string customPath = "./sql/" + sqlDialect + "/custom";
 
-                        // pridame ke standardu
-                        sqlCommands += "\n--split\n";
-                        sqlCommands += customSqlCommands;
+                    if (Directory.Exists(customPath))
+                    {
+                        this.Log(string.Format("Checked custom sql files in {0} - directory exists.", customPath));
+                        foreach (var file in Directory.GetFiles(customPath))
+                        {
+                            if (file.EndsWith("sql", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                string customSqlCommands = System.IO.File.ReadAllText(file);
+
+                                // pridame ke standardu
+                                sqlCommands += "\n--split\n";
+                                sqlCommands += customSqlCommands;
+                            }
+                            else
+                            {
+                                this.Log(string.Format("File {0} in custom directory ignored - expected extension sql.", customPath));
+                            }
+                        }
                     }
                     else
                     {
-                        this.Log(string.Format("File {0} in custom directory ignored - expected extension sql.", customPath));
+                        this.Log(string.Format("Checked custom sql files in {0} - directory does not exist.", customPath));
                     }
                 }
-            }
-            else
-            {
-                this.Log(string.Format("Checked custom sql files in {0} - directory does not exist.", customPath));
             }
 
             // a dale jedeme jako posledne
@@ -645,6 +665,8 @@ namespace SQLDepLib
             int tableCount = 0;
             int synonymsCount = 0;
 
+            bool firstSqlCommands = true;
+            bool firstSqlCommands2 = true;
             foreach (var dbName in dbNames)
             {
 
@@ -667,7 +689,9 @@ namespace SQLDepLib
 
                     // tabulky a viecka se sloupci dohromady
                     modelItem.tables = new List<SQLTableModelItem>();
-                    List<string> sqlsTablesWithColumns = this.GetSQLCommands(sqlDialect, "tables", replaces);
+                    List<string> sqlsTablesWithColumns = this.GetSQLCommands(sqlDialect, Purpose.TABLES, firstSqlCommands, replaces);
+                    firstSqlCommands = false;
+
                     List<SQLResult> tablesWithColumns = new List<SQLResult>();
                     foreach (var item in sqlsTablesWithColumns)
                     {
@@ -709,7 +733,8 @@ namespace SQLDepLib
                     this.Log("Getting synonyms in database" + dbName + ".");
 
                     modelItem.synonyms = new List<SQLSynonymModelItem>();
-                    List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, "synonyms", replaces);
+                    List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, Purpose.SYNONYMS, firstSqlCommands2, replaces);
+                    firstSqlCommands2 = false;
                     List<SQLResult> synonyms = new List<SQLResult>();
                     foreach (var item in sqlsSynonyms)
                     {
