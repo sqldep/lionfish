@@ -357,8 +357,9 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                string msg = ex.Message + ex.StackTrace;
-                MessageBox.Show(msg);
+                FormErr form = new FormErr(ex);
+                form.Error = ex;
+                form.ShowDialog();
             }
         }
 
