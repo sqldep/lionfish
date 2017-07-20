@@ -35,7 +35,7 @@ namespace SQLDepCmd
                 { "d|database=",  "database (SID for Oracle)", v => database = v },
                 { "u|user=",  "loginName", v => { if ( v != null) loginName = v; } },
                 { "pwd|password=",  "loginpassword", v => { if (v != null) loginpassword = v; } },
-                { "n|name=",  "name of export", v => customSqlSetName = v },
+                { "n|name=",  "batch name for the web dashboard", v => customSqlSetName = v },
                 { "f|file=",  "output file", v => exportFileName = v },
                 { "k|key=",  "api key (Guid)", v => sMyKey = v },
                 { "h|help",  "show help", v => help = "set" },
