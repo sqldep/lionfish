@@ -59,6 +59,7 @@
     <Compile Include="ProgressInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLData.cs" />
+    <Compile Include="SQLDepException.cs" />
     <Compile Include="TeradataExecutor.cs" />
   </ItemGroup>
   <ItemGroup>

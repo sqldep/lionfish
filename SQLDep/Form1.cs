@@ -343,7 +343,7 @@ namespace SQLDep
                 Guid myKey;
                 if (!Guid.TryParse(this.textBoxKey.Text.ToString(), out myKey))
                 {
-                    throw new Exception("Invalid or missing API key! Get one at https://www.sqldep.com/browser/upload/api");
+                    throw new SQLDepException("Invalid or missing API key. Get one in your dashboard on SQLdep website.");
                 }
 
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
@@ -358,6 +358,12 @@ namespace SQLDep
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
                 this.AsyncExecutorThread.Start();
                 new Thread(this.ShowProgress).Start();
+            }
+            catch (SQLDepException ex)
+            {
+                // known errors - do not show details about stack
+                string msg = ex.Message;
+                MessageBox.Show(msg);
             }
             catch (Exception ex)
             {
