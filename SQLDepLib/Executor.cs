@@ -554,7 +554,7 @@ namespace SQLDepLib
                                 sqlCommands += customSqlCommands;
 
                                 // log it
-                                this.Log(string.Format("File {0} in custom directory succesfully added ({1} characters readed).", file, customSqlCommands.Length));
+                                this.Log(string.Format("File {0} in custom directory succesfully added ({1} characters read).", file, customSqlCommands.Length));
                             }
                             else
                             {
