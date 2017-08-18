@@ -329,6 +329,10 @@ namespace SQLDep
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             DialogResult result = fbd.ShowDialog();
 
+            // export cancelled - do nothing
+            if (result != DialogResult.OK)
+                return;
+
             try
             {
                 this.SaveDialogSettings();
