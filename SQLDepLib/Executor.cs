@@ -396,6 +396,29 @@ namespace SQLDepLib
 
                         ret.Add(querryItem);
                     }
+
+                    sqls.RemoveAt(0);
+
+                    // There could be custom code left
+                    foreach (var sql in sqls)
+                    {
+                        List<SQLResult> customBlock = new List<SQLResult>();
+                        DBExecutor.RunQuerySql(customBlock, sql);
+
+                        foreach (var item in customBlock)
+                        {
+                            SQLQuerry querryItem = new SQLQuerry()
+                            {
+                                sourceCode = item.Column0,
+                                name = item.Column1,
+                                groupName = item.Column2,
+                                database = item.Column3,
+                                schema = item.Column4
+                            };
+
+                            ret.Add(querryItem);
+                        }
+                    }
                 }
                 catch (Exception)
                 {
@@ -586,7 +609,7 @@ namespace SQLDepLib
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-            querries.createdBy = "SQLdep v1.5.10-beta";
+            querries.createdBy = "SQLdep v1.5.11-beta";
             querries.exportId = this.runId;
             querries.physicalInstance = this.DBExecutor.Server;
 
