@@ -1,5 +1,5 @@
 set BUILDDIR=build_%TIME::=-%
-mkdir %BUILDDIR%
+mkdir "%BUILDDIR%"
 
 rmdir /S/Q SQLDep\bin\Release
 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe" SQLDepCmd/SQLDepCmd.csproj  /build Release
