@@ -296,20 +296,21 @@ namespace SQLDepLib
             foreach (var dbName in dbNames)
             {
                 //this.ProgressInfo.SetProgressDone((double)100* ++iiDbCounter / dbNames.Count, dbName);
+
+                // sql commands
+                List<StrReplace> replaces = new List<StrReplace>();
+                StrReplace itemForReplace = new StrReplace()
+                {
+                    SearchText = "##DBNAME##",
+                    ReplaceText = dbName
+                };
+                replaces.Add(itemForReplace);
+
+                List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
+                firstSqlCommands = false;
+
                 try
                 {
-                    // sql commands
-                    List<StrReplace> replaces = new List<StrReplace>();
-                    StrReplace itemForReplace = new StrReplace()
-                    {
-                        SearchText = "##DBNAME##",
-                        ReplaceText = dbName
-                    };
-                    replaces.Add(itemForReplace);
-
-                    List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
-                    firstSqlCommands = false;
-
                     // vem prvni select, procedury spojime dle cisla radku
 
                     List<SQLResult> firstBlock = new List<SQLResult>();
@@ -400,8 +401,9 @@ namespace SQLDepLib
                     sqls.RemoveAt(0);
 
                     // There could be custom code left
-                    foreach (var sql in sqls)
+                    while (sqls.Count != 0)
                     {
+                        String sql = sqls.FirstOrDefault();
                         List<SQLResult> customBlock = new List<SQLResult>();
                         DBExecutor.RunQuerySql(customBlock, sql);
 
@@ -418,7 +420,13 @@ namespace SQLDepLib
 
                             ret.Add(querryItem);
                         }
+                        sqls.RemoveAt(0);
                     }
+                }
+                catch (Oracle.ManagedDataAccess.Client.OracleException oe)
+                {
+                    this.Log("Last executed SQL dump:\n" + sqls.FirstOrDefault());
+                    throw oe;
                 }
                 catch (Exception)
                 {

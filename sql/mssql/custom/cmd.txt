@@ -1,0 +1,25 @@
+/*
+
+Here you can place your custom SQL which will be executed by Lionfish
+and the result stored in JSON file. The goal is to help you to export statements
+from your log table, etc.
+
+IMPORTANT: Only files with ".sql" extensions will be read by Lionfish,
+so please rename this file if you want it not to be ignored!
+
+SQL result set must have 5 columns which will be filled in order into
+"sourceCode", "name", "groupName", "database" and "schema" fields of objects
+in the "queries" JSON array.
+
+You can place special placholder "##DBNAME##" which will be replaced
+with the name of currently extracted database, see example below.
+
+Example:
+*/
+
+SELECT
+ 'create table foo as select bar from baz' AS SOURCECODE,
+ 'foo_table' AS NAME,
+ 'example' AS GROUPNAME,
+ '##DBNAME##' AS DATABASENAME,
+ 'test' AS SCHEMANAME
