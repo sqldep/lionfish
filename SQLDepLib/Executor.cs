@@ -734,9 +734,13 @@ namespace SQLDepLib
 
                     foreach (var item in tablesWithColumns)
                     {
+                        string schemaName = item.Column1;
                         string tableName = item.Column2;
 
-                        SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.name == tableName);
+                        SQLTableModelItem tableModelItem = modelItem.tables.Find
+                        (
+                            x => x.name == tableName && x.schema == schemaName
+                        );
 
                         if (tableModelItem == null)
                         {
