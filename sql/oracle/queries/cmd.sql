@@ -43,8 +43,15 @@ SELECT
 	v.VIEW_NAME as name,
 	v.OWNER||'.'||v.VIEW_NAME as groupName,
 	'##DBNAME##' as databaseName,
-	v.OWNER as schemaName
+	v.OWNER as schemaName,
+	c.columnList
 FROM all_views v
+JOIN (
+	SELECT OWNER, TABLE_NAME, listagg(COLUMN_NAME,',') within group(order by COLUMN_ID) columnList
+	FROM all_tab_columns
+	GROUP BY OWNER, TABLE_NAME
+) c
+ON c.OWNER = v.OWNER AND c.TABLE_NAME = v.VIEW_NAME
 WHERE v.OWNER NOT IN (
 	'APEX_040200',
 	'CTXSYS',
@@ -78,8 +85,15 @@ SELECT
 	mv.MVIEW_NAME as name,
 	mv.OWNER||'.'||mv.MVIEW_NAME as groupName,
 	'##DBNAME##' as databaseName,
-	mv.OWNER as schemaName
+	mv.OWNER as schemaName,
+	c.columnList
 FROM all_mviews mv
+JOIN (
+	SELECT OWNER, TABLE_NAME, listagg(COLUMN_NAME,',') within group(order by COLUMN_ID) columnList
+	FROM all_tab_columns
+	GROUP BY OWNER, TABLE_NAME
+) c
+ON c.OWNER = mv.OWNER AND c.TABLE_NAME = mv.MVIEW_NAME
 WHERE  mv.OWNER NOT IN (
 	'APEX_040200',
 	'CTXSYS',
@@ -104,5 +118,5 @@ WHERE  mv.OWNER NOT IN (
 /* AND mv.OWNER IN ('schema_to _export')                                               */
 
 /* Uncomment following line to narrow the export only to some views                    */
-/* AND mv.VIEW_NAME IN ('view_to _export')                                             */
+/* AND mv.MVIEW_NAME IN ('view_to _export')                                            */
 

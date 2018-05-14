@@ -370,7 +370,7 @@ namespace SQLDepLib
                     {
                         SQLQuerry querryItem = new SQLQuerry()
                         {
-                            sourceCode = "CREATE OR REPLACE FORCE VIEW " + item.Column2 + " AS " +  item.Column0,
+                            sourceCode = "CREATE OR REPLACE FORCE VIEW " + item.Column2 + " (" + item.Column5 + ") AS " +  item.Column0,
                             name = item.Column1,
                             groupName = item.Column2,
                             database = item.Column3,
@@ -388,7 +388,7 @@ namespace SQLDepLib
                     {
                         SQLQuerry querryItem = new SQLQuerry()
                         {
-                            sourceCode = "CREATE MATERIALIZED VIEW " + item.Column2 + " AS " + item.Column0,
+                            sourceCode = "CREATE MATERIALIZED VIEW " + item.Column2 + " (" + item.Column5 + ") AS " + item.Column0,
                             name = item.Column1,
                             groupName = item.Column2,
                             database = item.Column3,
