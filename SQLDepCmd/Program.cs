@@ -25,9 +25,12 @@ namespace SQLDepCmd
             string sendFile = string.Empty;
             string help = string.Empty;
             string driverName = string.Empty;
+            string inputDir = string.Empty;
+            string fileMask = string.Empty;
             Guid myKey;
 
             var p = new OptionSet() {
+                //Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
                 { "dbType=", "database type MsSQL(mssql)/Oracle(oracle)", v => dbType = v },
                 { "a|auth=",  "authorization SQL(default: sql_auth)/Windows (win_auth)", v => { if (v != null) auth_type = v; } },
                 { "s|server=",  "server", v => server = v },
@@ -41,6 +44,9 @@ namespace SQLDepCmd
                 { "h|help",  "show help", v => help = "set" },
                 { "driver",  "driver name", v => driverName = v },
                 { "send=",  "SEND or SENDONLY, default do not send", v => sendFile = v.ToUpper() },
+                // --inputdir=my_dir/ --filemask=*.sql --batchname=my_batch
+                { "inputdir=",  "FS version: root directory", v => inputDir = v },
+                { "filemask=",  "FS version: file mask (regular expression) i.e. *.sql", v => fileMask = v},
             };
 
             try
@@ -53,6 +59,7 @@ namespace SQLDepCmd
                 }
                 else
                 {
+
                     myKey = Guid.Parse(sMyKey);
 
                     DBExecutor dbExecutor = new DBExecutor();
@@ -61,7 +68,9 @@ namespace SQLDepCmd
                     bool sendIt = (sendFile == "SEND" || sendFile == "SENDONLY");
 
                     string connectString = dbExecutor.BuildConnectionString(dbType, string.Empty, auth_type, server, port, database, loginName, loginpassword, driverName, DBExecutor.UseDriver.DEFAULT);
+                    // TODO
                     dbExecutor.ConnectString = connectString;
+                    //dbExecutor.ConnectString = "Driver={SQL Server};Server=localhost;Database=master;Trusted_Connection=True;";
                     if (runDb)
                     {
                         dbExecutor.Connect();
@@ -71,7 +80,7 @@ namespace SQLDepCmd
 
                     if (runDb)
                     {
-                        executor.Run(customSqlSetName, myKey, dbType, exportFileName);
+                        executor.Run(customSqlSetName, myKey, dbType, exportFileName, inputDir, fileMask, database);
                     }
 
                     if (sendIt)

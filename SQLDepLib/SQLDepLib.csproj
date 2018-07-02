@@ -48,7 +48,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Teradata.Client.Provider, Version=15.11.0.0, Culture=neutral, PublicKeyToken=76b417ee2e04956c, processorArchitecture=MSIL" />
+    <Reference Include="Teradata.Client.Provider, Version=15.1.0.0, Culture=neutral, PublicKeyToken=76b417ee2e04956c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Td.Client.15.01\lib\Teradata.Client.Provider.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassQuerries.cs" />
@@ -63,6 +65,7 @@
     <Compile Include="TeradataExecutor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Settings.StyleCop">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </None>

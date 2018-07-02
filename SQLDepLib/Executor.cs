@@ -44,7 +44,7 @@ namespace SQLDepLib
 
         private string myJson = string.Empty;
 
-        public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName)
+        public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName, string inputDir, string fileMask, string database)
         {
             this.ProgressInfo.CreateProgress();
             try
@@ -63,7 +63,18 @@ namespace SQLDepLib
                 this.Log("Database open.");
 
                 this.ProgressInfo.SetProgressRatio(0.95, string.Empty);
+
+                bool useFileSystem = !string.IsNullOrEmpty(inputDir);
+                if (useFileSystem)
+                    this.Log(String.Format("Using FS as a data source for queries. Root dir: {0}, regex: {1}", inputDir, fileMask));
+
+
+                // TODO do not fill queries from database if FS is used
                 SQLCompleteStructure dbStructure = this.Run(sqlDialect);
+
+                // append queries from FS
+                if (useFileSystem)
+                    this.GetQueriesFromFS(dbStructure, inputDir, fileMask, database);
 
                 this.ProgressInfo.SetProgressRatio(0.05, string.Empty);
 
@@ -96,6 +107,29 @@ namespace SQLDepLib
                 this.ProgressInfo.RemoveProgress();
             }
 
+        }
+
+        /// <summary>
+        /// Gets all files that are matched with fileMask and appends them to dbStructure as queries.
+        /// </summary>
+        /// <param name="dbStructure"></param>
+        /// <param name="inputDir"></param>
+        /// <param name="fileMask"></param>
+        /// <param name="database"></param>
+        private void GetQueriesFromFS(SQLCompleteStructure dbStructure, string inputDir, string fileMask, string database)
+        {
+            string[] allFiles = Directory.GetFiles(inputDir, fileMask, SearchOption.AllDirectories);
+
+            foreach (var path in allFiles)
+            {
+                string fileString = File.ReadAllText(path);
+                SQLQuerry newQuerry = new SQLQuerry();
+                newQuerry.sourceCode = fileString;
+                // TODO get schema
+                newQuerry.schema = "dbo";
+                newQuerry.database = database;
+                dbStructure.queries.Add(newQuerry);
+            }
         }
 
         public void SendStructure()
@@ -552,7 +586,8 @@ namespace SQLDepLib
             // tyto jsou povinne
             string sqlCommands = System.IO.File.ReadAllText("./sql/" + sqlDialect + "/" + purpose + "/cmd.sql");
 
-            //  Ted se sekce Queries v JSONu plni tak, ze se nacte napriklad definice procedury a ta se vlozi do Queries.Potrebujeme uzivatelum dat moznost, aby meli moznost vlozit vlastni SQL prikaz z jine tabulku a nejen databazoveho katalogu. A to by se ulozilo do Queries.
+            //  Ted se sekce Queries v JSONu plni tak, ze se nacte napriklad definice procedury a ta se vlozi do Queries.
+            //  Potrebujeme uzivatelum dat moznost, aby meli moznost vlozit vlastni SQL prikaz z jine tabulku a nejen databazoveho katalogu. A to by se ulozilo do Queries.
             // Navrhuju to resit tak, ze by vznikl v kazdem adresari s dialektemadresar custom, cili / sql / teradata / custom
             // Tam by se lionfish vzdy koukl a pokud by tam existoval nejaky fajl, tak by ho spustil.
             // Uvnitr by byl takovyhle nejaky dotaz, ktery by rovnou vracel vsechny fieldy, ktere jsou treba vyplnit v Queries.
