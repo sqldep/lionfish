@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Odbc;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
 using Teradata.Client.Provider;
+using Npgsql;
 
 namespace SQLDepLib
 {
@@ -21,6 +23,7 @@ namespace SQLDepLib
             ODBC = 1,
             ORACLE = 2,
             TERADATA = 3,
+            GREENPLUM = 4,  
         };
 
         public DBExecutor ()
@@ -36,11 +39,13 @@ namespace SQLDepLib
         private OracleConnection OleDbConnection { get; set; }
 
         private TdConnection TdConnection { get; set; }
+        private NpgsqlConnection NpgsqlConnection { get; set; }
 
         public string Server { get; private set; }
 
         public string BuildConnectionString(string dbType, string dsnName, string auth_type, string server, string port, string database, string loginName, string loginpassword, string userDefinedDriverName, UseDriver useDriverType)
         {
+            Logger.Log("Creating connection string, dbType: " + dbType);
             string ret = string.Empty;
             this.Server = server;
 
@@ -78,6 +83,52 @@ namespace SQLDepLib
                     builder.DataSource = server;
                     builder.UserId = loginName;
                     builder.Password = loginpassword;
+                    this.ConnectString = builder.ToString();
+                    return this.ConnectString;
+                }
+            }
+
+            if (useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.GREENPLUM)
+            {
+                // greenplum - we have own driver
+                if (dbType == "greenplum")
+                {
+                    this.MyDriver = DBExecutor.UseDriver.GREENPLUM;
+                    NpgsqlConnectionStringBuilder builder = new NpgsqlConnectionStringBuilder();
+                    builder.Host = server;
+                    
+                    builder.Encoding = "UTF8";
+
+                    if (!string.IsNullOrEmpty(port))
+                    {
+                        if (int.TryParse(port, out int portNum) == false)
+                        {
+                            throw new ArgumentException("Could not parse port number");
+                        }
+                        else
+                        {
+                            builder.Port = portNum;
+                        }
+                    }
+
+                    switch (auth_type)
+                    {
+                        case "win_auth":
+                            builder.IntegratedSecurity = true;
+                            Logger.Log("Connection string: " + builder.ToString());
+                            break;
+                        case "sql_auth":
+                            // logging
+                            builder.Username = "**user***";
+                            builder.Password = "**passw**";
+                            Logger.Log("Connection string: " + builder.ToString());
+                            builder.Username = loginName;
+                            builder.Password = loginpassword;
+                            break;
+                        case "dsn_auth":
+                        default: break;
+                    }
+
                     this.ConnectString = builder.ToString();
                     return this.ConnectString;
                 }
@@ -158,6 +209,7 @@ namespace SQLDepLib
 
         public void Connect ()
         {
+            Logger.Log("Connecting to server");
             if (this.MyDriver == UseDriver.ODBC)
             {
                 OdbcConnection connection = new OdbcConnection(this.ConnectString);
@@ -176,6 +228,14 @@ namespace SQLDepLib
                 connection.Open();
                 this.TdConnection = connection;
             }
+            else if (this.MyDriver == UseDriver.GREENPLUM)
+            {
+                NpgsqlConnection connection = new NpgsqlConnection(this.ConnectString);
+                connection.Open();
+                this.NpgsqlConnection = connection;
+            }
+
+            Logger.Log("Connection succesfully established");
         }
         public void Close()
         {
@@ -190,6 +250,10 @@ namespace SQLDepLib
             else if (this.MyDriver == UseDriver.TERADATA)
             {
                 this.TdConnection.Close();
+            }
+            else if (this.MyDriver == UseDriver.GREENPLUM)
+            {
+                this.NpgsqlConnection.Close();
             }
         }
         public void RunSql(List<SQLResult> result, string cmd)
@@ -206,6 +270,11 @@ namespace SQLDepLib
             {
                 this.RunTeradata(result, cmd);
             }
+            else if (this.MyDriver == UseDriver.GREENPLUM)
+            {
+                this.RunNpsql(result, cmd);
+            }
+
         }
         public void RunQuerySql(List<SQLResult> result, string cmd)
         {
@@ -221,6 +290,57 @@ namespace SQLDepLib
             {
                 this.RunTeradata(result, cmd);
             }
+            else if (this.MyDriver == UseDriver.GREENPLUM)
+            {
+                this.RunNpsql(result, cmd);
+            }
+        }
+
+        private void RunNpsql(List<SQLResult> result, string cmd)
+        {
+            try
+            {
+                NpgsqlCommand toGo = this.NpgsqlConnection.CreateCommand();
+                toGo.CommandTimeout = 3600 * 12;
+                toGo.CommandText = cmd;
+
+                NpgsqlDataReader reader = toGo.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        int nCol = reader.FieldCount;
+                        SQLResult newItem = new SQLResult();
+
+                        if (nCol > 0)
+                            newItem.Column0 = reader.IsDBNull(0) ? String.Empty : reader.GetValue(0).ToString();
+                        if (nCol > 1)
+                            newItem.Column1 = reader.IsDBNull(1) ? String.Empty : reader.GetValue(1).ToString();
+                        if (nCol > 2)
+                            newItem.Column2 = reader.IsDBNull(2) ? String.Empty : reader.GetValue(2).ToString();
+                        if (nCol > 3)
+                            newItem.Column3 = reader.IsDBNull(3) ? String.Empty : reader.GetValue(3).ToString();
+                        if (nCol > 4)
+                            newItem.Column4 = reader.IsDBNull(4) ? String.Empty : reader.GetValue(4).ToString();
+                        if (nCol > 5)
+                            newItem.Column5 = reader.IsDBNull(5) ? String.Empty : reader.GetValue(5).ToString();
+                        if (nCol > 6)
+                            newItem.Column6 = reader.IsDBNull(6) ? String.Empty : reader.GetValue(6).ToString();
+
+                        result.Add(newItem);
+
+                    }
+                }
+
+                reader.Close();
+                toGo.Dispose();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
         }
 
         private void RunTeradata(List<SQLResult> result, string cmd)

@@ -25,9 +25,9 @@ namespace SQLDepCmd
             string sendFile = string.Empty;
             string help = string.Empty;
             string driverName = string.Empty;
-            string inputDir = string.Empty;
-            string fileMask = string.Empty;
             Guid myKey;
+
+            bool useFS = false;
 
             var p = new OptionSet() {
                 //Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
@@ -44,9 +44,7 @@ namespace SQLDepCmd
                 { "h|help",  "show help", v => help = "set" },
                 { "driver",  "driver name", v => driverName = v },
                 { "send=",  "SEND or SENDONLY, default do not send", v => sendFile = v.ToUpper() },
-                // --inputdir=my_dir/ --filemask=*.sql --batchname=my_batch
-                { "inputdir=",  "FS version: root directory", v => inputDir = v },
-                { "filemask=",  "FS version: file mask (regular expression) i.e. *.sql", v => fileMask = v},
+                { "use-filesystem",  "Use this option to use FS. file_system.conf must be configured!", v => useFS = true},
             };
 
             try
@@ -68,19 +66,18 @@ namespace SQLDepCmd
                     bool sendIt = (sendFile == "SEND" || sendFile == "SENDONLY");
 
                     string connectString = dbExecutor.BuildConnectionString(dbType, string.Empty, auth_type, server, port, database, loginName, loginpassword, driverName, DBExecutor.UseDriver.DEFAULT);
-                    // TODO
                     dbExecutor.ConnectString = connectString;
-                    //dbExecutor.ConnectString = "Driver={SQL Server};Server=localhost;Database=master;Trusted_Connection=True;";
-                    if (runDb)
-                    {
-                        dbExecutor.Connect();
-                    }
+                    // why is this here? Connect is called again in Run(...)
+                    //if (runDb)
+                    //{
+                    //    dbExecutor.Connect();
+                    //}
 
                     Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, dbType);
 
                     if (runDb)
                     {
-                        executor.Run(customSqlSetName, myKey, dbType, exportFileName, inputDir, fileMask, database);
+                        executor.Run(customSqlSetName, myKey, dbType, exportFileName, useFS);
                     }
 
                     if (sendIt)
@@ -118,7 +115,7 @@ namespace SQLDepCmd
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Logger.Exception(e.Message);
                 return -1;
             }
             return 0; // standard success

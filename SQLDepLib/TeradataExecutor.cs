@@ -64,21 +64,27 @@ namespace SQLDepLib
             return querryItem;
         }
 
-        public override SQLCompleteStructure Run(string sqlDialect)
+        public override SQLCompleteStructure Run(string sqlDialect, bool useFS)
         {
             this.ProgressInfo.CreateProgress();
 
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
-            this.Log("Getting list of databases");
+            Logger.Log("Getting list of databases");
             List<string> dbNames = this.GetTeradataDbNames(sqlDialect);
-            this.Log("List of databases has " + dbNames.Count + " items.");
+            Logger.Log("List of databases has " + dbNames.Count + " items.");
 
-            this.Log("Getting list of querries");
+            Logger.Log("Getting list of querries");
             this.ProgressInfo.SetProgressRatio(0.45, "querries");
-            ret.queries = this.GetTeradataQuerries(sqlDialect, dbNames);
-            this.Log("List of querries has " + ret.queries.Count + " items.");
-
+            if (!useFS)
+            {
+                ret.queries = this.GetTeradataQuerries(sqlDialect, dbNames);
+                Logger.Log("List of querries has " + ret.queries.Count + " items.");
+            }
+            else
+            {
+                ret.queries = new List<SQLQuerry>();
+            }
 
             this.ProgressInfo.SetProgressRatio(0.55, "DB model");
             ret.databaseModel = new SQLDatabaseModel();
@@ -149,7 +155,7 @@ namespace SQLDepLib
                         }
                         catch(Exception ex)
                         {
-                            this.Log("Ignored error " + ex.Message);// ignore
+                            Logger.Log("Ignored error " + ex.Message);// ignore
                         }
                     }
                 }
@@ -266,11 +272,11 @@ namespace SQLDepLib
                     }
                     catch(Exception ex)
                     {
-                        this.Log("Ignored error for table/view " + tableOrViewName + ", error:" + ex.Message);// ignore
+                        Logger.Log("Ignored error for table/view " + tableOrViewName + ", error:" + ex.Message);// ignore
                     }
                 }
 
-                this.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
+                Logger.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
             }
             modelItems.Add(modelItem);
 
