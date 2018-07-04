@@ -127,6 +127,10 @@ namespace SQLDep
                 case "mssql":
                     odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("SQL", StringComparison.InvariantCultureIgnoreCase) >=0).ToList();
                     break;
+                case "greenplum":
+                    comboItems.Add(new ComboBoxDriverItem() { Text = UIConfig.DRIVER_NAME_NATIVE, UseDriverType = DBExecutor.UseDriver.GREENPLUM });
+                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("greenplum", StringComparison.InvariantCultureIgnoreCase) >= 0).ToList();
+                    break;
                 default:
                     odbcDrivers = new List<string>();
                     break;
@@ -189,6 +193,24 @@ namespace SQLDep
             }
         }
 
+        public void EnableFileSystem()
+        {
+            if (this.textBoxRootDirectory.Enabled)
+            {
+                this.textBoxRootDirectory.Enabled = false;
+                this.textBoxDefautSchema.Enabled = false;
+                this.textBoxDefaultDatabase.Enabled = false;
+                this.textBoxFileMask.Enabled = false;
+            }
+            else
+            {
+                this.textBoxRootDirectory.Enabled = true;
+                this.textBoxDefautSchema.Enabled = true;
+                this.textBoxDefaultDatabase.Enabled = true;
+                this.textBoxFileMask.Enabled = true;
+            }
+        }
+
         private int GetDatabaseTypeIdx (string sqlDialect)
         {
             if (sqlDialect == "teradata")
@@ -207,17 +229,13 @@ namespace SQLDep
 
         private string GetDatabaseTypeName(int idx)
         {
-            if (idx == 0)
+            switch (idx)
             {
-                return "oracle";
-            }
-            else if (idx == 2)
-            {
-                return "teradata";
-            }
-            else
-            {
-                return "mssql";
+                case 0: return "oracle";
+                case 1: return "mssql";
+                case 2: return "teradata";
+                case 3: return "greenplum";
+                default: return "mssql";
             }
         }
 
@@ -339,6 +357,10 @@ namespace SQLDep
                 DBExecutor dbExecutor = new DBExecutor();
                 this.BuildConnectionString(dbExecutor);
 
+                // create filesystem configuration file, Executor will use this
+                if (checkboxUseFS.Checked)
+                    CreateFileSystemCfgFile();
+
                 string myName = this.textBoxUserName.Text.ToString();
                 Guid myKey;
                 if (!Guid.TryParse(this.textBoxKey.Text.ToString(), out myKey))
@@ -354,7 +376,7 @@ namespace SQLDep
 
                 string exportFileName = fbd.SelectedPath + "\\DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
 
-                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor);
+                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor, checkboxUseFS.Checked);
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
                 this.AsyncExecutorThread.Start();
                 new Thread(this.ShowProgress).Start();
@@ -370,6 +392,16 @@ namespace SQLDep
                 string msg = ex.Message + ex.StackTrace;
                 MessageBox.Show(msg);
             }
+        }
+
+        private void CreateFileSystemCfgFile()
+        {
+            FileSystemData fsData = new FileSystemData();
+            fsData.ConfFile.DefaultDatabase = this.textBoxDefaultDatabase.Text;
+            fsData.ConfFile.DefaultSchema = this.textBoxDefautSchema.Text;
+            fsData.ConfFile.InputDir = this.textBoxRootDirectory.Text;
+            fsData.ConfFile.FileMask = this.textBoxFileMask.Text;
+            fsData.Save();
         }
 
         public void ShowProgress ()
@@ -482,6 +514,11 @@ namespace SQLDep
         {
             this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            this.EnableFileSystem();
         }
     }
 }

@@ -1072,4 +1072,308 @@ SELECT
 		d.name;
 
 2018-07-03 11:52:42	GetDBNames - adding SQLDepLib.SQLResult2018-07-03 11:52:42	GetDBNames - count 12018-07-03 11:52:42	All db names : 
-[test]2018-07-03 11:52:42	End of testing.
+[test]2018-07-03 11:52:42	End of testing.2018-07-04 10:56:27	Creating connection string, dbType: mssql
+2018-07-04 10:56:27	Connecting to server
+2018-07-04 10:56:27	Connection succesfully established
+2018-07-04 10:56:36	Creating connection string, dbType: mssql
+2018-07-04 10:56:36	64bit system
+2018-07-04 10:56:36	Before connection to databaze.
+2018-07-04 10:56:36	Connecting to server
+2018-07-04 10:56:36	Connection succesfully established
+2018-07-04 10:56:36	After connection to databaze.
+2018-07-04 10:56:36	Getting list of databases
+2018-07-04 10:56:36	GetDbNames processing cmd /* Select databases to export                                                      */
+SELECT
+		d.name 
+	FROM
+		sys.databases d
+	WHERE
+		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+/* AND d.name IN ('db_to_export')                                                  */
+	ORDER BY
+		d.name;
+
+
+2018-07-04 10:56:36	GetDBNames - adding SQLDepLib.SQLResult
+2018-07-04 10:56:36	GetDBNames - count 1
+2018-07-04 10:56:36	List of databases has 1 items.
+2018-07-04 10:56:36	Getting list of querries
+2018-07-04 10:56:36	Checked custom sql files in ./sql/mssql/custom - directory exists.
+2018-07-04 10:56:36	ConfFile ./sql/mssql/custom in custom directory ignored - expected extension sql.
+2018-07-04 10:56:36	List of querries has 0 items.
+2018-07-04 10:56:36	Getting tables in databasetest.
+2018-07-04 10:56:36	Tables #[3] in databasetest processed.
+2018-07-04 10:56:36	Getting synonyms in databasetest.
+2018-07-04 10:56:36	Synonyms #[1] in databasetestprocessed.
+2018-07-04 10:56:36	Getting list of dblinks
+2018-07-04 10:56:37	List of dblinks has 0 items.
+2018-07-04 11:03:21	Result data saved in D:\Desktop\DBexport_32e0d39b-5a09-400d-a898-b8c3a8294a34_2018_07_04_10_56_36.json
+2018-07-04 12:23:26	Creating connection string, dbType: mssql
+2018-07-04 12:23:26	Connecting to server
+2018-07-04 12:23:26	Connection succesfully established
+2018-07-04 12:23:46	Creating connection string, dbType: mssql
+2018-07-04 12:25:11	Creating connection string, dbType: mssql
+2018-07-04 12:25:11	Connecting to server
+2018-07-04 12:25:11	Connection succesfully established
+2018-07-04 12:25:20	Creating connection string, dbType: mssql
+2018-07-04 12:25:20	64bit system
+2018-07-04 12:25:20	Before connection to databaze.
+2018-07-04 12:25:20	Connecting to server
+2018-07-04 12:25:20	Connection succesfully established
+2018-07-04 12:25:20	After connection to databaze.
+2018-07-04 12:25:20	Getting list of databases
+2018-07-04 12:25:20	GetDbNames processing cmd /* Select databases to export                                                      */
+SELECT
+		d.name 
+	FROM
+		sys.databases d
+	WHERE
+		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+/* AND d.name IN ('db_to_export')                                                  */
+	ORDER BY
+		d.name;
+
+
+2018-07-04 12:25:20	GetDBNames - adding SQLDepLib.SQLResult
+2018-07-04 12:25:20	GetDBNames - count 1
+2018-07-04 12:25:20	List of databases has 1 items.
+2018-07-04 12:25:20	Getting list of querries
+2018-07-04 12:25:20	Checked custom sql files in ./sql/mssql/custom - directory exists.
+2018-07-04 12:25:20	ConfFile ./sql/mssql/custom in custom directory ignored - expected extension sql.
+2018-07-04 12:25:20	List of querries has 0 items.
+2018-07-04 12:25:20	Getting tables in databasetest.
+2018-07-04 12:25:20	Tables #[3] in databasetest processed.
+2018-07-04 12:25:20	Getting synonyms in databasetest.
+2018-07-04 12:25:20	Synonyms #[1] in databasetestprocessed.
+2018-07-04 12:25:20	Getting list of dblinks
+2018-07-04 12:25:20	List of dblinks has 0 items.
+2018-07-04 12:25:20	Result data saved in D:\Desktop\DBexport_b3f79dd2-9c37-4b61-a091-c9b8fdd15d7c_2018_07_04_12_25_20.json
+2018-07-04 12:27:55	Creating connection string, dbType: mssql
+2018-07-04 12:27:55	64bit system
+2018-07-04 12:27:55	Before connection to databaze.
+2018-07-04 12:27:55	Connecting to server
+2018-07-04 12:27:55	Connection succesfully established
+2018-07-04 12:27:55	After connection to databaze.
+2018-07-04 12:27:55	Getting list of databases
+2018-07-04 12:27:55	GetDbNames processing cmd /* Select databases to export                                                      */
+SELECT
+		d.name 
+	FROM
+		sys.databases d
+	WHERE
+		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+/* AND d.name IN ('db_to_export')                                                  */
+	ORDER BY
+		d.name;
+
+
+2018-07-04 12:27:55	GetDBNames - adding SQLDepLib.SQLResult
+2018-07-04 12:27:55	GetDBNames - count 1
+2018-07-04 12:27:55	List of databases has 1 items.
+2018-07-04 12:27:55	Getting list of querries
+2018-07-04 12:27:55	Getting tables in databasetest.
+2018-07-04 12:27:55	Tables #[3] in databasetest processed.
+2018-07-04 12:27:55	Getting synonyms in databasetest.
+2018-07-04 12:27:55	Synonyms #[1] in databasetestprocessed.
+2018-07-04 12:27:55	Getting list of dblinks
+2018-07-04 12:27:55	List of dblinks has 0 items.
+2018-07-04 12:27:55	Getting data from Filesystem.
+2018-07-04 12:27:55	Error Část cesty D:\Desktop\Programming\SqlDep\lionfish\Testdir nebyla nalezena.
+   v System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   v System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   v System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   v System.IO.Directory.GetFiles(String path, String searchPattern, SearchOption searchOption)
+   v SQLDepLib.Executor.GetQueriesFromFS(SQLCompleteStructure dbStructure) v D:\Desktop\Programming\SqlDep\lionfish\SQLDepLib\Executor.cs:řádek 109
+   v SQLDepLib.Executor.Run(String customSqlSetName, Guid myKey, String sqlDialect, String exportFileName, Boolean useFS) v D:\Desktop\Programming\SqlDep\lionfish\SQLDepLib\Executor.cs:řádek 64
+2018-07-04 12:27:55	ExceptionČást cesty D:\Desktop\Programming\SqlDep\lionfish\Testdir nebyla nalezena.
+2018-07-04 12:28:25	Creating connection string, dbType: mssql
+2018-07-04 12:28:25	64bit system
+2018-07-04 12:28:25	Before connection to databaze.
+2018-07-04 12:28:25	Connecting to server
+2018-07-04 12:28:25	Connection succesfully established
+2018-07-04 12:28:25	After connection to databaze.
+2018-07-04 12:28:25	Getting list of databases
+2018-07-04 12:28:25	GetDbNames processing cmd /* Select databases to export                                                      */
+SELECT
+		d.name 
+	FROM
+		sys.databases d
+	WHERE
+		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+/* AND d.name IN ('db_to_export')                                                  */
+	ORDER BY
+		d.name;
+
+
+2018-07-04 12:28:25	GetDBNames - adding SQLDepLib.SQLResult
+2018-07-04 12:28:25	GetDBNames - count 1
+2018-07-04 12:28:25	List of databases has 1 items.
+2018-07-04 12:28:25	Getting list of querries
+2018-07-04 12:28:25	Getting tables in databasetest.
+2018-07-04 12:28:25	Tables #[3] in databasetest processed.
+2018-07-04 12:28:25	Getting synonyms in databasetest.
+2018-07-04 12:28:25	Synonyms #[1] in databasetestprocessed.
+2018-07-04 12:28:25	Getting list of dblinks
+2018-07-04 12:28:25	List of dblinks has 0 items.
+2018-07-04 12:28:25	Getting data from Filesystem.
+2018-07-04 12:28:25	Result data saved in testoutput.txt
+2018-07-04 12:28:25	Before sending zipped data.
+2018-07-04 12:28:25	Proxy URL: https://sqldep.com/api/batch/zip/
+2018-07-04 12:28:28	Data sent.
+2018-07-04 12:32:53	Creating connection string, dbType: mssql
+2018-07-04 12:32:53	64bit system
+2018-07-04 12:32:53	Before connection to databaze.
+2018-07-04 12:32:53	Connecting to server
+2018-07-04 12:32:53	Connection succesfully established
+2018-07-04 12:32:53	After connection to databaze.
+2018-07-04 12:32:53	Getting list of databases
+2018-07-04 12:32:53	GetDbNames processing cmd /* Select databases to export                                                      */
+SELECT
+		d.name 
+	FROM
+		sys.databases d
+	WHERE
+		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+/* AND d.name IN ('db_to_export')                                                  */
+	ORDER BY
+		d.name;
+
+
+2018-07-04 12:32:53	GetDBNames - adding SQLDepLib.SQLResult
+2018-07-04 12:32:53	GetDBNames - count 1
+2018-07-04 12:32:53	List of databases has 1 items.
+2018-07-04 12:32:53	Getting list of querries
+2018-07-04 12:32:53	Getting tables in databasetest.
+2018-07-04 12:32:53	Tables #[3] in databasetest processed.
+2018-07-04 12:32:53	Getting synonyms in databasetest.
+2018-07-04 12:32:53	Synonyms #[1] in databasetestprocessed.
+2018-07-04 12:32:53	Getting list of dblinks
+2018-07-04 12:32:53	List of dblinks has 0 items.
+2018-07-04 12:32:53	Getting data from Filesystem.
+2018-07-04 12:32:53	Result data saved in testoutput.json
+2018-07-04 12:32:53	Before sending zipped data.
+2018-07-04 12:32:53	Proxy URL: https://sqldep.com/api/batch/zip/
+2018-07-04 12:32:55	Data sent.
+2018-07-04 12:40:47	Creating connection string, dbType: mssql
+2018-07-04 12:40:47	Connecting to server
+2018-07-04 12:40:47	Connection succesfully established
+2018-07-04 12:41:03	Creating connection string, dbType: mssql
+2018-07-04 12:41:03	64bit system
+2018-07-04 12:41:03	Before connection to databaze.
+2018-07-04 12:41:03	Connecting to server
+2018-07-04 12:41:03	Connection succesfully established
+2018-07-04 12:41:03	After connection to databaze.
+2018-07-04 12:41:03	Getting list of databases
+2018-07-04 12:41:03	GetDbNames processing cmd /* Select databases to export                                                      */
+SELECT
+		d.name 
+	FROM
+		sys.databases d
+	WHERE
+		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+/* AND d.name IN ('db_to_export')                                                  */
+	ORDER BY
+		d.name;
+
+
+2018-07-04 12:41:03	GetDBNames - adding SQLDepLib.SQLResult
+2018-07-04 12:41:03	GetDBNames - count 1
+2018-07-04 12:41:03	List of databases has 1 items.
+2018-07-04 12:41:03	Getting list of querries
+2018-07-04 12:41:03	Getting tables in databasetest.
+2018-07-04 12:41:03	Tables #[3] in databasetest processed.
+2018-07-04 12:41:03	Getting synonyms in databasetest.
+2018-07-04 12:41:03	Synonyms #[1] in databasetestprocessed.
+2018-07-04 12:41:03	Getting list of dblinks
+2018-07-04 12:41:03	List of dblinks has 0 items.
+2018-07-04 12:41:03	Getting data from Filesystem.
+2018-07-04 12:41:04	Error Část cesty D:\Desktop\Programming\SqlDep\lionfish\some\long\path nebyla nalezena.
+   v System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   v System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   v System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   v System.IO.Directory.GetFiles(String path, String searchPattern, SearchOption searchOption)
+   v SQLDepLib.Executor.GetQueriesFromFS(SQLCompleteStructure dbStructure) v D:\Desktop\Programming\SqlDep\lionfish\SQLDepLib\Executor.cs:řádek 109
+   v SQLDepLib.Executor.Run(String customSqlSetName, Guid myKey, String sqlDialect, String exportFileName, Boolean useFS) v D:\Desktop\Programming\SqlDep\lionfish\SQLDepLib\Executor.cs:řádek 64
+2018-07-04 12:42:49	Creating connection string, dbType: mssql
+2018-07-04 12:42:49	64bit system
+2018-07-04 12:42:49	Before connection to databaze.
+2018-07-04 12:42:49	Connecting to server
+2018-07-04 12:42:49	Connection succesfully established
+2018-07-04 12:42:49	After connection to databaze.
+2018-07-04 12:42:49	Getting list of databases
+2018-07-04 12:42:49	GetDbNames processing cmd /* Select databases to export                                                      */
+SELECT
+		d.name 
+	FROM
+		sys.databases d
+	WHERE
+		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+/* AND d.name IN ('db_to_export')                                                  */
+	ORDER BY
+		d.name;
+
+
+2018-07-04 12:42:49	GetDBNames - adding SQLDepLib.SQLResult
+2018-07-04 12:42:49	GetDBNames - count 1
+2018-07-04 12:42:49	List of databases has 1 items.
+2018-07-04 12:42:49	Getting list of querries
+2018-07-04 12:42:49	Getting tables in databasetest.
+2018-07-04 12:42:49	Tables #[3] in databasetest processed.
+2018-07-04 12:42:49	Getting synonyms in databasetest.
+2018-07-04 12:42:49	Synonyms #[1] in databasetestprocessed.
+2018-07-04 12:42:49	Getting list of dblinks
+2018-07-04 12:42:49	List of dblinks has 0 items.
+2018-07-04 12:42:49	Getting data from Filesystem.
+2018-07-04 12:42:49	Error Část cesty D:\Desktop\Programming\SqlDep\lionfish\Testdir nebyla nalezena.
+   v System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   v System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   v System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   v System.IO.Directory.GetFiles(String path, String searchPattern, SearchOption searchOption)
+   v SQLDepLib.Executor.GetQueriesFromFS(SQLCompleteStructure dbStructure) v D:\Desktop\Programming\SqlDep\lionfish\SQLDepLib\Executor.cs:řádek 109
+   v SQLDepLib.Executor.Run(String customSqlSetName, Guid myKey, String sqlDialect, String exportFileName, Boolean useFS) v D:\Desktop\Programming\SqlDep\lionfish\SQLDepLib\Executor.cs:řádek 64
+2018-07-04 12:43:13	Creating connection string, dbType: mssql
+2018-07-04 12:43:13	64bit system
+2018-07-04 12:43:13	Before connection to databaze.
+2018-07-04 12:43:13	Connecting to server
+2018-07-04 12:43:13	Connection succesfully established
+2018-07-04 12:43:13	After connection to databaze.
+2018-07-04 12:43:13	Getting list of databases
+2018-07-04 12:43:13	GetDbNames processing cmd /* Select databases to export                                                      */
+SELECT
+		d.name 
+	FROM
+		sys.databases d
+	WHERE
+		d.name not in ('master', 'model', 'msdb', 'tempdb', 'SSISDB')
+/* AND d.name IN ('db_to_export')                                                  */
+	ORDER BY
+		d.name;
+
+
+2018-07-04 12:43:13	GetDBNames - adding SQLDepLib.SQLResult
+2018-07-04 12:43:13	GetDBNames - count 1
+2018-07-04 12:43:13	List of databases has 1 items.
+2018-07-04 12:43:13	Getting list of querries
+2018-07-04 12:43:13	Getting tables in databasetest.
+2018-07-04 12:43:13	Tables #[3] in databasetest processed.
+2018-07-04 12:43:13	Getting synonyms in databasetest.
+2018-07-04 12:43:13	Synonyms #[1] in databasetestprocessed.
+2018-07-04 12:43:13	Getting list of dblinks
+2018-07-04 12:43:13	List of dblinks has 0 items.
+2018-07-04 12:43:13	Getting data from Filesystem.
+2018-07-04 12:43:13	Result data saved in D:\Desktop\DBexport_becf77ce-b970-4181-af2a-fdbc560104df_2018_07_04_12_43_13.json
+2018-07-04 12:43:34	Before sending zipped data.
+2018-07-04 12:43:34	Proxy URL: https://sqldep.com/api/batch/zip/
+2018-07-04 12:43:37	Data sent.
+2018-07-04 02:15:52	Creating connection string, dbType: greenplum
+2018-07-04 02:15:52	Connecting to server
+2018-07-04 02:18:41	Creating connection string, dbType: greenplum
+2018-07-04 02:20:58	Creating connection string, dbType: greenplum
+2018-07-04 02:20:58	Connecting to server
+2018-07-04 02:21:57	Creating connection string, dbType: greenplum
+2018-07-04 02:21:57	Connection string: Host=localhost;Encoding=UTF8;Integrated Security=True
+2018-07-04 02:22:27	Connecting to server
+2018-07-04 02:23:13	Creating connection string, dbType: mssql
+2018-07-04 02:23:48	Creating connection string, dbType: greenplum
+2018-07-04 02:23:48	Connection string: Host=localhost;Encoding=UTF8;Username=**user***;Password=**passw**
+2018-07-04 02:25:01	Connecting to server

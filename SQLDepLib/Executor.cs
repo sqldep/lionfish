@@ -28,15 +28,6 @@ namespace SQLDepLib
 
         public ProgressInfo ProgressInfo { get; private set; }
 
-        protected void Log(string msg)
-        {
-            StreamWriter wr = File.AppendText("SQLdepLog.txt");
-            wr.Write(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
-            wr.Write("\t");
-            wr.WriteLine(msg);
-            wr.Close();
-        }
-
         private string myJson = string.Empty;
 
         public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName, bool useFS)
@@ -56,11 +47,11 @@ namespace SQLDepLib
                 Logger.Log("After connection to databaze.");
 
                 // THIS IS FOR TESTING ONLY ---------------- START
-
+                /*
                 List<string> dbNames = this.GetDbNames(sqlDialect);
                 Logger.Log("All db names : \n[" + String.Join(",", dbNames) + "]");
                 Logger.Log("End of testing.");
-                System.Environment.Exit(0);
+                System.Environment.Exit(0);*/
                 // THIS IS FOR TESTING ONLY ---------------- EBD
 
                 this.ProgressInfo.SetProgressRatio(0.95, string.Empty);
