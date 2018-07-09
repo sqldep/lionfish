@@ -520,5 +520,15 @@ namespace SQLDep
         {
             this.EnableFileSystem();
         }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            var FD = new FolderBrowserDialog();
+            if (FD.ShowDialog() == DialogResult.OK)
+            {
+                string fileToOpen = FD.SelectedPath;
+                textBoxRootDirectory.Text = fileToOpen;
+            }
+        }
     }
 }
