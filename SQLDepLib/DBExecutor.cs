@@ -23,7 +23,7 @@ namespace SQLDepLib
             ODBC = 1,
             ORACLE = 2,
             TERADATA = 3,
-            GREENPLUM = 4,  
+            POSTGRESQL = 4,  
         };
 
         public DBExecutor ()
@@ -88,12 +88,12 @@ namespace SQLDepLib
                 }
             }
 
-            if (useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.GREENPLUM)
+            if (useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.POSTGRESQL)
             {
-                // greenplum - we have own driver
-                if (dbType == "greenplum")
+                // greenplum, redhift - we have own driver
+                if (dbType == "greenplum" || dbType == "redshift" || dbType == "postgresql")
                 {
-                    this.MyDriver = DBExecutor.UseDriver.GREENPLUM;
+                    this.MyDriver = DBExecutor.UseDriver.POSTGRESQL;
                     NpgsqlConnectionStringBuilder builder = new NpgsqlConnectionStringBuilder();
                     builder.Host = server;
                     
@@ -228,7 +228,7 @@ namespace SQLDepLib
                 connection.Open();
                 this.TdConnection = connection;
             }
-            else if (this.MyDriver == UseDriver.GREENPLUM)
+            else if (this.MyDriver == UseDriver.POSTGRESQL)
             {
                 NpgsqlConnection connection = new NpgsqlConnection(this.ConnectString);
                 connection.Open();
@@ -251,7 +251,7 @@ namespace SQLDepLib
             {
                 this.TdConnection.Close();
             }
-            else if (this.MyDriver == UseDriver.GREENPLUM)
+            else if (this.MyDriver == UseDriver.POSTGRESQL)
             {
                 this.NpgsqlConnection.Close();
             }
@@ -270,7 +270,7 @@ namespace SQLDepLib
             {
                 this.RunTeradata(result, cmd);
             }
-            else if (this.MyDriver == UseDriver.GREENPLUM)
+            else if (this.MyDriver == UseDriver.POSTGRESQL)
             {
                 this.RunNpsql(result, cmd);
             }
@@ -290,7 +290,7 @@ namespace SQLDepLib
             {
                 this.RunTeradata(result, cmd);
             }
-            else if (this.MyDriver == UseDriver.GREENPLUM)
+            else if (this.MyDriver == UseDriver.POSTGRESQL)
             {
                 this.RunNpsql(result, cmd);
             }

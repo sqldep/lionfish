@@ -128,8 +128,10 @@ namespace SQLDep
                     odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("SQL", StringComparison.InvariantCultureIgnoreCase) >=0).ToList();
                     break;
                 case "greenplum":
-                    comboItems.Add(new ComboBoxDriverItem() { Text = UIConfig.DRIVER_NAME_NATIVE, UseDriverType = DBExecutor.UseDriver.GREENPLUM });
-                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("greenplum", StringComparison.InvariantCultureIgnoreCase) >= 0).ToList();
+                case "postgresql":
+                case "redshift":
+                    comboItems.Add(new ComboBoxDriverItem() { Text = UIConfig.DRIVER_NAME_NATIVE, UseDriverType = DBExecutor.UseDriver.POSTGRESQL });
+                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("postgresql", StringComparison.InvariantCultureIgnoreCase) >= 0).ToList();
                     break;
                 default:
                     odbcDrivers = new List<string>();
@@ -201,6 +203,7 @@ namespace SQLDep
                 this.textBoxDefautSchema.Enabled = false;
                 this.textBoxDefaultDatabase.Enabled = false;
                 this.textBoxFileMask.Enabled = false;
+                this.ButtonBrowse.Enabled = false;
             }
             else
             {
@@ -208,6 +211,7 @@ namespace SQLDep
                 this.textBoxDefautSchema.Enabled = true;
                 this.textBoxDefaultDatabase.Enabled = true;
                 this.textBoxFileMask.Enabled = true;
+                this.ButtonBrowse.Enabled = true;
             }
         }
 
@@ -235,6 +239,8 @@ namespace SQLDep
                 case 1: return "mssql";
                 case 2: return "teradata";
                 case 3: return "greenplum";
+                case 4: return "redshift";
+                case 5: return "postgresql";
                 default: return "mssql";
             }
         }
