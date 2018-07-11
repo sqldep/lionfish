@@ -27,3 +27,7 @@ ipch/
 [Dd]ebug*/
 [Rr]elease*/
 .vs
+
+SQLdepLog\.txt
+
+testoutput\.json
