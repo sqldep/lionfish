@@ -30,7 +30,7 @@ namespace SQLDepLib
 
         private string myJson = string.Empty;
 
-        public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName, bool useFS)
+        public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName, bool useFs)
         {
             this.ProgressInfo.CreateProgress();
             try
@@ -38,13 +38,10 @@ namespace SQLDepLib
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                // muze se hodit
+                // coult be useful
                 Logger.Log(Environment.Is64BitOperatingSystem ? "64bit system" : "32bit system");
 
-                // pripoj se do databaze
-                Logger.Log("Before connection to databaze.");
                 DBExecutor.Connect();
-                Logger.Log("After connection to databaze.");
 
                 // THIS IS FOR TESTING ONLY ---------------- START
                 /*
@@ -57,10 +54,10 @@ namespace SQLDepLib
                 this.ProgressInfo.SetProgressRatio(0.95, string.Empty);
                 
                 // this will fill some dbStructure fields, such as queries and tables...
-                SQLCompleteStructure dbStructure = this.Run(sqlDialect, useFS);
+                SQLCompleteStructure dbStructure = this.Run(sqlDialect, useFs);
 
                 // append queries from FS
-                if (useFS)
+                if (useFs)
                     this.GetQueriesFromFS(dbStructure);
 
                 this.ProgressInfo.SetProgressRatio(0.05, string.Empty);
@@ -86,7 +83,7 @@ namespace SQLDepLib
             }
             catch (Exception ex)
             {
-                Logger.Log("Error " + ex.Message + "\n" + ex.StackTrace);
+                Logger.Log("Error " + ex.Message);
                 throw;
             }
             finally
@@ -127,7 +124,7 @@ namespace SQLDepLib
             }
             catch (Exception ex)
             {
-                Logger.Log("Error " + ex.Message + "\n" + ex.StackTrace);
+                Logger.Log("Error " + ex.Message);
                 throw;
             }
         }

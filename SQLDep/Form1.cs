@@ -217,17 +217,11 @@ namespace SQLDep
 
         private int GetDatabaseTypeIdx (string sqlDialect)
         {
-            if (sqlDialect == "teradata")
+            switch (sqlDialect)
             {
-                return 2;
-            }
-            else if (sqlDialect == "oracle")
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
+                case "teradata": return 2;
+                case "oracle": return 0;
+                default: return 1;
             }
         }
 
@@ -254,7 +248,6 @@ namespace SQLDep
                 SQLDep.ComboBoxDriverItem item = (SQLDep.ComboBoxDriverItem) this.comboBoxDriverName.Items[idx];
                 value = item.UseDriverType;
                 return item.Text;
-
             }
             else
             {
@@ -395,7 +388,7 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                string msg = ex.Message + ex.StackTrace;
+                string msg = ex.Message;
                 MessageBox.Show(msg);
             }
         }
@@ -476,7 +469,7 @@ namespace SQLDep
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Files were not sent!"+ ex.ToString() + ex.StackTrace);
+                    MessageBox.Show("Files were not sent! "+ ex.Message);
                 }
                 this.Text = form1Text;
 
@@ -503,7 +496,7 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Database not connected! \n\nConnection string:\n" + connection + "\n\nError: " + ex.ToString());
+                MessageBox.Show("Database not connected! \n" + "\n\nError: " + ex.Message);
             }
         }
 

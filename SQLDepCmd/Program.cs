@@ -25,13 +25,11 @@ namespace SQLDepCmd
             string sendFile = string.Empty;
             string help = string.Empty;
             string driverName = string.Empty;
+            bool useFS = false;
             Guid myKey;
 
-            bool useFS = false;
-
             var p = new OptionSet() {
-                //Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
-                { "dbType=", "database type MsSQL(mssql)/Oracle(oracle)", v => dbType = v },
+                { "dbType=", "database type MsSQL(mssql)/Oracle(oracle)/Greenplum(greenplum), PostgreSQL(postgresql), Amazon Redshift(redshift)", v => dbType = v },
                 { "a|auth=",  "authorization SQL(default: sql_auth)/Windows (win_auth)", v => { if (v != null) auth_type = v; } },
                 { "s|server=",  "server", v => server = v },
                 { "p|port=",  "port", v => { if ( v != null) port = v; } },
@@ -67,11 +65,6 @@ namespace SQLDepCmd
 
                     string connectString = dbExecutor.BuildConnectionString(dbType, string.Empty, auth_type, server, port, database, loginName, loginpassword, driverName, DBExecutor.UseDriver.DEFAULT);
                     dbExecutor.ConnectString = connectString;
-                    // why is this here? Connect is called again in Run(...)
-                    //if (runDb)
-                    //{
-                    //    dbExecutor.Connect();
-                    //}
 
                     Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, dbType);
 

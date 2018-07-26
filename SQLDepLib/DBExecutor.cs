@@ -96,8 +96,10 @@ namespace SQLDepLib
                     this.MyDriver = DBExecutor.UseDriver.POSTGRESQL;
                     NpgsqlConnectionStringBuilder builder = new NpgsqlConnectionStringBuilder();
                     builder.Host = server;
-                    
                     builder.Encoding = "UTF8";
+
+                    if (!string.IsNullOrEmpty(database))
+                        builder.Database = database;                    
 
                     if (!string.IsNullOrEmpty(port))
                     {
@@ -115,15 +117,18 @@ namespace SQLDepLib
                     {
                         case "win_auth":
                             builder.IntegratedSecurity = true;
+                            builder.Username = loginName;
+                            Logger.Log("Using Integrated Security: username may be required.");
                             Logger.Log("Connection string: " + builder.ToString());
                             break;
                         case "sql_auth":
                             // logging
                             builder.Username = "**user***";
                             builder.Password = "**passw**";
+                            Logger.Log("Using passw");
                             Logger.Log("Connection string: " + builder.ToString());
-                            builder.Username = loginName;
                             builder.Password = loginpassword;
+                            builder.Username = loginName;
                             break;
                         case "dsn_auth":
                         default: break;

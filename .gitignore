@@ -31,3 +31,5 @@ ipch/
 SQLdepLog\.txt
 
 testoutput\.json
+
+testcmd\.cmd
