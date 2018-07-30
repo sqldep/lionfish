@@ -27,7 +27,7 @@ namespace SQLDepLib
             }
             catch (Exception)
             {
-                throw new ArgumentException("Could not parse configuration file. Have you created file_system.conf");
+                throw new ArgumentException("Could not parse configuration file for reading queries from file system. Have you created file_system.conf?");
             }
         }
 

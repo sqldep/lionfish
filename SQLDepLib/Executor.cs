@@ -278,10 +278,13 @@ namespace SQLDepLib
             ret.databaseModel = new SQLDatabaseModel();
             ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
 
-            Logger.Log("Getting list of dblinks");
-            this.ProgressInfo.SetProgressRatio(0.2, "dblinks");
-            ret.dblinks = this.GetDBLinks(sqlDialect);
-            Logger.Log("List of dblinks has " + ret.dblinks.Count + " items.");
+            if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
+            {
+                Logger.Log("Getting list of dblinks");
+                this.ProgressInfo.SetProgressRatio(0.2, "dblinks");
+                ret.dblinks = this.GetDBLinks(sqlDialect);
+                Logger.Log("List of dblinks has " + ret.dblinks.Count + " items.");
+            }
 
             this.ProgressInfo.RemoveProgress();
             return ret;
@@ -728,8 +731,6 @@ namespace SQLDepLib
             bool firstSqlCommands2 = true;
             foreach (var dbName in dbNames)
             {
-
-                //this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
                 try
                 {
                     SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
@@ -787,34 +788,37 @@ namespace SQLDepLib
                     }
                     Logger.Log("Tables #["+ modelItem.tables.Count + "] in database" + dbName + " processed.");
 
-
                     // synonyms
-                    Logger.Log("Getting synonyms in database" + dbName + ".");
+                    if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
+                    {
+                        Logger.Log("Getting synonyms in database" + dbName + ".");
 
-                    modelItem.synonyms = new List<SQLSynonymModelItem>();
-                    List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, Purpose.SYNONYMS, firstSqlCommands2, replaces);
-                    firstSqlCommands2 = false;
-                    List<SQLResult> synonyms = new List<SQLResult>();
-                    foreach (var item in sqlsSynonyms)
-                    {
-                        DBExecutor.RunSql(synonyms, item);
-                    }
-                    foreach (var item in synonyms)
-                    {
-                        SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
+                        modelItem.synonyms = new List<SQLSynonymModelItem>();
+                        List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, Purpose.SYNONYMS, firstSqlCommands2, replaces);
+                        firstSqlCommands2 = false;
+                        List<SQLResult> synonyms = new List<SQLResult>();
+                        foreach (var item in sqlsSynonyms)
                         {
-                            database = item.Column0,
-                            schema = item.Column1,
-                            name = item.Column2,
-                            sourceName = item.Column4,
-                            sourceSchema = item.Column3,
-                            sourceDbLinkName = item.Column5
-                        };
-                        modelItem.synonyms.Add(synonymModelItem);
-                        synonymsCount++;
+                            DBExecutor.RunSql(synonyms, item);
+                        }
+                        foreach (var item in synonyms)
+                        {
+                            SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
+                            {
+                                database = item.Column0,
+                                schema = item.Column1,
+                                name = item.Column2,
+                                sourceName = item.Column4,
+                                sourceSchema = item.Column3,
+                                sourceDbLinkName = item.Column5
+                            };
+                            modelItem.synonyms.Add(synonymModelItem);
+                            synonymsCount++;
+                        }
+                        
+                        Logger.Log("Synonyms #[" + sqlsSynonyms.Count + "] in database" + dbName + "processed.");
                     }
                     ret.Add(modelItem);
-                    Logger.Log("Synonyms #["+ sqlsSynonyms .Count + "] in database" + dbName + "processed.");
                 }
                 catch (Exception ex)
                 {

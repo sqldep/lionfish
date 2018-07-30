@@ -91,7 +91,7 @@ namespace SQLDepLib
             if (useDriverType == UseDriver.DEFAULT || useDriverType == UseDriver.POSTGRESQL)
             {
                 // greenplum, redhift - we have own driver
-                if (dbType == "greenplum" || dbType == "redshift" || dbType == "postgresql")
+                if (dbType == "greenplum" || dbType == "redshift" || dbType == "postgres")
                 {
                     this.MyDriver = DBExecutor.UseDriver.POSTGRESQL;
                     NpgsqlConnectionStringBuilder builder = new NpgsqlConnectionStringBuilder();

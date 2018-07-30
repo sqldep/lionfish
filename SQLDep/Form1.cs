@@ -128,10 +128,10 @@ namespace SQLDep
                     odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("SQL", StringComparison.InvariantCultureIgnoreCase) >=0).ToList();
                     break;
                 case "greenplum":
-                case "postgresql":
+                case "postgres":
                 case "redshift":
                     comboItems.Add(new ComboBoxDriverItem() { Text = UIConfig.DRIVER_NAME_NATIVE, UseDriverType = DBExecutor.UseDriver.POSTGRESQL });
-                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("postgresql", StringComparison.InvariantCultureIgnoreCase) >= 0).ToList();
+                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("postgres", StringComparison.InvariantCultureIgnoreCase) >= 0).ToList();
                     break;
                 default:
                     odbcDrivers = new List<string>();
@@ -234,7 +234,7 @@ namespace SQLDep
                 case 2: return "teradata";
                 case 3: return "greenplum";
                 case 4: return "redshift";
-                case 5: return "postgresql";
+                case 5: return "postgres";
                 default: return "mssql";
             }
         }

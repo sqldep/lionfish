@@ -29,7 +29,7 @@ namespace SQLDepCmd
             Guid myKey;
 
             var p = new OptionSet() {
-                { "dbType=", "database type MsSQL(mssql)/Oracle(oracle)/Greenplum(greenplum), PostgreSQL(postgresql), Amazon Redshift(redshift)", v => dbType = v },
+                { "dbType=", "database type MsSQL(mssql)/Oracle(oracle)/Greenplum(greenplum), PostgreSQL(postgres), Amazon Redshift(redshift)", v => dbType = v },
                 { "a|auth=",  "authorization SQL(default: sql_auth)/Windows (win_auth)", v => { if (v != null) auth_type = v; } },
                 { "s|server=",  "server", v => server = v },
                 { "p|port=",  "port", v => { if ( v != null) port = v; } },
