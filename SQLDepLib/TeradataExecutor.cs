@@ -66,8 +66,6 @@ namespace SQLDepLib
 
         public override SQLCompleteStructure Run(string sqlDialect, bool useFS)
         {
-            this.ProgressInfo.CreateProgress();
-
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
             Logger.Log("Getting list of databases");
@@ -75,7 +73,6 @@ namespace SQLDepLib
             Logger.Log("List of databases has " + dbNames.Count + " items.");
 
             Logger.Log("Getting list of querries");
-            this.ProgressInfo.SetProgressRatio(0.45, "querries");
             if (!useFS)
             {
                 ret.queries = this.GetTeradataQuerries(sqlDialect, dbNames);
@@ -86,12 +83,9 @@ namespace SQLDepLib
                 ret.queries = new List<SQLQuerry>();
             }
 
-            this.ProgressInfo.SetProgressRatio(0.55, "DB model");
             ret.databaseModel = new SQLDatabaseModel();
             ret.databaseModel.databases = this.GetTeradataDatabaseModels(sqlDialect, dbNames);
 
-
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -99,7 +93,6 @@ namespace SQLDepLib
         {
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
-            this.ProgressInfo.CreateProgress();
             bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
             {
@@ -155,12 +148,11 @@ namespace SQLDepLib
                         }
                         catch(Exception ex)
                         {
-                            Logger.Log("Ignored error " + ex.Message);// ignore
+                            Logger.Log("Ignored error " + ex.Message);
                         }
                     }
                 }
             }
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -189,7 +181,6 @@ namespace SQLDepLib
         private List<SQLDatabaseModelItem> GetTeradataDatabaseModels(string sqlDialect, List<string> dbNames)
         {
             List<SQLDatabaseModelItem> modelItems = new List<SQLDatabaseModelItem>();
-            this.ProgressInfo.CreateProgress();
 
             SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
             modelItem.name = "default";

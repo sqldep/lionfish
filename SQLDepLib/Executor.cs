@@ -18,8 +18,7 @@ namespace SQLDepLib
             this.DBExecutor = dbExecutor;
             this.runId = Guid.NewGuid().ToString();
             this.ProgressInfo = new ProgressInfo();
-            ServicePointManager.SecurityProtocol =
-                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
         }
 
         public string runId { get; set; }
@@ -32,7 +31,6 @@ namespace SQLDepLib
 
         public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName, bool useFs)
         {
-            this.ProgressInfo.CreateProgress();
             try
             {
                 Stopwatch sw = new Stopwatch();
@@ -43,24 +41,17 @@ namespace SQLDepLib
 
                 DBExecutor.Connect();
 
-                // THIS IS FOR TESTING ONLY ---------------- START
-                /*
-                List<string> dbNames = this.GetDbNames(sqlDialect);
-                Logger.Log("All db names : \n[" + String.Join(",", dbNames) + "]");
-                Logger.Log("End of testing.");
-                System.Environment.Exit(0);*/
-                // THIS IS FOR TESTING ONLY ---------------- EBD
+                this.ProgressInfo.SetProgressPercent(10, "Collecting data from DB.");
 
-                this.ProgressInfo.SetProgressRatio(0.95, string.Empty);
-                
                 // this will fill some dbStructure fields, such as queries and tables...
                 SQLCompleteStructure dbStructure = this.Run(sqlDialect, useFs);
 
                 // append queries from FS
                 if (useFs)
+                {
+                    this.ProgressInfo.SetProgressPercent(85, "Collecting data from FileSystem.");
                     this.GetQueriesFromFS(dbStructure);
-
-                this.ProgressInfo.SetProgressRatio(0.05, string.Empty);
+                }
 
                 int totalTablesCount = 0;
                 foreach (var item in dbStructure.databaseModel.databases)
@@ -78,6 +69,7 @@ namespace SQLDepLib
                 dbStructure.customSqlSetName = customSqlSetName;
                 sw.Stop();
                 dbStructure.exportTime = sw.ElapsedMilliseconds.ToString();
+                this.ProgressInfo.SetProgressPercent(95, "Saving collected data to file.");
                 myJson = this.SaveStructureToFile(dbStructure, exportFileName);
                 DBExecutor.Close();
             }
@@ -147,7 +139,6 @@ namespace SQLDepLib
             }
 
             Logger.Log("Before sending zipped data.");
-            //var baseAddress = "http://192.168.1.13:8000/api/batch/zip/";
             var baseAddress = "https://sqldep.com/api/batch/zip/";
 
             var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
@@ -192,9 +183,7 @@ namespace SQLDepLib
         }
 
         public virtual SQLCompleteStructure Run(string sqlDialect, bool useFS)
-        {
-            this.ProgressInfo.CreateProgress();
-            
+        {            
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
             Logger.Log("Getting list of databases");
@@ -254,7 +243,7 @@ namespace SQLDepLib
             // Expect columns in this order: Owner, Name, UserName, Host
 
             Logger.Log("Getting list of querries");
-            this.ProgressInfo.SetProgressRatio(0.45, "querries");
+            this.ProgressInfo.SetProgressPercent(15, "Collecting queries.");
             if (!useFS)
             {
                 if (sqlDialect == "oracle")
@@ -272,21 +261,18 @@ namespace SQLDepLib
             {
                 ret.queries = new List<SQLQuerry>();
             }
-
-            this.ProgressInfo.SetProgressRatio(0.35, "DB model");
-
+            this.ProgressInfo.SetProgressPercent(60, "Collecting database model.");
             ret.databaseModel = new SQLDatabaseModel();
             ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
 
             if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
             {
+                this.ProgressInfo.SetProgressPercent(62, "Colleting DB links.");
                 Logger.Log("Getting list of dblinks");
-                this.ProgressInfo.SetProgressRatio(0.2, "dblinks");
                 ret.dblinks = this.GetDBLinks(sqlDialect);
                 Logger.Log("List of dblinks has " + ret.dblinks.Count + " items.");
             }
 
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -319,7 +305,6 @@ namespace SQLDepLib
             List<SQLQuerry> ret = new List<SQLQuerry>();
 
             bool firstSqlCommands = true;
-            this.ProgressInfo.CreateProgress();
             foreach (var dbName in dbNames)
             {
                 //this.ProgressInfo.SetProgressDone((double)100* ++iiDbCounter / dbNames.Count, dbName);
@@ -353,6 +338,7 @@ namespace SQLDepLib
 
                     foreach (var item in firstBlock)
                     {
+                        this.ProgressInfo.SetProgressPercent(15 + 30 * (counter / firstBlock.Count), "Collecting queries.");
                         if (item.Column5.Equals("1")) { // dump previous wholeCode
 
                             if (counter > 0)
@@ -460,7 +446,6 @@ namespace SQLDepLib
                     throw;
                 }
             }
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -470,7 +455,6 @@ namespace SQLDepLib
 
             int count = 0;
             bool firstSqlCommands = true;
-            this.ProgressInfo.CreateProgress();
             foreach (var dbName in dbNames)
             {
                 //this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
@@ -496,6 +480,7 @@ namespace SQLDepLib
 
                     foreach (var item in result)
                     {
+                        this.ProgressInfo.SetProgressPercent(15 + 40 * (count / result.Count), "Collecting queries.");
                         SQLQuerry querryItem = new SQLQuerry()
                         {
                             sourceCode = item.Column0,
@@ -515,7 +500,6 @@ namespace SQLDepLib
                     throw;
                 }
             }
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -524,7 +508,6 @@ namespace SQLDepLib
         {
             List<SQLDBLink> ret = new List<SQLDBLink>();
 
-            this.ProgressInfo.CreateProgress();
             int count = 0;
             try
             {
@@ -542,6 +525,8 @@ namespace SQLDepLib
 
                 foreach (var item in result)
                 {
+                    this.ProgressInfo.SetProgressPercent(62 + 20*(count/result.Count), String.Format("Colleting DB links({}/{}).", count, result.Count));
+
                     SQLDBLink dblinkItem = new SQLDBLink()
                     {
                         owner = item.Column0,
@@ -558,8 +543,6 @@ namespace SQLDepLib
             {
                 throw;
             }
-            this.ProgressInfo.RemoveProgress();
-
             return ret;
         }
 
@@ -721,8 +704,6 @@ namespace SQLDepLib
         private List<SQLDatabaseModelItem> GetDatabaseModels(string sqlDialect, List<string> dbNames)
         {
             List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
-
-            this.ProgressInfo.CreateProgress();
 
             int tableCount = 0;
             int synonymsCount = 0;

@@ -471,7 +471,6 @@ namespace SQLDepLib
             }
 
             reader.Close();
-            //toGo.Dispose();
         }
     }
 }

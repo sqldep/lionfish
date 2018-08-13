@@ -427,7 +427,7 @@ namespace SQLDep
                 Thread.Sleep(100);
                 done = this.AsyncExecutor.MyExecutor.ProgressInfo.GetPercentDone(out workingOn);
                 this.progressBarCalc.Value = (int)done;
-                this.Text = form1Text + " - Running " + workingOn;
+                this.Text = form1Text + " - " + workingOn;
             }
             this.progressBarCalc.Value = 0;
             this.buttonRun.Enabled = true;
@@ -464,7 +464,7 @@ namespace SQLDep
                 this.Text = form1Text + " - sending...";
                 try
                 {
-                    ExecutorFactory.CreateExecutor(new DBExecutor(), string.Empty).SendFiles(result, this.textBoxKey.Text.ToString());
+                    ExecutorFactory.CreateExecutor(new DBExecutor(), string.Empty).SendFiles(result, this.textBoxKey.Text);
                     MessageBox.Show("Files sent successfully");
                 }
                 catch (Exception ex)
@@ -484,8 +484,7 @@ namespace SQLDep
         private void buttonTestConnection_Click(object sender, EventArgs e)
         {
             DBExecutor dbExecutor = new DBExecutor();
-            string connection = this.BuildConnectionString(dbExecutor);
-
+            this.BuildConnectionString(dbExecutor);
             try
             {
                 dbExecutor.Connect();
@@ -496,23 +495,27 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Database not connected! \n" + "\n\nError: " + ex.Message);
+                this.buttonRun.Enabled = false;
+                MessageBox.Show("Database not connected! \nError: " + ex.Message);
             }
         }
 
         private void comboBoxDriverName_SelectedIndexChanged(object sender, EventArgs e)
-        { 
+        {
+            this.buttonRun.Enabled = false;
         }
 
         private void comboBoxDSNName_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
+            this.buttonRun.Enabled = false;
         }
 
         private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
+            this.buttonRun.Enabled = false;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -525,8 +528,7 @@ namespace SQLDep
             var FD = new FolderBrowserDialog();
             if (FD.ShowDialog() == DialogResult.OK)
             {
-                string fileToOpen = FD.SelectedPath;
-                textBoxRootDirectory.Text = fileToOpen;
+                textBoxRootDirectory.Text = FD.SelectedPath;
             }
         }
     }
