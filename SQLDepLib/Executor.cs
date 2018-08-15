@@ -717,7 +717,7 @@ namespace SQLDepLib
                     SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
                     modelItem.name = dbName;
 
-                    Logger.Log("Getting tables in database" + dbName + ".");
+                    Logger.Log("Getting tables in database '" + dbName + "'.");
 
                     // sql commands
                     List<StrReplace> replaces = new List<StrReplace>();
@@ -742,8 +742,9 @@ namespace SQLDepLib
                     foreach (var item in tablesWithColumns)
                     {
                         string tableName = item.Column2;
+                        string schemaName = item.Column1;
 
-                        SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.name == tableName);
+                        SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.name == tableName && x.schema == schemaName);
 
                         if (tableModelItem == null)
                         {
