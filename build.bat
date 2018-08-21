@@ -1,17 +1,22 @@
-set BUILDDIR=build_%TIME::=-%
-mkdir "%BUILDDIR%"
+chcp 65001
+set devenvPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\devenv.exe"
 
-rmdir /S/Q SQLDep\bin\Release
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe" SQLDepCmd/SQLDepCmd.csproj  /build Release
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe" SQLDep/SQLDep.csproj  /build Release
+%devenvPath% SQLDepCmd/SQLDepCmd.csproj  /build Release
+%devenvPath% SQLDep/SQLDep.csproj  /build Release
 
-xcopy SQLDepCmd\bin\Release\SQLDepCmd.exe SQLDep\bin\Release
-xcopy /s sql SQLDep\bin\Release\sql\
-xcopy export.bat SQLDep\bin\Release
-xcopy README.md SQLDep\bin\Release
-xcopy packages\Terradata\Teradata.Net.Security.Tdgss.dll SQLDep\bin\Release
-del /s SQLDep\bin\Release\*.pdb
+rmdir /S/Q Release
+mkdir Release
+mkdir Release\sql
+xcopy /Y/Q SQLDep\bin\x86\Release\* Release
+xcopy /Y/Q SQLDepCmd\bin\x86\Release\* Release
+xcopy /S/Q sql Release\sql
+del /s Release\*.pdb
 
-xcopy /s SQLDep\bin\Release %BUILDDIR%\SQLdep\
-cd %BUILDDIR%
-zip -r SQLdep.zip SQLdep\
+
+rem To sign .exe files, uncomment next 3 lines, change path to signtool and fill in *values*
+
+rem set signtoolPath="C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
+rem %signtoolPath% sign /f *certificatePath* /p *CertificatePassword* /t http://timestamp.comodoca.com Release\SQLdepCmd.exe
+rem %signtoolPath% sign /f *certificatePath* /p *CertificatePassword* /t http://timestamp.comodoca.com Release\SQLdep.exe
+
+pause

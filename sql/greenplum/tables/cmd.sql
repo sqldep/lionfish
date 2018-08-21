@@ -17,4 +17,5 @@ where
   and t.table_schema = c.table_schema
   and t.table_name = c.table_name
   and t.table_schema not in ('pg_catalog', 'information_schema')
+  and t.table_name not ilike '%_prt_%' --ignore partition tables
 order by t.table_catalog, t.table_schema, t.table_name, c.ordinal_position;
