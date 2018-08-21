@@ -100,11 +100,12 @@ namespace SQLDepLib
             foreach (var path in allFiles)
             {
                 string fileString = File.ReadAllText(path);
-                SQLQuerry newQuerry = new SQLQuerry();
-                newQuerry.sourceCode = fileString;
-                newQuerry.schema = fsData.ConfFile.DefaultSchema;
-                newQuerry.database = fsData.ConfFile.DefaultDatabase;
-                dbStructure.queries.Add(newQuerry);
+                SQLQuery newQuery = new SQLQuery();
+                newQuery.name = Path.GetFileNameWithoutExtension(path);
+                newQuery.sourceCode = fileString;
+                newQuery.schema = fsData.ConfFile.DefaultSchema;
+                newQuery.database = fsData.ConfFile.DefaultDatabase;
+                dbStructure.queries.Add(newQuery);
             }
         }
 
@@ -259,7 +260,7 @@ namespace SQLDepLib
             }
             else
             {
-                ret.queries = new List<SQLQuerry>();
+                ret.queries = new List<SQLQuery>();
             }
             this.ProgressInfo.SetProgressPercent(60, "Collecting database model.");
             ret.databaseModel = new SQLDatabaseModel();
@@ -300,9 +301,9 @@ namespace SQLDepLib
             return ret;
         }
 
-        private List<SQLQuerry> GetOracleQuerries(string sqlDialect, List<string> dbNames)
+        private List<SQLQuery> GetOracleQuerries(string sqlDialect, List<string> dbNames)
         {
-            List<SQLQuerry> ret = new List<SQLQuerry>();
+            List<SQLQuery> ret = new List<SQLQuery>();
 
             bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
@@ -343,7 +344,7 @@ namespace SQLDepLib
 
                             if (counter > 0)
                             {
-                                SQLQuerry querryItem = new SQLQuerry()
+                                SQLQuery queryItem = new SQLQuery()
                                 {
                                     sourceCode = wholeCode.ToString(),
                                     name = queryName,
@@ -352,7 +353,7 @@ namespace SQLDepLib
                                     schema = querySchema
                                 };
 
-                                ret.Add(querryItem);
+                                ret.Add(queryItem);
                                 Logger.Log("Query done " + query_counter);
                                 query_counter++;
                             }
@@ -381,7 +382,7 @@ namespace SQLDepLib
 
                     foreach (var item in secondBlock)
                     {
-                        SQLQuerry querryItem = new SQLQuerry()
+                        SQLQuery queryItem = new SQLQuery()
                         {
                             sourceCode = "CREATE OR REPLACE FORCE VIEW " + item.Column2 + " (" + item.Column5 + ") AS " +  item.Column0,
                             name = item.Column1,
@@ -390,7 +391,7 @@ namespace SQLDepLib
                             schema = item.Column4
                         };
 
-                        ret.Add(querryItem);
+                        ret.Add(queryItem);
                     }
 
                     sqls.RemoveAt(0);
@@ -399,7 +400,7 @@ namespace SQLDepLib
 
                     foreach (var item in thirdBlock)
                     {
-                        SQLQuerry querryItem = new SQLQuerry()
+                        SQLQuery queryItem = new SQLQuery()
                         {
                             sourceCode = "CREATE MATERIALIZED VIEW " + item.Column2 + " (" + item.Column5 + ") AS " + item.Column0,
                             name = item.Column1,
@@ -408,7 +409,7 @@ namespace SQLDepLib
                             schema = item.Column4
                         };
 
-                        ret.Add(querryItem);
+                        ret.Add(queryItem);
                     }
 
                     sqls.RemoveAt(0);
@@ -422,7 +423,7 @@ namespace SQLDepLib
 
                         foreach (var item in customBlock)
                         {
-                            SQLQuerry querryItem = new SQLQuerry()
+                            SQLQuery queryItem = new SQLQuery()
                             {
                                 sourceCode = item.Column0,
                                 name = item.Column1,
@@ -431,7 +432,7 @@ namespace SQLDepLib
                                 schema = item.Column4
                             };
 
-                            ret.Add(querryItem);
+                            ret.Add(queryItem);
                         }
                         sqls.RemoveAt(0);
                     }
@@ -449,9 +450,9 @@ namespace SQLDepLib
             return ret;
         }
 
-        private List<SQLQuerry> GetQuerries(string sqlDialect, List<string> dbNames)
+        private List<SQLQuery> GetQuerries(string sqlDialect, List<string> dbNames)
         {
-            List<SQLQuerry> ret = new List<SQLQuerry>();
+            List<SQLQuery> ret = new List<SQLQuery>();
 
             int count = 0;
             bool firstSqlCommands = true;
@@ -481,7 +482,7 @@ namespace SQLDepLib
                     foreach (var item in result)
                     {
                         this.ProgressInfo.SetProgressPercent(15 + 40 * (count / result.Count), "Collecting queries.");
-                        SQLQuerry querryItem = new SQLQuerry()
+                        SQLQuery queryItem = new SQLQuery()
                         {
                             sourceCode = item.Column0,
                             name = item.Column1,
@@ -491,7 +492,7 @@ namespace SQLDepLib
                         };
 
 
-                        ret.Add(querryItem);
+                        ret.Add(queryItem);
                         count++;
                     }
                 }
@@ -773,7 +774,7 @@ namespace SQLDepLib
                     // synonyms
                     if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
                     {
-                        Logger.Log("Getting synonyms in database" + dbName + ".");
+                        Logger.Log("Getting synonyms in database " + dbName + ".");
 
                         modelItem.synonyms = new List<SQLSynonymModelItem>();
                         List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, Purpose.SYNONYMS, firstSqlCommands2, replaces);

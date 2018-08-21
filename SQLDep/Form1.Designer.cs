@@ -414,7 +414,7 @@
             this.ButtonBrowse.Location = new System.Drawing.Point(327, 50);
             this.ButtonBrowse.Name = "ButtonBrowse";
             this.ButtonBrowse.Size = new System.Drawing.Size(75, 23);
-            this.ButtonBrowse.TabIndex = 9;
+            this.ButtonBrowse.TabIndex = 6;
             this.ButtonBrowse.Text = "Browse";
             this.ButtonBrowse.UseVisualStyleBackColor = true;
             this.ButtonBrowse.Click += new System.EventHandler(this.button1_Click_1);
@@ -425,7 +425,7 @@
             this.textBoxRootDirectory.Location = new System.Drawing.Point(125, 52);
             this.textBoxRootDirectory.Name = "textBoxRootDirectory";
             this.textBoxRootDirectory.Size = new System.Drawing.Size(196, 20);
-            this.textBoxRootDirectory.TabIndex = 8;
+            this.textBoxRootDirectory.TabIndex = 5;
             // 
             // textBoxFileMask
             // 
@@ -441,7 +441,7 @@
             this.textBoxDefautSchema.Location = new System.Drawing.Point(125, 102);
             this.textBoxDefautSchema.Name = "textBoxDefautSchema";
             this.textBoxDefautSchema.Size = new System.Drawing.Size(138, 20);
-            this.textBoxDefautSchema.TabIndex = 6;
+            this.textBoxDefautSchema.TabIndex = 8;
             // 
             // textBoxDefaultDatabase
             // 
@@ -449,7 +449,7 @@
             this.textBoxDefaultDatabase.Location = new System.Drawing.Point(125, 127);
             this.textBoxDefaultDatabase.Name = "textBoxDefaultDatabase";
             this.textBoxDefaultDatabase.Size = new System.Drawing.Size(138, 20);
-            this.textBoxDefaultDatabase.TabIndex = 5;
+            this.textBoxDefaultDatabase.TabIndex = 9;
             // 
             // label16
             // 
