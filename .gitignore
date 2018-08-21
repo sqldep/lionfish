@@ -33,3 +33,5 @@ SQLdepLog\.txt
 testoutput\.json
 
 testcmd\.cmd
+
+Release/*
