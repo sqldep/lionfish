@@ -22,7 +22,7 @@ namespace SQLDepLib
             MACRO
         }
 
-        public SQLQuerry GetQuerry (string dbName, string name, ItemType type)
+        public SQLQuery GetQuerry (string dbName, string name, ItemType type)
         {
             string sql = string.Empty;
             name = name.Trim();
@@ -42,7 +42,7 @@ namespace SQLDepLib
                     break;
             }
 
-            SQLQuerry querryItem = new SQLQuerry()
+            SQLQuery queryItem = new SQLQuery()
             {
                 sourceCode = string.Empty,
                 name = name,
@@ -58,10 +58,10 @@ namespace SQLDepLib
             {
                 // teradata ma zvlastni oddelovac radku
                 sourceCodeLine = item.Column0.Replace('\r', '\n');
-                querryItem.sourceCode += sourceCodeLine;
+                queryItem.sourceCode += sourceCodeLine;
             }
 
-            return querryItem;
+            return queryItem;
         }
 
         public override SQLCompleteStructure Run(string sqlDialect, bool useFS)
@@ -80,7 +80,7 @@ namespace SQLDepLib
             }
             else
             {
-                ret.queries = new List<SQLQuerry>();
+                ret.queries = new List<SQLQuery>();
             }
 
             ret.databaseModel = new SQLDatabaseModel();
@@ -89,9 +89,9 @@ namespace SQLDepLib
             return ret;
         }
 
-        private List<SQLQuerry> GetTeradataQuerries(string sqlDialect, List<string> dbNames)
+        private List<SQLQuery> GetTeradataQuerries(string sqlDialect, List<string> dbNames)
         {
-            List<SQLQuerry> ret = new List<SQLQuerry>();
+            List<SQLQuery> ret = new List<SQLQuery>();
 
             bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
@@ -143,8 +143,8 @@ namespace SQLDepLib
                         try
                         {
             
-                            SQLQuerry querryItem = this.GetQuerry(dbName, procedureOrViewName, itemType);
-                            ret.Add(querryItem);
+                            SQLQuery queryItem = this.GetQuerry(dbName, procedureOrViewName, itemType);
+                            ret.Add(queryItem);
                         }
                         catch(Exception ex)
                         {
@@ -221,7 +221,7 @@ namespace SQLDepLib
                         
                         zatim neukladame create tabulek
 
-                        SQLQuerry structure = null;
+                        SQLQuery structure = null;
                         if (tableOrView.Column1 == "T")
                         {
                             // table
