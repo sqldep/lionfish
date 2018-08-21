@@ -59,9 +59,21 @@
             this.tabPageBasic = new System.Windows.Forms.TabPage();
             this.tabPageAdvanced = new System.Windows.Forms.TabPage();
             this.label12 = new System.Windows.Forms.Label();
+            this.Filesystem = new System.Windows.Forms.TabPage();
+            this.ButtonBrowse = new System.Windows.Forms.Button();
+            this.textBoxRootDirectory = new System.Windows.Forms.TextBox();
+            this.textBoxFileMask = new System.Windows.Forms.TextBox();
+            this.textBoxDefautSchema = new System.Windows.Forms.TextBox();
+            this.textBoxDefaultDatabase = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.checkboxUseFS = new System.Windows.Forms.CheckBox();
             this.tabControlMain.SuspendLayout();
             this.tabPageBasic.SuspendLayout();
             this.tabPageAdvanced.SuspendLayout();
+            this.Filesystem.SuspendLayout();
             this.SuspendLayout();
             // 
             // comboBoxDatabase
@@ -71,7 +83,10 @@
             this.comboBoxDatabase.Items.AddRange(new object[] {
             "Oracle",
             "MsSQL",
-            "Teradata"});
+            "Teradata",
+            "Greenplum",
+            "Amazon Redshift",
+            "PostgreSQL"});
             this.comboBoxDatabase.Location = new System.Drawing.Point(103, 16);
             this.comboBoxDatabase.Name = "comboBoxDatabase";
             this.comboBoxDatabase.Size = new System.Drawing.Size(234, 21);
@@ -310,6 +325,7 @@
             // 
             this.tabControlMain.Controls.Add(this.tabPageBasic);
             this.tabControlMain.Controls.Add(this.tabPageAdvanced);
+            this.tabControlMain.Controls.Add(this.Filesystem);
             this.tabControlMain.Location = new System.Drawing.Point(6, 12);
             this.tabControlMain.Name = "tabControlMain";
             this.tabControlMain.SelectedIndex = 0;
@@ -372,6 +388,116 @@
     "t work. For example if you want to use a different driver or a preconfigured DSN" +
     " connection.";
             // 
+            // Filesystem
+            // 
+            this.Filesystem.Controls.Add(this.ButtonBrowse);
+            this.Filesystem.Controls.Add(this.textBoxRootDirectory);
+            this.Filesystem.Controls.Add(this.textBoxFileMask);
+            this.Filesystem.Controls.Add(this.textBoxDefautSchema);
+            this.Filesystem.Controls.Add(this.textBoxDefaultDatabase);
+            this.Filesystem.Controls.Add(this.label16);
+            this.Filesystem.Controls.Add(this.label15);
+            this.Filesystem.Controls.Add(this.label14);
+            this.Filesystem.Controls.Add(this.label13);
+            this.Filesystem.Controls.Add(this.checkboxUseFS);
+            this.Filesystem.Location = new System.Drawing.Point(4, 22);
+            this.Filesystem.Name = "Filesystem";
+            this.Filesystem.Padding = new System.Windows.Forms.Padding(3);
+            this.Filesystem.Size = new System.Drawing.Size(476, 296);
+            this.Filesystem.TabIndex = 2;
+            this.Filesystem.Text = "File system";
+            this.Filesystem.UseVisualStyleBackColor = true;
+            // 
+            // ButtonBrowse
+            // 
+            this.ButtonBrowse.Enabled = false;
+            this.ButtonBrowse.Location = new System.Drawing.Point(327, 50);
+            this.ButtonBrowse.Name = "ButtonBrowse";
+            this.ButtonBrowse.Size = new System.Drawing.Size(75, 23);
+            this.ButtonBrowse.TabIndex = 6;
+            this.ButtonBrowse.Text = "Browse";
+            this.ButtonBrowse.UseVisualStyleBackColor = true;
+            this.ButtonBrowse.Click += new System.EventHandler(this.button1_Click_1);
+            // 
+            // textBoxRootDirectory
+            // 
+            this.textBoxRootDirectory.Enabled = false;
+            this.textBoxRootDirectory.Location = new System.Drawing.Point(125, 52);
+            this.textBoxRootDirectory.Name = "textBoxRootDirectory";
+            this.textBoxRootDirectory.Size = new System.Drawing.Size(196, 20);
+            this.textBoxRootDirectory.TabIndex = 5;
+            // 
+            // textBoxFileMask
+            // 
+            this.textBoxFileMask.Enabled = false;
+            this.textBoxFileMask.Location = new System.Drawing.Point(125, 77);
+            this.textBoxFileMask.Name = "textBoxFileMask";
+            this.textBoxFileMask.Size = new System.Drawing.Size(138, 20);
+            this.textBoxFileMask.TabIndex = 7;
+            // 
+            // textBoxDefautSchema
+            // 
+            this.textBoxDefautSchema.Enabled = false;
+            this.textBoxDefautSchema.Location = new System.Drawing.Point(125, 102);
+            this.textBoxDefautSchema.Name = "textBoxDefautSchema";
+            this.textBoxDefautSchema.Size = new System.Drawing.Size(138, 20);
+            this.textBoxDefautSchema.TabIndex = 8;
+            // 
+            // textBoxDefaultDatabase
+            // 
+            this.textBoxDefaultDatabase.Enabled = false;
+            this.textBoxDefaultDatabase.Location = new System.Drawing.Point(125, 127);
+            this.textBoxDefaultDatabase.Name = "textBoxDefaultDatabase";
+            this.textBoxDefaultDatabase.Size = new System.Drawing.Size(138, 20);
+            this.textBoxDefaultDatabase.TabIndex = 9;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(30, 130);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(88, 13);
+            this.label16.TabIndex = 4;
+            this.label16.Text = "Default database";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(30, 105);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(81, 13);
+            this.label15.TabIndex = 3;
+            this.label15.Text = "Default schema";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(30, 80);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(51, 13);
+            this.label14.TabIndex = 2;
+            this.label14.Text = "File mask";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(30, 55);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(73, 13);
+            this.label13.TabIndex = 1;
+            this.label13.Text = "Root directory";
+            // 
+            // checkboxUseFS
+            // 
+            this.checkboxUseFS.AutoSize = true;
+            this.checkboxUseFS.Location = new System.Drawing.Point(13, 23);
+            this.checkboxUseFS.Name = "checkboxUseFS";
+            this.checkboxUseFS.Size = new System.Drawing.Size(207, 17);
+            this.checkboxUseFS.TabIndex = 0;
+            this.checkboxUseFS.Text = "Use file system as a query data source";
+            this.checkboxUseFS.UseVisualStyleBackColor = true;
+            this.checkboxUseFS.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -381,12 +507,14 @@
             this.Controls.Add(this.progressBarCalc);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "SQLdep v1.5.15";
+            this.Text = "SQLdep v1.6.0";
             this.tabControlMain.ResumeLayout(false);
             this.tabPageBasic.ResumeLayout(false);
             this.tabPageBasic.PerformLayout();
             this.tabPageAdvanced.ResumeLayout(false);
             this.tabPageAdvanced.PerformLayout();
+            this.Filesystem.ResumeLayout(false);
+            this.Filesystem.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -423,6 +551,17 @@
         private System.Windows.Forms.TabPage tabPageBasic;
         private System.Windows.Forms.TabPage tabPageAdvanced;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TabPage Filesystem;
+        private System.Windows.Forms.CheckBox checkboxUseFS;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox textBoxRootDirectory;
+        private System.Windows.Forms.TextBox textBoxFileMask;
+        private System.Windows.Forms.TextBox textBoxDefautSchema;
+        private System.Windows.Forms.TextBox textBoxDefaultDatabase;
+        private System.Windows.Forms.Button ButtonBrowse;
     }
 }
 

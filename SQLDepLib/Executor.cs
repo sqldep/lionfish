@@ -18,54 +18,40 @@ namespace SQLDepLib
             this.DBExecutor = dbExecutor;
             this.runId = Guid.NewGuid().ToString();
             this.ProgressInfo = new ProgressInfo();
-            ServicePointManager.SecurityProtocol =
-                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
         }
 
         public string runId { get; set; }
 
         public DBExecutor DBExecutor { get; private set; }
 
-        public string LogFileName { get; set; }
-
         public ProgressInfo ProgressInfo { get; private set; }
-
-        protected void Log(string msg)
-        {
-            if (this.LogFileName != null)
-            {
-                StreamWriter wr = File.AppendText(LogFileName);
-                wr.Write(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
-                wr.Write("\t");
-                wr.WriteLine(msg);
-                wr.Close();
-            }
-        }
 
         private string myJson = string.Empty;
 
-        public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName)
+        public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName, bool useFs)
         {
-            this.ProgressInfo.CreateProgress();
             try
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                this.LogFileName = "SQLdepLog.txt";
-                
-                // muze se hodit
-                this.Log(Environment.Is64BitOperatingSystem ? "64bit system" : "32bit system");
+                // coult be useful
+                Logger.Log(Environment.Is64BitOperatingSystem ? "64bit system" : "32bit system");
 
-                // pripoj se do databaze
-                this.Log("Before database open.");
                 DBExecutor.Connect();
-                this.Log("Database open.");
 
-                this.ProgressInfo.SetProgressRatio(0.95, string.Empty);
-                SQLCompleteStructure dbStructure = this.Run(sqlDialect);
+                this.ProgressInfo.SetProgressPercent(10, "Collecting data from DB.");
 
-                this.ProgressInfo.SetProgressRatio(0.05, string.Empty);
+                // this will fill some dbStructure fields, such as queries and tables...
+                SQLCompleteStructure dbStructure = this.Run(sqlDialect, useFs);
+
+                // append queries from FS
+                if (useFs)
+                {
+                    this.ProgressInfo.SetProgressPercent(85, "Collecting data from FileSystem.");
+                    this.GetQueriesFromFS(dbStructure);
+                }
 
                 int totalTablesCount = 0;
                 foreach (var item in dbStructure.databaseModel.databases)
@@ -83,12 +69,13 @@ namespace SQLDepLib
                 dbStructure.customSqlSetName = customSqlSetName;
                 sw.Stop();
                 dbStructure.exportTime = sw.ElapsedMilliseconds.ToString();
+                this.ProgressInfo.SetProgressPercent(95, "Saving collected data to file.");
                 myJson = this.SaveStructureToFile(dbStructure, exportFileName);
                 DBExecutor.Close();
             }
             catch (Exception ex)
             {
-                this.Log("Error " + ex.Message + "\n" + ex.StackTrace);
+                Logger.Log("Error " + ex.Message);
                 throw;
             }
             finally
@@ -96,6 +83,30 @@ namespace SQLDepLib
                 this.ProgressInfo.RemoveProgress();
             }
 
+        }
+
+        /// <summary>
+        /// Gets all files that are matched with fileMask and appends them to dbStructure as queries.
+        /// </summary>
+        /// <param name="dbStructure"></param>
+        private void GetQueriesFromFS(SQLCompleteStructure dbStructure)
+        {
+            Logger.Log("Getting data from Filesystem.");
+            FileSystemData fsData = new FileSystemData();
+            fsData.Load();
+
+            string[] allFiles = Directory.GetFiles(fsData.ConfFile.InputDir, fsData.ConfFile.FileMask, SearchOption.AllDirectories);
+
+            foreach (var path in allFiles)
+            {
+                string fileString = File.ReadAllText(path);
+                SQLQuery newQuery = new SQLQuery();
+                newQuery.name = Path.GetFileNameWithoutExtension(path);
+                newQuery.sourceCode = fileString;
+                newQuery.schema = fsData.ConfFile.DefaultSchema;
+                newQuery.database = fsData.ConfFile.DefaultDatabase;
+                dbStructure.queries.Add(newQuery);
+            }
         }
 
         public void SendStructure()
@@ -106,7 +117,7 @@ namespace SQLDepLib
             }
             catch (Exception ex)
             {
-                this.Log("Error " + ex.Message + "\n" + ex.StackTrace);
+                Logger.Log("Error " + ex.Message);
                 throw;
             }
         }
@@ -128,8 +139,7 @@ namespace SQLDepLib
                 zip.Dispose();
             }
 
-            this.Log("Before sending zipped data.");
-            //var baseAddress = "http://192.168.1.13:8000/api/batch/zip/";
+            Logger.Log("Before sending zipped data.");
             var baseAddress = "https://sqldep.com/api/batch/zip/";
 
             var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
@@ -137,7 +147,7 @@ namespace SQLDepLib
             string proxy = WebRequest.DefaultWebProxy.GetProxy(http.Address).AbsoluteUri;
             if (proxy != string.Empty)
             {
-                this.Log("Proxy URL: " + proxy);
+                Logger.Log("Proxy URL: " + proxy);
                 http.Proxy = WebRequest.DefaultWebProxy;
 
                 // experinemt with proxy setting
@@ -170,18 +180,16 @@ namespace SQLDepLib
             {
                 throw new Exception("Unexpected returned message " + content);
             }
-            this.Log("Data sent.");
+            Logger.Log("Data sent.");
         }
 
-        public virtual SQLCompleteStructure Run(string sqlDialect)
-        {
-            this.ProgressInfo.CreateProgress();
-            
+        public virtual SQLCompleteStructure Run(string sqlDialect, bool useFS)
+        {            
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
-            this.Log("Getting list of databases");
+            Logger.Log("Getting list of databases");
             List<string> dbNames = this.GetDbNames(sqlDialect);
-            this.Log("List of databases has " + dbNames.Count + " items.");
+            Logger.Log("List of databases has " + dbNames.Count + " items.");
 
             // 2. SELECT
             // DDL ("queries" in JSON): procedures and views
@@ -235,31 +243,37 @@ namespace SQLDepLib
             //
             // Expect columns in this order: Owner, Name, UserName, Host
 
-            this.Log("Getting list of querries");
-            this.ProgressInfo.SetProgressRatio(0.45, "querries");
-            if (sqlDialect == "oracle")
+            Logger.Log("Getting list of querries");
+            this.ProgressInfo.SetProgressPercent(15, "Collecting queries.");
+            if (!useFS)
             {
-                this.Log("Using Oracle dialect");
-                ret.queries = this.GetOracleQuerries(sqlDialect, dbNames);
+                if (sqlDialect == "oracle")
+                {
+                    Logger.Log("Using Oracle dialect");
+                    ret.queries = this.GetOracleQuerries(sqlDialect, dbNames);
+                }
+                else
+                {
+                    ret.queries = this.GetQuerries(sqlDialect, dbNames);
+                }
+                Logger.Log("List of querries has " + ret.queries.Count + " items.");
             }
             else
             {
-                ret.queries = this.GetQuerries(sqlDialect, dbNames);
+                ret.queries = new List<SQLQuery>();
+            }
+            this.ProgressInfo.SetProgressPercent(60, "Collecting database model.");
+            ret.databaseModel = new SQLDatabaseModel();
+            ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
+
+            if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
+            {
+                this.ProgressInfo.SetProgressPercent(62, "Colleting DB links.");
+                Logger.Log("Getting list of dblinks");
+                ret.dblinks = this.GetDBLinks(sqlDialect);
+                Logger.Log("List of dblinks has " + ret.dblinks.Count + " items.");
             }
 
-            this.Log("List of querries has " + ret.queries.Count + " items.");
-
-            this.ProgressInfo.SetProgressRatio(0.35, "DB model");
-
-            ret.databaseModel = new SQLDatabaseModel();
-                ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
-
-            this.Log("Getting list of dblinks");
-            this.ProgressInfo.SetProgressRatio(0.2, "dblinks");
-            ret.dblinks = this.GetDBLinks(sqlDialect);
-            this.Log("List of dblinks has " + ret.dblinks.Count + " items.");
-
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -271,28 +285,27 @@ namespace SQLDepLib
 
             foreach (var item in sqls)
             {
-                this.Log(string.Format("GetDbNames processing cmd {0}", item));
+                Logger.Log(string.Format("GetDbNames processing cmd {0}", item));
                 DBExecutor.RunSql(result, item);
             }
 
             List<string> ret = new List<string>();
             foreach (var item in result)
             {
-                this.Log(string.Format("GetDBNames - adding {0}", item));
+                Logger.Log(string.Format("GetDBNames - adding {0}", item));
                 ret.Add(item.Column0);
             }
 
-            this.Log(string.Format("GetDBNames - count {0}", ret != null ? (ret.Count).ToString() : "null"));
+            Logger.Log(string.Format("GetDBNames - count {0}", ret != null ? (ret.Count).ToString() : "null"));
 
             return ret;
         }
 
-        private List<SQLQuerry> GetOracleQuerries(string sqlDialect, List<string> dbNames)
+        private List<SQLQuery> GetOracleQuerries(string sqlDialect, List<string> dbNames)
         {
-            List<SQLQuerry> ret = new List<SQLQuerry>();
+            List<SQLQuery> ret = new List<SQLQuery>();
 
             bool firstSqlCommands = true;
-            this.ProgressInfo.CreateProgress();
             foreach (var dbName in dbNames)
             {
                 //this.ProgressInfo.SetProgressDone((double)100* ++iiDbCounter / dbNames.Count, dbName);
@@ -326,11 +339,12 @@ namespace SQLDepLib
 
                     foreach (var item in firstBlock)
                     {
+                        this.ProgressInfo.SetProgressPercent(15 + 30 * (counter / firstBlock.Count), "Collecting queries.");
                         if (item.Column5.Equals("1")) { // dump previous wholeCode
 
                             if (counter > 0)
                             {
-                                SQLQuerry querryItem = new SQLQuerry()
+                                SQLQuery queryItem = new SQLQuery()
                                 {
                                     sourceCode = wholeCode.ToString(),
                                     name = queryName,
@@ -339,8 +353,8 @@ namespace SQLDepLib
                                     schema = querySchema
                                 };
 
-                                ret.Add(querryItem);
-                                this.Log("Query done " + query_counter);
+                                ret.Add(queryItem);
+                                Logger.Log("Query done " + query_counter);
                                 query_counter++;
                             }
 
@@ -368,7 +382,7 @@ namespace SQLDepLib
 
                     foreach (var item in secondBlock)
                     {
-                        SQLQuerry querryItem = new SQLQuerry()
+                        SQLQuery queryItem = new SQLQuery()
                         {
                             sourceCode = "CREATE OR REPLACE FORCE VIEW " + item.Column2 + " (" + item.Column5 + ") AS " +  item.Column0,
                             name = item.Column1,
@@ -377,7 +391,7 @@ namespace SQLDepLib
                             schema = item.Column4
                         };
 
-                        ret.Add(querryItem);
+                        ret.Add(queryItem);
                     }
 
                     sqls.RemoveAt(0);
@@ -386,7 +400,7 @@ namespace SQLDepLib
 
                     foreach (var item in thirdBlock)
                     {
-                        SQLQuerry querryItem = new SQLQuerry()
+                        SQLQuery queryItem = new SQLQuery()
                         {
                             sourceCode = "CREATE MATERIALIZED VIEW " + item.Column2 + " (" + item.Column5 + ") AS " + item.Column0,
                             name = item.Column1,
@@ -395,7 +409,7 @@ namespace SQLDepLib
                             schema = item.Column4
                         };
 
-                        ret.Add(querryItem);
+                        ret.Add(queryItem);
                     }
 
                     sqls.RemoveAt(0);
@@ -409,7 +423,7 @@ namespace SQLDepLib
 
                         foreach (var item in customBlock)
                         {
-                            SQLQuerry querryItem = new SQLQuerry()
+                            SQLQuery queryItem = new SQLQuery()
                             {
                                 sourceCode = item.Column0,
                                 name = item.Column1,
@@ -418,14 +432,14 @@ namespace SQLDepLib
                                 schema = item.Column4
                             };
 
-                            ret.Add(querryItem);
+                            ret.Add(queryItem);
                         }
                         sqls.RemoveAt(0);
                     }
                 }
                 catch (Oracle.ManagedDataAccess.Client.OracleException oe)
                 {
-                    this.Log("Last executed SQL dump:\n" + sqls.FirstOrDefault());
+                    Logger.Log("Last executed SQL dump:\n" + sqls.FirstOrDefault());
                     throw oe;
                 }
                 catch (Exception)
@@ -433,17 +447,15 @@ namespace SQLDepLib
                     throw;
                 }
             }
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
-        private List<SQLQuerry> GetQuerries(string sqlDialect, List<string> dbNames)
+        private List<SQLQuery> GetQuerries(string sqlDialect, List<string> dbNames)
         {
-            List<SQLQuerry> ret = new List<SQLQuerry>();
+            List<SQLQuery> ret = new List<SQLQuery>();
 
             int count = 0;
             bool firstSqlCommands = true;
-            this.ProgressInfo.CreateProgress();
             foreach (var dbName in dbNames)
             {
                 //this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
@@ -469,7 +481,8 @@ namespace SQLDepLib
 
                     foreach (var item in result)
                     {
-                        SQLQuerry querryItem = new SQLQuerry()
+                        this.ProgressInfo.SetProgressPercent(15 + 40 * (count / result.Count), "Collecting queries.");
+                        SQLQuery queryItem = new SQLQuery()
                         {
                             sourceCode = item.Column0,
                             name = item.Column1,
@@ -479,7 +492,7 @@ namespace SQLDepLib
                         };
 
 
-                        ret.Add(querryItem);
+                        ret.Add(queryItem);
                         count++;
                     }
                 }
@@ -488,7 +501,6 @@ namespace SQLDepLib
                     throw;
                 }
             }
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -497,7 +509,6 @@ namespace SQLDepLib
         {
             List<SQLDBLink> ret = new List<SQLDBLink>();
 
-            this.ProgressInfo.CreateProgress();
             int count = 0;
             try
             {
@@ -515,6 +526,8 @@ namespace SQLDepLib
 
                 foreach (var item in result)
                 {
+                    this.ProgressInfo.SetProgressPercent(62 + 20*(count/result.Count), String.Format("Colleting DB links({}/{}).", count, result.Count));
+
                     SQLDBLink dblinkItem = new SQLDBLink()
                     {
                         owner = item.Column0,
@@ -531,8 +544,6 @@ namespace SQLDepLib
             {
                 throw;
             }
-            this.ProgressInfo.RemoveProgress();
-
             return ret;
         }
 
@@ -552,7 +563,8 @@ namespace SQLDepLib
             // tyto jsou povinne
             string sqlCommands = System.IO.File.ReadAllText("./sql/" + sqlDialect + "/" + purpose + "/cmd.sql");
 
-            //  Ted se sekce Queries v JSONu plni tak, ze se nacte napriklad definice procedury a ta se vlozi do Queries.Potrebujeme uzivatelum dat moznost, aby meli moznost vlozit vlastni SQL prikaz z jine tabulku a nejen databazoveho katalogu. A to by se ulozilo do Queries.
+            //  Ted se sekce Queries v JSONu plni tak, ze se nacte napriklad definice procedury a ta se vlozi do Queries.
+            //  Potrebujeme uzivatelum dat moznost, aby meli moznost vlozit vlastni SQL prikaz z jine tabulku a nejen databazoveho katalogu. A to by se ulozilo do Queries.
             // Navrhuju to resit tak, ze by vznikl v kazdem adresari s dialektemadresar custom, cili / sql / teradata / custom
             // Tam by se lionfish vzdy koukl a pokud by tam existoval nejaky fajl, tak by ho spustil.
             // Uvnitr by byl takovyhle nejaky dotaz, ktery by rovnou vracel vsechny fieldy, ktere jsou treba vyplnit v Queries.
@@ -573,7 +585,7 @@ namespace SQLDepLib
 
                     if (Directory.Exists(customPath))
                     {
-                        this.Log(string.Format("Checked custom sql files in {0} - directory exists.", customPath));
+                        Logger.Log(string.Format("Checked custom sql files in {0} - directory exists.", customPath));
                         foreach (var file in Directory.GetFiles(customPath))
                         {
                             if (file.EndsWith("sql", StringComparison.InvariantCultureIgnoreCase))
@@ -585,17 +597,17 @@ namespace SQLDepLib
                                 sqlCommands += customSqlCommands;
 
                                 // log it
-                                this.Log(string.Format("File {0} in custom directory succesfully added ({1} characters read).", file, customSqlCommands.Length));
+                                Logger.Log(string.Format("ConfFile {0} in custom directory succesfully added ({1} characters read).", file, customSqlCommands.Length));
                             }
                             else
                             {
-                                this.Log(string.Format("File {0} in custom directory ignored - expected extension sql.", customPath));
+                                Logger.Log(string.Format("ConfFile {0} in custom directory ignored - expected extension sql.", customPath));
                             }
                         }
                     }
                     else
                     {
-                        this.Log(string.Format("Checked custom sql files in {0} - directory does not exist.", customPath));
+                        Logger.Log(string.Format("Checked custom sql files in {0} - directory does not exist.", customPath));
                     }
                 }
             }
@@ -617,7 +629,7 @@ namespace SQLDepLib
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-            querries.createdBy = "SQLdep v1.5.15";
+            querries.createdBy = "SQLdep v1.6.0";
             querries.exportId = this.runId;
             querries.physicalInstance = this.DBExecutor.Server;
 
@@ -638,7 +650,7 @@ namespace SQLDepLib
             wr.Write(json);
             wr.Close();
 
-            this.Log("Result data saved in " + logJSONName);
+            Logger.Log("Result data saved in " + logJSONName);
             return json;
         }
     
@@ -655,7 +667,7 @@ namespace SQLDepLib
             //    string HtmlResult = wc.UploadString(URI, myParameters);
             //}
 
-            this.Log("Before sending data.");
+            Logger.Log("Before sending data.");
             var baseAddress = "https://sqldep.com/api/rest/sqlset/create/";
 
             var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
@@ -663,7 +675,7 @@ namespace SQLDepLib
             string proxy = WebRequest.DefaultWebProxy.GetProxy(http.Address).AbsoluteUri;
             if (proxy != string.Empty)
             {
-                this.Log("Proxy URL: " + proxy);
+                Logger.Log("Proxy URL: " + proxy);
                 http.Proxy = WebRequest.DefaultWebProxy;
             }
 
@@ -687,14 +699,12 @@ namespace SQLDepLib
             {
                 throw new Exception("Unexpected returned message " + content);
             }
-            this.Log("Data sent.");
+            Logger.Log("Data sent.");
         }
 
         private List<SQLDatabaseModelItem> GetDatabaseModels(string sqlDialect, List<string> dbNames)
         {
             List<SQLDatabaseModelItem> ret = new List<SQLDatabaseModelItem>();
-
-            this.ProgressInfo.CreateProgress();
 
             int tableCount = 0;
             int synonymsCount = 0;
@@ -703,14 +713,12 @@ namespace SQLDepLib
             bool firstSqlCommands2 = true;
             foreach (var dbName in dbNames)
             {
-
-                //this.ProgressInfo.SetProgressDone((double)100 * ++iiCounter / dbNames.Count, dbName);
                 try
                 {
                     SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
                     modelItem.name = dbName;
 
-                    this.Log("Getting tables in database" + dbName + ".");
+                    Logger.Log("Getting tables in database '" + dbName + "'.");
 
                     // sql commands
                     List<StrReplace> replaces = new List<StrReplace>();
@@ -735,8 +743,9 @@ namespace SQLDepLib
                     foreach (var item in tablesWithColumns)
                     {
                         string tableName = item.Column2;
+                        string schemaName = item.Column1;
 
-                        SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.name == tableName);
+                        SQLTableModelItem tableModelItem = modelItem.tables.Find(x => x.name == tableName && x.schema == schemaName);
 
                         if (tableModelItem == null)
                         {
@@ -760,36 +769,39 @@ namespace SQLDepLib
                         };
                         tableModelItem.columns.Add(columnModelItem);
                     }
-                    this.Log("Tables #["+ modelItem.tables.Count + "] in database" + dbName + " processed.");
-
+                    Logger.Log("Tables #["+ modelItem.tables.Count + "] in database" + dbName + " processed.");
 
                     // synonyms
-                    this.Log("Getting synonyms in database" + dbName + ".");
+                    if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
+                    {
+                        Logger.Log("Getting synonyms in database " + dbName + ".");
 
-                    modelItem.synonyms = new List<SQLSynonymModelItem>();
-                    List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, Purpose.SYNONYMS, firstSqlCommands2, replaces);
-                    firstSqlCommands2 = false;
-                    List<SQLResult> synonyms = new List<SQLResult>();
-                    foreach (var item in sqlsSynonyms)
-                    {
-                        DBExecutor.RunSql(synonyms, item);
-                    }
-                    foreach (var item in synonyms)
-                    {
-                        SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
+                        modelItem.synonyms = new List<SQLSynonymModelItem>();
+                        List<string> sqlsSynonyms = this.GetSQLCommands(sqlDialect, Purpose.SYNONYMS, firstSqlCommands2, replaces);
+                        firstSqlCommands2 = false;
+                        List<SQLResult> synonyms = new List<SQLResult>();
+                        foreach (var item in sqlsSynonyms)
                         {
-                            database = item.Column0,
-                            schema = item.Column1,
-                            name = item.Column2,
-                            sourceName = item.Column4,
-                            sourceSchema = item.Column3,
-                            sourceDbLinkName = item.Column5
-                        };
-                        modelItem.synonyms.Add(synonymModelItem);
-                        synonymsCount++;
+                            DBExecutor.RunSql(synonyms, item);
+                        }
+                        foreach (var item in synonyms)
+                        {
+                            SQLSynonymModelItem synonymModelItem = new SQLSynonymModelItem()
+                            {
+                                database = item.Column0,
+                                schema = item.Column1,
+                                name = item.Column2,
+                                sourceName = item.Column4,
+                                sourceSchema = item.Column3,
+                                sourceDbLinkName = item.Column5
+                            };
+                            modelItem.synonyms.Add(synonymModelItem);
+                            synonymsCount++;
+                        }
+                        
+                        Logger.Log("Synonyms #[" + sqlsSynonyms.Count + "] in database" + dbName + "processed.");
                     }
                     ret.Add(modelItem);
-                    this.Log("Synonyms #["+ sqlsSynonyms .Count + "] in database" + dbName + "processed.");
                 }
                 catch (Exception ex)
                 {

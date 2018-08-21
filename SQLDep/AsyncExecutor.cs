@@ -9,13 +9,14 @@ namespace SQLDepLib
 {
     public class AsyncExecutor
     {
-        public AsyncExecutor(string myName, Guid myKey, string sqlDialect, string exportFileName, Executor executor)
+        public AsyncExecutor(string myName, Guid myKey, string sqlDialect, string exportFileName, Executor executor, bool useFs)
         {
             this.MyName = myName;
             this.MyKey = myKey;
             this.SqlDialect = sqlDialect;
             this.MyExecutor = executor;
             this.ExportFileName = exportFileName;
+            this.UseFs = useFs;
         }
 
         private string MyName { get; set; }
@@ -28,13 +29,14 @@ namespace SQLDepLib
         public Executor MyExecutor { get; set; }
 
         public bool IsRunning { get; set; }
+        public bool UseFs { get; set; }
 
         public void Run()
         {
             this.IsRunning = true;
             try
             {
-                this.MyExecutor.Run(this.MyName, this.MyKey, this.SqlDialect, this.ExportFileName);
+                this.MyExecutor.Run(this.MyName, this.MyKey, this.SqlDialect, this.ExportFileName, this.UseFs);
                 MessageBox.Show("Completed succesfully. Data are saved on disk! " + this.ExportFileName);
 
             }

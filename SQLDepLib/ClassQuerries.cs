@@ -7,7 +7,7 @@ namespace SQLDepLib
 {
     public class SQLCompleteStructure
     {
-        public List<SQLQuerry> queries { get; set; }
+        public List<SQLQuery> queries { get; set; }
 
         public List<SQLDBLink> dblinks { get; set; }
 

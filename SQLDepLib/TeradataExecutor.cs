@@ -22,7 +22,7 @@ namespace SQLDepLib
             MACRO
         }
 
-        public SQLQuerry GetQuerry (string dbName, string name, ItemType type)
+        public SQLQuery GetQuerry (string dbName, string name, ItemType type)
         {
             string sql = string.Empty;
             name = name.Trim();
@@ -42,7 +42,7 @@ namespace SQLDepLib
                     break;
             }
 
-            SQLQuerry querryItem = new SQLQuerry()
+            SQLQuery queryItem = new SQLQuery()
             {
                 sourceCode = string.Empty,
                 name = name,
@@ -58,42 +58,41 @@ namespace SQLDepLib
             {
                 // teradata ma zvlastni oddelovac radku
                 sourceCodeLine = item.Column0.Replace('\r', '\n');
-                querryItem.sourceCode += sourceCodeLine;
+                queryItem.sourceCode += sourceCodeLine;
             }
 
-            return querryItem;
+            return queryItem;
         }
 
-        public override SQLCompleteStructure Run(string sqlDialect)
+        public override SQLCompleteStructure Run(string sqlDialect, bool useFS)
         {
-            this.ProgressInfo.CreateProgress();
-
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
-            this.Log("Getting list of databases");
+            Logger.Log("Getting list of databases");
             List<string> dbNames = this.GetTeradataDbNames(sqlDialect);
-            this.Log("List of databases has " + dbNames.Count + " items.");
+            Logger.Log("List of databases has " + dbNames.Count + " items.");
 
-            this.Log("Getting list of querries");
-            this.ProgressInfo.SetProgressRatio(0.45, "querries");
-            ret.queries = this.GetTeradataQuerries(sqlDialect, dbNames);
-            this.Log("List of querries has " + ret.queries.Count + " items.");
+            Logger.Log("Getting list of querries");
+            if (!useFS)
+            {
+                ret.queries = this.GetTeradataQuerries(sqlDialect, dbNames);
+                Logger.Log("List of querries has " + ret.queries.Count + " items.");
+            }
+            else
+            {
+                ret.queries = new List<SQLQuery>();
+            }
 
-
-            this.ProgressInfo.SetProgressRatio(0.55, "DB model");
             ret.databaseModel = new SQLDatabaseModel();
             ret.databaseModel.databases = this.GetTeradataDatabaseModels(sqlDialect, dbNames);
 
-
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
-        private List<SQLQuerry> GetTeradataQuerries(string sqlDialect, List<string> dbNames)
+        private List<SQLQuery> GetTeradataQuerries(string sqlDialect, List<string> dbNames)
         {
-            List<SQLQuerry> ret = new List<SQLQuerry>();
+            List<SQLQuery> ret = new List<SQLQuery>();
 
-            this.ProgressInfo.CreateProgress();
             bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
             {
@@ -144,17 +143,16 @@ namespace SQLDepLib
                         try
                         {
             
-                            SQLQuerry querryItem = this.GetQuerry(dbName, procedureOrViewName, itemType);
-                            ret.Add(querryItem);
+                            SQLQuery queryItem = this.GetQuerry(dbName, procedureOrViewName, itemType);
+                            ret.Add(queryItem);
                         }
                         catch(Exception ex)
                         {
-                            this.Log("Ignored error " + ex.Message);// ignore
+                            Logger.Log("Ignored error " + ex.Message);
                         }
                     }
                 }
             }
-            this.ProgressInfo.RemoveProgress();
             return ret;
         }
 
@@ -183,7 +181,6 @@ namespace SQLDepLib
         private List<SQLDatabaseModelItem> GetTeradataDatabaseModels(string sqlDialect, List<string> dbNames)
         {
             List<SQLDatabaseModelItem> modelItems = new List<SQLDatabaseModelItem>();
-            this.ProgressInfo.CreateProgress();
 
             SQLDatabaseModelItem modelItem = new SQLDatabaseModelItem();
             modelItem.name = "default";
@@ -224,7 +221,7 @@ namespace SQLDepLib
                         
                         zatim neukladame create tabulek
 
-                        SQLQuerry structure = null;
+                        SQLQuery structure = null;
                         if (tableOrView.Column1 == "T")
                         {
                             // table
@@ -266,11 +263,11 @@ namespace SQLDepLib
                     }
                     catch(Exception ex)
                     {
-                        this.Log("Ignored error for table/view " + tableOrViewName + ", error:" + ex.Message);// ignore
+                        Logger.Log("Ignored error for table/view " + tableOrViewName + ", error:" + ex.Message);// ignore
                     }
                 }
 
-                this.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
+                Logger.Log("Tables #[" + modelItem.tables.Count + "] in database" + dbName + " processed.");
             }
             modelItems.Add(modelItem);
 

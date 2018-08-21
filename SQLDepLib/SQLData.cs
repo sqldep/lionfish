@@ -18,7 +18,7 @@ namespace SQLDepLib
     }
 
 
-    public class SQLQuerry
+    public class SQLQuery
     {
         public string schema { get; set; }
         public string database { get; set; }

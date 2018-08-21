@@ -127,6 +127,12 @@ namespace SQLDep
                 case "mssql":
                     odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("SQL", StringComparison.InvariantCultureIgnoreCase) >=0).ToList();
                     break;
+                case "greenplum":
+                case "postgres":
+                case "redshift":
+                    comboItems.Add(new ComboBoxDriverItem() { Text = UIConfig.DRIVER_NAME_NATIVE, UseDriverType = DBExecutor.UseDriver.POSTGRESQL });
+                    odbcDrivers = ODBCUtils.GetSystemDriverList().Where(x => x.IndexOf("postgres", StringComparison.InvariantCultureIgnoreCase) >= 0).ToList();
+                    break;
                 default:
                     odbcDrivers = new List<string>();
                     break;
@@ -189,35 +195,47 @@ namespace SQLDep
             }
         }
 
-        private int GetDatabaseTypeIdx (string sqlDialect)
+        public void EnableFileSystem()
         {
-            if (sqlDialect == "teradata")
+            if (this.textBoxRootDirectory.Enabled)
             {
-                return 2;
-            }
-            else if (sqlDialect == "oracle")
-            {
-                return 0;
+                this.textBoxRootDirectory.Enabled = false;
+                this.textBoxDefautSchema.Enabled = false;
+                this.textBoxDefaultDatabase.Enabled = false;
+                this.textBoxFileMask.Enabled = false;
+                this.ButtonBrowse.Enabled = false;
             }
             else
             {
-                return 1;
+                this.textBoxRootDirectory.Enabled = true;
+                this.textBoxDefautSchema.Enabled = true;
+                this.textBoxDefaultDatabase.Enabled = true;
+                this.textBoxFileMask.Enabled = true;
+                this.ButtonBrowse.Enabled = true;
+            }
+        }
+
+        private int GetDatabaseTypeIdx (string sqlDialect)
+        {
+            switch (sqlDialect)
+            {
+                case "teradata": return 2;
+                case "oracle": return 0;
+                default: return 1;
             }
         }
 
         private string GetDatabaseTypeName(int idx)
         {
-            if (idx == 0)
+            switch (idx)
             {
-                return "oracle";
-            }
-            else if (idx == 2)
-            {
-                return "teradata";
-            }
-            else
-            {
-                return "mssql";
+                case 0: return "oracle";
+                case 1: return "mssql";
+                case 2: return "teradata";
+                case 3: return "greenplum";
+                case 4: return "redshift";
+                case 5: return "postgres";
+                default: return "mssql";
             }
         }
 
@@ -230,7 +248,6 @@ namespace SQLDep
                 SQLDep.ComboBoxDriverItem item = (SQLDep.ComboBoxDriverItem) this.comboBoxDriverName.Items[idx];
                 value = item.UseDriverType;
                 return item.Text;
-
             }
             else
             {
@@ -339,6 +356,10 @@ namespace SQLDep
                 DBExecutor dbExecutor = new DBExecutor();
                 this.BuildConnectionString(dbExecutor);
 
+                // create filesystem configuration file, Executor will use this
+                if (checkboxUseFS.Checked)
+                    CreateFileSystemCfgFile();
+
                 string myName = this.textBoxUserName.Text.ToString();
                 Guid myKey;
                 if (!Guid.TryParse(this.textBoxKey.Text.ToString(), out myKey))
@@ -354,7 +375,7 @@ namespace SQLDep
 
                 string exportFileName = fbd.SelectedPath + "\\DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
 
-                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor);
+                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor, checkboxUseFS.Checked);
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
                 this.AsyncExecutorThread.Start();
                 new Thread(this.ShowProgress).Start();
@@ -367,9 +388,19 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                string msg = ex.Message + ex.StackTrace;
+                string msg = ex.Message;
                 MessageBox.Show(msg);
             }
+        }
+
+        private void CreateFileSystemCfgFile()
+        {
+            FileSystemData fsData = new FileSystemData();
+            fsData.ConfFile.DefaultDatabase = this.textBoxDefaultDatabase.Text;
+            fsData.ConfFile.DefaultSchema = this.textBoxDefautSchema.Text;
+            fsData.ConfFile.InputDir = this.textBoxRootDirectory.Text;
+            fsData.ConfFile.FileMask = this.textBoxFileMask.Text;
+            fsData.Save();
         }
 
         public void ShowProgress ()
@@ -396,7 +427,7 @@ namespace SQLDep
                 Thread.Sleep(100);
                 done = this.AsyncExecutor.MyExecutor.ProgressInfo.GetPercentDone(out workingOn);
                 this.progressBarCalc.Value = (int)done;
-                this.Text = form1Text + " - Running " + workingOn;
+                this.Text = form1Text + " - " + workingOn;
             }
             this.progressBarCalc.Value = 0;
             this.buttonRun.Enabled = true;
@@ -433,12 +464,12 @@ namespace SQLDep
                 this.Text = form1Text + " - sending...";
                 try
                 {
-                    ExecutorFactory.CreateExecutor(new DBExecutor(), string.Empty).SendFiles(result, this.textBoxKey.Text.ToString());
+                    ExecutorFactory.CreateExecutor(new DBExecutor(), string.Empty).SendFiles(result, this.textBoxKey.Text);
                     MessageBox.Show("Files sent successfully");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Files were not sent!"+ ex.ToString() + ex.StackTrace);
+                    MessageBox.Show("Files were not sent! "+ ex.Message);
                 }
                 this.Text = form1Text;
 
@@ -453,8 +484,7 @@ namespace SQLDep
         private void buttonTestConnection_Click(object sender, EventArgs e)
         {
             DBExecutor dbExecutor = new DBExecutor();
-            string connection = this.BuildConnectionString(dbExecutor);
-
+            this.BuildConnectionString(dbExecutor);
             try
             {
                 dbExecutor.Connect();
@@ -465,23 +495,41 @@ namespace SQLDep
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Database not connected! \n\nConnection string:\n" + connection + "\n\nError: " + ex.ToString());
+                this.buttonRun.Enabled = false;
+                MessageBox.Show("Database not connected! \nError: " + ex.Message);
             }
         }
 
         private void comboBoxDriverName_SelectedIndexChanged(object sender, EventArgs e)
-        { 
+        {
+            this.buttonRun.Enabled = false;
         }
 
         private void comboBoxDSNName_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
+            this.buttonRun.Enabled = false;
         }
 
         private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
+            this.buttonRun.Enabled = false;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            this.EnableFileSystem();
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            var FD = new FolderBrowserDialog();
+            if (FD.ShowDialog() == DialogResult.OK)
+            {
+                textBoxRootDirectory.Text = FD.SelectedPath;
+            }
         }
     }
 }

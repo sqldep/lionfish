@@ -25,11 +25,12 @@ namespace SQLDepCmd
             string sendFile = string.Empty;
             string help = string.Empty;
             string driverName = string.Empty;
+            bool useFS = false;
             Guid myKey;
 
             var p = new OptionSet() {
-                { "dbType=", "database type MsSQL(mssql)/Oracle(oracle)", v => dbType = v },
-                { "a|auth=",  "authorization SQL(default: sql_auth)/Windows (win_auth)", v => { if (v != null) auth_type = v; } },
+                { "dbType=", "database type: mssql|oracle|greenplum|postgres|redshift", v => dbType = v },
+                { "a|auth=",  "authorization SQL(default: sql_auth)/ Windows(win_auth)", v => { if (v != null) auth_type = v; } },
                 { "s|server=",  "server", v => server = v },
                 { "p|port=",  "port", v => { if ( v != null) port = v; } },
                 { "d|database=",  "database (SID for Oracle)", v => database = v },
@@ -41,6 +42,7 @@ namespace SQLDepCmd
                 { "h|help",  "show help", v => help = "set" },
                 { "driver",  "driver name", v => driverName = v },
                 { "send=",  "SEND or SENDONLY, default do not send", v => sendFile = v.ToUpper() },
+                { "use-filesystem",  "Use this option to use FS. file_system.conf must be configured!", v => useFS = true},
             };
 
             try
@@ -53,6 +55,7 @@ namespace SQLDepCmd
                 }
                 else
                 {
+
                     myKey = Guid.Parse(sMyKey);
 
                     DBExecutor dbExecutor = new DBExecutor();
@@ -62,16 +65,12 @@ namespace SQLDepCmd
 
                     string connectString = dbExecutor.BuildConnectionString(dbType, string.Empty, auth_type, server, port, database, loginName, loginpassword, driverName, DBExecutor.UseDriver.DEFAULT);
                     dbExecutor.ConnectString = connectString;
-                    if (runDb)
-                    {
-                        dbExecutor.Connect();
-                    }
 
                     Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, dbType);
 
                     if (runDb)
                     {
-                        executor.Run(customSqlSetName, myKey, dbType, exportFileName);
+                        executor.Run(customSqlSetName, myKey, dbType, exportFileName, useFS);
                     }
 
                     if (sendIt)
@@ -109,7 +108,7 @@ namespace SQLDepCmd
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Logger.Exception(e.Message);
                 return -1;
             }
             return 0; // standard success
