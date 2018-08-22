@@ -50,7 +50,7 @@
             this.textBoxPort = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.progressBarCalc = new System.Windows.Forms.ProgressBar();
-            this.buttonSendFiles = new System.Windows.Forms.Button();
+            this.buttonCreateAndSendFiles = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.comboBoxDriverName = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -273,15 +273,15 @@
             this.progressBarCalc.Size = new System.Drawing.Size(480, 29);
             this.progressBarCalc.TabIndex = 11;
             // 
-            // buttonSendFiles
+            // buttonCreateAndSendFiles
             // 
-            this.buttonSendFiles.Location = new System.Drawing.Point(354, 250);
-            this.buttonSendFiles.Name = "buttonSendFiles";
-            this.buttonSendFiles.Size = new System.Drawing.Size(111, 32);
-            this.buttonSendFiles.TabIndex = 10;
-            this.buttonSendFiles.Text = "Send file(s)";
-            this.buttonSendFiles.UseVisualStyleBackColor = true;
-            this.buttonSendFiles.Click += new System.EventHandler(this.buttonSendFiles_Click);
+            this.buttonCreateAndSendFiles.Location = new System.Drawing.Point(354, 250);
+            this.buttonCreateAndSendFiles.Name = "buttonCreateAndSendFiles";
+            this.buttonCreateAndSendFiles.Size = new System.Drawing.Size(111, 32);
+            this.buttonCreateAndSendFiles.TabIndex = 10;
+            this.buttonCreateAndSendFiles.Text = "Extract && Send";
+            this.buttonCreateAndSendFiles.UseVisualStyleBackColor = true;
+            this.buttonCreateAndSendFiles.Click += new System.EventHandler(this.buttonCreateAndSendFiles_Click);
             // 
             // label10
             // 
@@ -349,7 +349,7 @@
             this.tabPageBasic.Controls.Add(this.textBoxLoginPassword);
             this.tabPageBasic.Controls.Add(this.buttonRun);
             this.tabPageBasic.Controls.Add(this.comboBoxAuthType);
-            this.tabPageBasic.Controls.Add(this.buttonSendFiles);
+            this.tabPageBasic.Controls.Add(this.buttonCreateAndSendFiles);
             this.tabPageBasic.Controls.Add(this.label4);
             this.tabPageBasic.Controls.Add(this.buttonTestConnection);
             this.tabPageBasic.Controls.Add(this.label3);
@@ -542,7 +542,7 @@
         private System.Windows.Forms.TextBox textBoxPort;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ProgressBar progressBarCalc;
-        private System.Windows.Forms.Button buttonSendFiles;
+        private System.Windows.Forms.Button buttonCreateAndSendFiles;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.ComboBox comboBoxDriverName;
         private System.Windows.Forms.Label label11;
