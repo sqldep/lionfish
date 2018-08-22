@@ -1,3 +1,5 @@
+/* IMPORTANT: If you modify this file, rename it to cmd.sql (so it won't be overwritten when you upgrade lionfish).
+Only cmd.sql will be used when both exist.*/
 /* Result of this query will be used to fill the databaseModel key in JSON         */
 /* which contains a list of all tables and views and their columns.                */
 

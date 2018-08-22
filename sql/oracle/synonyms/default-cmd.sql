@@ -1,3 +1,5 @@
+/* IMPORTANT: If you modify this file, rename it to cmd.sql (so it won't be overwritten when you upgrade lionfish).
+Only cmd.sql will be used when both exist.*/
 select
   '##DBNAME##' as databaseName,
   s.OWNER as schemaName,
