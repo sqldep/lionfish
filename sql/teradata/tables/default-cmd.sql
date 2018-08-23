@@ -3,7 +3,7 @@ Only cmd.sql will be used when both exist.*/
 -- Select a list of all views and tables
 SELECT '##DBNAME##', tablekind, creatorname, tablename
 FROM dbc.tablesv
-WHERE (TABLEKIND = 'T' OR TABLEKIND = 'V') AND
+WHERE (TABLEKIND = 'T' OR TABLEKIND = 'V' OR TABLEKIND = 'O') AND
     DatabaseName = '##DBNAME##'
 -- AND tablename IN ('view_to_export', 'table_to_export')
 
@@ -82,18 +82,3 @@ WHERE DATABASENAME='##DBNAME##'
 -- AND tablename IN ('view_to_export', 'table_to_export')
 
 ) TBL;
-
---split
-
--- Select a list of all tables, views and procedures - the list will be used
--- for generating SHOW .... statements that fetcg corresponding source codes
--- that will be filled in the "queries" key in JSON
-SELECT '##DBNAME##', creatorname, tablename, TABLEKIND
-FROM dbc.tablesv
-WHERE (
-	TABLEKIND = 'P' OR
-	TABLEKIND = 'V' OR
-	TABLEKIND = 'M') AND
-	DatabaseName = '##DBNAME##'
-
--- AND tablename IN ('view_to_export', 'table_to_export')

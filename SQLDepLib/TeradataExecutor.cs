@@ -96,11 +96,7 @@ namespace SQLDepLib
             bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
             {
-                // this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
                 {
-                    // let us run this script two times, first run returns list of procedures, the second loads its definition
-                    List<string> procedures = new List<string>();
-                    // sql commands with replace
                     List<StrReplace> replaces = new List<StrReplace>();
                     StrReplace itemForReplace = new StrReplace()
                     {
@@ -110,12 +106,12 @@ namespace SQLDepLib
                     replaces.Add(itemForReplace);
 
                     // load script with replaces for the given database/procedure
-                    List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.TABLES, firstSqlCommands, replaces);
+                    List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
                     firstSqlCommands = false;
 
                     // first command is list of procedures and views
                     List<SQLResult> result = new List<SQLResult>();
-                    DBExecutor.RunSql(result, sqls.ElementAt(2));
+                    DBExecutor.RunSql(result, sqls.ElementAt(0));
 
                     foreach (var item in result)
                     {
