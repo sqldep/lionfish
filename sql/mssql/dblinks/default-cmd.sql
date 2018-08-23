@@ -1,3 +1,5 @@
+/* IMPORTANT: If you modify this file, rename it to cmd.sql (so it won't be overwritten when you upgrade lionfish).
+Only cmd.sql will be used when both exist.*/
 /* Select all database links (information about linked servers)                    */
 /* To avoid exporting links uncomment the following SQL                            */
 /* SELECT 1,1,1,1;                                                                 */

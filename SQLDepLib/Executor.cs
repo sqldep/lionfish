@@ -561,7 +561,17 @@ namespace SQLDepLib
             string purpose = enumPurpose.ToString().ToLower();
 
             // tyto jsou povinne
-            string sqlCommands = System.IO.File.ReadAllText("./sql/" + sqlDialect + "/" + purpose + "/cmd.sql");
+            string sqlCommands;
+            string customFilepath = "./sql/" + sqlDialect + "/" + purpose + "/cmd.sql";
+            string defaultFilepath = "./sql/" + sqlDialect + "/" + purpose + "/default-cmd.sql";
+            if (File.Exists(customFilepath))
+            {
+                sqlCommands = File.ReadAllText(customFilepath);
+            }
+            else
+            {
+                sqlCommands = File.ReadAllText(defaultFilepath);
+            }
 
             //  Ted se sekce Queries v JSONu plni tak, ze se nacte napriklad definice procedury a ta se vlozi do Queries.
             //  Potrebujeme uzivatelum dat moznost, aby meli moznost vlozit vlastni SQL prikaz z jine tabulku a nejen databazoveho katalogu. A to by se ulozilo do Queries.
@@ -629,7 +639,7 @@ namespace SQLDepLib
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-            querries.createdBy = "SQLdep v1.6.0";
+            querries.createdBy = "SQLdep v1.6.1";
             querries.exportId = this.runId;
             querries.physicalInstance = this.DBExecutor.Server;
 

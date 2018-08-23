@@ -37,6 +37,7 @@ namespace SQLDep
             this.textBoxDatabaseName.Text = UIConfig.Get(UIConfig.DATABASE_NAME, "master");
             this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "");
             this.buttonRun.Enabled = false;
+            this.buttonCreateAndSendFiles.Enabled = false;
             this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
 
@@ -343,6 +344,12 @@ namespace SQLDep
                 return;  
             }
 
+            createJson();
+
+        }
+
+        private void createJson(bool sendFiles = false)
+        {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             DialogResult result = fbd.ShowDialog();
 
@@ -360,9 +367,9 @@ namespace SQLDep
                 if (checkboxUseFS.Checked)
                     CreateFileSystemCfgFile();
 
-                string myName = this.textBoxUserName.Text.ToString();
+                string myName = this.textBoxUserName.Text;
                 Guid myKey;
-                if (!Guid.TryParse(this.textBoxKey.Text.ToString(), out myKey))
+                if (!Guid.TryParse(this.textBoxKey.Text, out myKey))
                 {
                     throw new SQLDepException("Invalid or missing API key. Get one in your dashboard on SQLdep website.");
                 }
@@ -375,7 +382,7 @@ namespace SQLDep
 
                 string exportFileName = fbd.SelectedPath + "\\DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
 
-                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor, checkboxUseFS.Checked);
+                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor, checkboxUseFS.Checked, sendFiles);
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
                 this.AsyncExecutorThread.Start();
                 new Thread(this.ShowProgress).Start();
@@ -443,37 +450,15 @@ namespace SQLDep
             this.textBoxLoginPassword.Enabled = true;
 
             this.Text = form1Text;
-        //
             this.AsyncExecutor = null;
             this.AsyncExecutorThread = null;
 
         }
 
 
-        private void buttonSendFiles_Click(object sender, EventArgs e)
+        private void buttonCreateAndSendFiles_Click(object sender, EventArgs e)
         {
-            OpenFileDialog fdlg = new OpenFileDialog();
-            fdlg.Multiselect = true;
-            fdlg.ShowDialog();
-            List<string> result = fdlg.FileNames.ToList();
-
-            if (result.Count > 0)
-            {
-                string form1Text = this.Text;
-
-                this.Text = form1Text + " - sending...";
-                try
-                {
-                    ExecutorFactory.CreateExecutor(new DBExecutor(), string.Empty).SendFiles(result, this.textBoxKey.Text);
-                    MessageBox.Show("Files sent successfully");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Files were not sent! "+ ex.Message);
-                }
-                this.Text = form1Text;
-
-            }
+            createJson(true);
         }
 
         private void comboBoxAuthType_SelectedIndexChanged(object sender, EventArgs e)
@@ -490,12 +475,14 @@ namespace SQLDep
                 dbExecutor.Connect();
                 dbExecutor.Close();
                 this.buttonRun.Enabled = true;
+                this.buttonCreateAndSendFiles.Enabled = true;
                 this.SaveDialogSettings();
                 MessageBox.Show("Database connected!");
             }
             catch (Exception ex)
             {
                 this.buttonRun.Enabled = false;
+                this.buttonCreateAndSendFiles.Enabled = false;
                 MessageBox.Show("Database not connected! \nError: " + ex.Message);
             }
         }
@@ -503,12 +490,14 @@ namespace SQLDep
         private void comboBoxDriverName_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.buttonRun.Enabled = false;
+            this.buttonCreateAndSendFiles.Enabled = false;
         }
 
         private void comboBoxDSNName_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
             this.buttonRun.Enabled = false;
+            this.buttonCreateAndSendFiles.Enabled = false;
         }
 
         private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
@@ -516,6 +505,7 @@ namespace SQLDep
             this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
             this.buttonRun.Enabled = false;
+            this.buttonCreateAndSendFiles.Enabled = false;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)

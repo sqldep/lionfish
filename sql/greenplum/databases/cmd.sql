@@ -1,2 +1,0 @@
-select catalog_name as databaseName
-from information_schema.information_schema_catalog_name;

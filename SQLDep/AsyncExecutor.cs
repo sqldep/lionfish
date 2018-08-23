@@ -9,7 +9,7 @@ namespace SQLDepLib
 {
     public class AsyncExecutor
     {
-        public AsyncExecutor(string myName, Guid myKey, string sqlDialect, string exportFileName, Executor executor, bool useFs)
+        public AsyncExecutor(string myName, Guid myKey, string sqlDialect, string exportFileName, Executor executor, bool useFs, bool send)
         {
             this.MyName = myName;
             this.MyKey = myKey;
@@ -17,6 +17,7 @@ namespace SQLDepLib
             this.MyExecutor = executor;
             this.ExportFileName = exportFileName;
             this.UseFs = useFs;
+            this.Send = send;
         }
 
         private string MyName { get; set; }
@@ -30,6 +31,7 @@ namespace SQLDepLib
 
         public bool IsRunning { get; set; }
         public bool UseFs { get; set; }
+        public bool Send { get; set; }
 
         public void Run()
         {
@@ -37,8 +39,25 @@ namespace SQLDepLib
             try
             {
                 this.MyExecutor.Run(this.MyName, this.MyKey, this.SqlDialect, this.ExportFileName, this.UseFs);
-                MessageBox.Show("Completed succesfully. Data are saved on disk! " + this.ExportFileName);
+                if (Send)
+                {
+                    List<string> files = new List<string>();
+                    files.Add(ExportFileName);
+                    try
+                    {
+                        MyExecutor.SendFiles(files, MyKey.ToString());
+                        MessageBox.Show("Files sent successfully");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Files were not sent successfully: " + e.Message);
+                    }
 
+                }
+                else
+                {
+                    MessageBox.Show("Completed succesfully. Data are saved on disk! " + this.ExportFileName);
+                }
             }
             catch (Exception ex)
             {
