@@ -521,5 +521,28 @@ namespace SQLDep
                 textBoxRootDirectory.Text = FD.SelectedPath;
             }
         }
+
+        private void buttonSendOnly_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog fdlg = new OpenFileDialog();
+            fdlg.Multiselect = true;
+            fdlg.ShowDialog();
+            List<string> result = fdlg.FileNames.ToList();
+            if (result.Count > 0)
+            {
+                string form1Text = this.Text;
+                this.Text = form1Text + " - sending...";
+                try
+                {
+                    ExecutorFactory.CreateExecutor(new DBExecutor(), string.Empty).SendFiles(result, this.textBoxKey.Text);
+                    MessageBox.Show("Files sent successfully");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Files were not sent! " + ex.Message);
+                }
+                this.Text = form1Text;
+            }
+        }
     }
 }

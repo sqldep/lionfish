@@ -70,6 +70,7 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.checkboxUseFS = new System.Windows.Forms.CheckBox();
+            this.buttonSendOnly = new System.Windows.Forms.Button();
             this.tabControlMain.SuspendLayout();
             this.tabPageBasic.SuspendLayout();
             this.tabPageAdvanced.SuspendLayout();
@@ -105,7 +106,7 @@
             // 
             // buttonRun
             // 
-            this.buttonRun.Location = new System.Drawing.Point(355, 213);
+            this.buttonRun.Location = new System.Drawing.Point(354, 156);
             this.buttonRun.Name = "buttonRun";
             this.buttonRun.Size = new System.Drawing.Size(111, 32);
             this.buttonRun.TabIndex = 10;
@@ -223,7 +224,7 @@
             // 
             // buttonTestConnection
             // 
-            this.buttonTestConnection.Location = new System.Drawing.Point(355, 176);
+            this.buttonTestConnection.Location = new System.Drawing.Point(354, 16);
             this.buttonTestConnection.Name = "buttonTestConnection";
             this.buttonTestConnection.Size = new System.Drawing.Size(111, 32);
             this.buttonTestConnection.TabIndex = 7;
@@ -334,6 +335,7 @@
             // 
             // tabPageBasic
             // 
+            this.tabPageBasic.Controls.Add(this.buttonSendOnly);
             this.tabPageBasic.Controls.Add(this.comboBoxDatabase);
             this.tabPageBasic.Controls.Add(this.label1);
             this.tabPageBasic.Controls.Add(this.textBoxPort);
@@ -498,6 +500,16 @@
             this.checkboxUseFS.UseVisualStyleBackColor = true;
             this.checkboxUseFS.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // buttonSendOnly
+            // 
+            this.buttonSendOnly.Location = new System.Drawing.Point(354, 194);
+            this.buttonSendOnly.Name = "buttonSendOnly";
+            this.buttonSendOnly.Size = new System.Drawing.Size(111, 32);
+            this.buttonSendOnly.TabIndex = 11;
+            this.buttonSendOnly.Text = "Send file(s)";
+            this.buttonSendOnly.UseVisualStyleBackColor = true;
+            this.buttonSendOnly.Click += new System.EventHandler(this.buttonSendOnly_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -562,6 +574,7 @@
         private System.Windows.Forms.TextBox textBoxDefautSchema;
         private System.Windows.Forms.TextBox textBoxDefaultDatabase;
         private System.Windows.Forms.Button ButtonBrowse;
+        private System.Windows.Forms.Button buttonSendOnly;
     }
 }
 
