@@ -482,7 +482,7 @@ namespace SQLDep
             catch (Exception ex)
             {
                 this.buttonRun.Enabled = false;
-                this.buttonCreateAndSendFiles.Enabled = true;
+                this.buttonCreateAndSendFiles.Enabled = false;
                 MessageBox.Show("Database not connected! \nError: " + ex.Message);
             }
         }
@@ -490,12 +490,14 @@ namespace SQLDep
         private void comboBoxDriverName_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.buttonRun.Enabled = false;
+            this.buttonCreateAndSendFiles.Enabled = false;
         }
 
         private void comboBoxDSNName_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
             this.buttonRun.Enabled = false;
+            this.buttonCreateAndSendFiles.Enabled = false;
         }
 
         private void comboBoxDatabase_SelectedIndexChanged(object sender, EventArgs e)
@@ -503,6 +505,7 @@ namespace SQLDep
             this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
             this.buttonRun.Enabled = false;
+            this.buttonCreateAndSendFiles.Enabled = false;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
