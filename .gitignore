@@ -35,3 +35,12 @@ testoutput\.json
 testcmd\.cmd
 
 Release/*
+UIConfig\.xml
+
+testoutput\.txt
+
+rename_files\.sh
+
+releaseCmdTest\.cmd
+
+file_system\.cfg

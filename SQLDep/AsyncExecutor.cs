@@ -46,11 +46,11 @@ namespace SQLDepLib
                     try
                     {
                         MyExecutor.SendFiles(files, MyKey.ToString());
-                        MessageBox.Show("Files sent successfully");
+                        MessageBox.Show("File sent successfully. (" + ExportFileName + ")");
                     }
                     catch (Exception e)
                     {
-                        MessageBox.Show("Files were not sent successfully: " + e.Message);
+                        MessageBox.Show("File was not sent successfully: " + e.Message);
                     }
 
                 }

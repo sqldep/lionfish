@@ -36,13 +36,16 @@ namespace SQLDep
             this.textBoxUserName.Text = UIConfig.Get(UIConfig.DATA_SET_NAME, "My Data Set Name");
             this.textBoxDatabaseName.Text = UIConfig.Get(UIConfig.DATABASE_NAME, "master");
             this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "");
+            this.textBoxDefaultDatabase.Text = UIConfig.Get(UIConfig.FS_DEFAULT_DB, "");
+            this.textBoxDefautSchema.Text = UIConfig.Get(UIConfig.FS_DEFAULT_SCHEMA, "");
+            this.textBoxRootDirectory.Text = UIConfig.Get(UIConfig.FS_PATH, "");
+            this.textBoxFileMask.Text = UIConfig.Get(UIConfig.FS_MASK, "*.sql");
             this.buttonRun.Enabled = false;
             this.buttonCreateAndSendFiles.Enabled = false;
             this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
 
             this.EnableAuthSettings();
-            //
             CheckForIllegalCrossThreadCalls = false;
         }
 
@@ -323,14 +326,18 @@ namespace SQLDep
             DBExecutor.UseDriver useDriverType;
             UIConfig.Set(UIConfig.AUTH_TYPE, this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex));
             UIConfig.Set(UIConfig.SQL_DIALECT, this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex));
-            UIConfig.Set(UIConfig.DATA_SET_NAME, this.textBoxUserName.Text.ToString());
-            UIConfig.Set(UIConfig.SQLDEP_KEY, this.textBoxKey.Text.ToString());
-            UIConfig.Set(UIConfig.SERVER_NAME, this.textBoxServerName.Text.ToString());
-            UIConfig.Set(UIConfig.SERVER_PORT, this.textBoxPort.Text.ToString());
-            UIConfig.Set(UIConfig.LOGIN_NAME, this.textBoxLoginName.Text.ToString());
-            UIConfig.Set(UIConfig.LOGIN_PASSWORD, this.textBoxLoginPassword.Text.ToString());
-            UIConfig.Set(UIConfig.DATABASE_NAME, this.textBoxDatabaseName.Text.ToString());
+            UIConfig.Set(UIConfig.DATA_SET_NAME, this.textBoxUserName.Text);
+            UIConfig.Set(UIConfig.SQLDEP_KEY, this.textBoxKey.Text);
+            UIConfig.Set(UIConfig.SERVER_NAME, this.textBoxServerName.Text);
+            UIConfig.Set(UIConfig.SERVER_PORT, this.textBoxPort.Text);
+            UIConfig.Set(UIConfig.LOGIN_NAME, this.textBoxLoginName.Text);
+            UIConfig.Set(UIConfig.LOGIN_PASSWORD, this.textBoxLoginPassword.Text);
+            UIConfig.Set(UIConfig.DATABASE_NAME, this.textBoxDatabaseName.Text);
             UIConfig.Set(UIConfig.DRIVER_NAME, this.GetDriverName(out useDriverType));
+            UIConfig.Set(UIConfig.FS_PATH, this.textBoxRootDirectory.Text);
+            UIConfig.Set(UIConfig.FS_MASK, this.textBoxFileMask.Text);
+            UIConfig.Set(UIConfig.FS_DEFAULT_SCHEMA, this.textBoxDefautSchema.Text);
+            UIConfig.Set(UIConfig.FS_DEFAULT_DB, this.textBoxDefaultDatabase.Text);
         }
 
         public AsyncExecutor AsyncExecutor { get; set; }
@@ -350,12 +357,22 @@ namespace SQLDep
 
         private void createJson(bool sendFiles = false)
         {
-            FolderBrowserDialog fbd = new FolderBrowserDialog();
-            DialogResult result = fbd.ShowDialog();
+            string saveFolder;
+            if (sendFiles)
+            {
+                saveFolder = Path.GetTempPath();
+            }
+            else
+            {
+                FolderBrowserDialog fbd = new FolderBrowserDialog();
+                DialogResult result = fbd.ShowDialog();
 
-            // export cancelled - do nothing
-            if (result != DialogResult.OK)
-                return;
+                // export cancelled - do nothing
+                if (result != DialogResult.OK)
+                    return;
+
+                saveFolder = fbd.SelectedPath;
+            }
 
             try
             {
@@ -376,11 +393,10 @@ namespace SQLDep
 
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
 
-
                 List<string> failedDbs = new List<string>();
                 Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, sqlDialect);
-
-                string exportFileName = fbd.SelectedPath + "\\DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
+                string filename = "DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
+                string exportFileName = Path.Combine(saveFolder, filename);
 
                 this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor, checkboxUseFS.Checked, sendFiles);
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
