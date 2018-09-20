@@ -36,7 +36,7 @@ namespace SQLDepLib
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                // coult be useful
+                // could be useful
                 Logger.Log(Environment.Is64BitOperatingSystem ? "64bit system" : "32bit system");
 
                 DBExecutor.Connect();
@@ -61,7 +61,7 @@ namespace SQLDepLib
 
                 if (dbStructure.queries.Count == 0 && totalTablesCount == 0)
                 {
-                    throw new Exception("None data collected. Missinq any querry or table.");
+                    throw new Exception("None data collected. Missing any querry or table.");
                 }
 
                 dbStructure.dialect = sqlDialect;
@@ -72,11 +72,6 @@ namespace SQLDepLib
                 this.ProgressInfo.SetProgressPercent(95, "Saving collected data to file.");
                 myJson = this.SaveStructureToFile(dbStructure, exportFileName);
                 DBExecutor.Close();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("Error " + ex.Message);
-                throw;
             }
             finally
             {
@@ -526,7 +521,7 @@ namespace SQLDepLib
 
                 foreach (var item in result)
                 {
-                    this.ProgressInfo.SetProgressPercent(62 + 20*(count/result.Count), String.Format("Colleting DB links({}/{}).", count, result.Count));
+                    this.ProgressInfo.SetProgressPercent(62 + 20*(count/result.Count), String.Format("Colleting DB links({0}/{1}).", count, result.Count));
 
                     SQLDBLink dblinkItem = new SQLDBLink()
                     {

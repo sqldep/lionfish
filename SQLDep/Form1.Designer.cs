@@ -37,7 +37,7 @@
             this.textBoxUserName = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
+            this.AuthenticationLabel = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.comboBoxAuthType = new System.Windows.Forms.ComboBox();
@@ -57,6 +57,7 @@
             this.comboBoxDSNName = new System.Windows.Forms.ComboBox();
             this.tabControlMain = new System.Windows.Forms.TabControl();
             this.tabPageBasic = new System.Windows.Forms.TabPage();
+            this.buttonSendOnly = new System.Windows.Forms.Button();
             this.tabPageAdvanced = new System.Windows.Forms.TabPage();
             this.label12 = new System.Windows.Forms.Label();
             this.Filesystem = new System.Windows.Forms.TabPage();
@@ -70,7 +71,7 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.checkboxUseFS = new System.Windows.Forms.CheckBox();
-            this.buttonSendOnly = new System.Windows.Forms.Button();
+            this.TextBoxAccount = new System.Windows.Forms.TextBox();
             this.tabControlMain.SuspendLayout();
             this.tabPageBasic.SuspendLayout();
             this.tabPageAdvanced.SuspendLayout();
@@ -87,7 +88,8 @@
             "Teradata",
             "Greenplum",
             "Amazon Redshift",
-            "PostgreSQL"});
+            "PostgreSQL",
+            "Snowflake"});
             this.comboBoxDatabase.Location = new System.Drawing.Point(103, 16);
             this.comboBoxDatabase.Name = "comboBoxDatabase";
             this.comboBoxDatabase.Size = new System.Drawing.Size(234, 21);
@@ -157,15 +159,15 @@
             this.label5.Text = "Hostname";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // label6
+            // AuthenticationLabel
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(12, 103);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(75, 13);
-            this.label6.TabIndex = 1;
-            this.label6.Text = "Authentication";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.AuthenticationLabel.AutoSize = true;
+            this.AuthenticationLabel.Location = new System.Drawing.Point(12, 103);
+            this.AuthenticationLabel.Name = "AuthenticationLabel";
+            this.AuthenticationLabel.Size = new System.Drawing.Size(75, 13);
+            this.AuthenticationLabel.TabIndex = 1;
+            this.AuthenticationLabel.Text = "Authentication";
+            this.AuthenticationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label7
             // 
@@ -335,13 +337,14 @@
             // 
             // tabPageBasic
             // 
+            this.tabPageBasic.Controls.Add(this.TextBoxAccount);
             this.tabPageBasic.Controls.Add(this.buttonSendOnly);
             this.tabPageBasic.Controls.Add(this.comboBoxDatabase);
             this.tabPageBasic.Controls.Add(this.label1);
             this.tabPageBasic.Controls.Add(this.textBoxPort);
             this.tabPageBasic.Controls.Add(this.label5);
             this.tabPageBasic.Controls.Add(this.label2);
-            this.tabPageBasic.Controls.Add(this.label6);
+            this.tabPageBasic.Controls.Add(this.AuthenticationLabel);
             this.tabPageBasic.Controls.Add(this.textBoxDatabaseName);
             this.tabPageBasic.Controls.Add(this.label7);
             this.tabPageBasic.Controls.Add(this.textBoxLoginName);
@@ -364,6 +367,16 @@
             this.tabPageBasic.TabIndex = 0;
             this.tabPageBasic.Text = "Basic";
             this.tabPageBasic.UseVisualStyleBackColor = true;
+            // 
+            // buttonSendOnly
+            // 
+            this.buttonSendOnly.Location = new System.Drawing.Point(354, 194);
+            this.buttonSendOnly.Name = "buttonSendOnly";
+            this.buttonSendOnly.Size = new System.Drawing.Size(111, 32);
+            this.buttonSendOnly.TabIndex = 11;
+            this.buttonSendOnly.Text = "Send file(s)";
+            this.buttonSendOnly.UseVisualStyleBackColor = true;
+            this.buttonSendOnly.Click += new System.EventHandler(this.buttonSendOnly_Click);
             // 
             // tabPageAdvanced
             // 
@@ -500,15 +513,13 @@
             this.checkboxUseFS.UseVisualStyleBackColor = true;
             this.checkboxUseFS.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
-            // buttonSendOnly
+            // TextBoxAccount
             // 
-            this.buttonSendOnly.Location = new System.Drawing.Point(354, 194);
-            this.buttonSendOnly.Name = "buttonSendOnly";
-            this.buttonSendOnly.Size = new System.Drawing.Size(111, 32);
-            this.buttonSendOnly.TabIndex = 11;
-            this.buttonSendOnly.Text = "Send file(s)";
-            this.buttonSendOnly.UseVisualStyleBackColor = true;
-            this.buttonSendOnly.Click += new System.EventHandler(this.buttonSendOnly_Click);
+            this.TextBoxAccount.Location = new System.Drawing.Point(103, 103);
+            this.TextBoxAccount.Name = "TextBoxAccount";
+            this.TextBoxAccount.Size = new System.Drawing.Size(234, 20);
+            this.TextBoxAccount.TabIndex = 12;
+            this.TextBoxAccount.Visible = false;
             // 
             // Form1
             // 
@@ -541,7 +552,7 @@
         private System.Windows.Forms.TextBox textBoxUserName;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label AuthenticationLabel;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox comboBoxAuthType;
@@ -575,6 +586,7 @@
         private System.Windows.Forms.TextBox textBoxDefaultDatabase;
         private System.Windows.Forms.Button ButtonBrowse;
         private System.Windows.Forms.Button buttonSendOnly;
+        private System.Windows.Forms.TextBox TextBoxAccount;
     }
 }
 

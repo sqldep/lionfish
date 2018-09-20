@@ -5336,6 +5336,14 @@
             Total number of current prepared statements (whether explicit or automatic).
             </summary>
         </member>
+        <member name="T:Npgsql.Schema.DbColumn">
+            <summary>
+            A copy of corefx's DbColumn, used only in .NET Framework where we don't have it.
+            </summary>
+            <remarks>
+            See https://github.com/dotnet/corefx/blob/master/src/System.Data.Common/src/System/Data/Common/DbColumn.cs
+            </remarks>
+        </member>
         <member name="M:Npgsql.Schema.DbColumnSchemaGenerator.GenerateOldColumnsQuery(System.String)">
             <summary>
             Stripped-down version of <see cref="M:Npgsql.Schema.DbColumnSchemaGenerator.GenerateColumnsQuery(System.Version,System.String)"/>, mainly to support Amazon Redshift.
@@ -6432,10 +6440,20 @@
             <summary>
             A type mapper, managing how to read and write CLR values to PostgreSQL data types.
             A type mapper exists for each connection, as well as a single global type mapper
-            (accessible via 
+            (accessible via <see cref="P:NpgsqlConnection.GlobalTypeMapper"/>).
             </summary>
             <remarks>
             </remarks>
+        </member>
+        <member name="P:Npgsql.TypeMapping.INpgsqlTypeMapper.DefaultNameTranslator">
+            <summary>
+            The default name translator to convert CLR type names and member names.
+            </summary>
+        </member>
+        <member name="P:Npgsql.TypeMapping.INpgsqlTypeMapper.Mappings">
+            <summary>
+            Enumerates all mappings currently set up on this type mapper.
+            </summary>
         </member>
         <member name="M:Npgsql.TypeMapping.INpgsqlTypeMapper.AddMapping(Npgsql.TypeMapping.NpgsqlTypeMapping)">
             <summary>
@@ -6447,11 +6465,7 @@
             Removes an existing mapping from this mapper. Attempts to read or write this type
             after removal will result in an exception.
             </summary>
-        </member>
-        <member name="P:Npgsql.TypeMapping.INpgsqlTypeMapper.Mappings">
-            <summary>
-            Enumerates all mappings currently set up on this type mapper.
-            </summary>
+            <param name="pgTypeName">A PostgreSQL type name for the type in the database.</param>
         </member>
         <member name="M:Npgsql.TypeMapping.INpgsqlTypeMapper.MapEnum``1(System.String,Npgsql.INpgsqlNameTranslator)">
             <summary>
@@ -7058,6 +7072,12 @@
             <remarks>See http://www.postgresql.org/docs/current/static/datatype-textsearch.html</remarks>
         </member>
         <member name="F:NpgsqlTypes.NpgsqlDbType.TsQuery">
+            <summary>
+            Corresponds to the PostgreSQL "tsquery" type.
+            </summary>
+            <remarks>See http://www.postgresql.org/docs/current/static/datatype-textsearch.html</remarks>
+        </member>
+        <member name="F:NpgsqlTypes.NpgsqlDbType.Regconfig">
             <summary>
             Corresponds to the PostgreSQL "tsquery" type.
             </summary>

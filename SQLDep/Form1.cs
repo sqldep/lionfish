@@ -173,11 +173,6 @@ namespace SQLDep
 
                 idx++;
             }
-
-            if(comboBoxDriverName.SelectedIndex < 0)
-            {
-                comboBoxDriverName.SelectedIndex = 0;
-            }
         }
 
         public void EnableAuthSettings()
@@ -239,6 +234,7 @@ namespace SQLDep
                 case 3: return "greenplum";
                 case 4: return "redshift";
                 case 5: return "postgres";
+                case 6: return "snowflake";
                 default: return "mssql";
             }
         }
@@ -310,15 +306,20 @@ namespace SQLDep
 
             ComboBoxDSNItem dsnItem = this.GetSelectedDSNName();
             string dsn = dsnItem.IsDSN ? dsnItem.Text : string.Empty;
-            return dbExecutor.BuildConnectionString(this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
-                                                dsn,
-                                                this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex),
-                                                this.textBoxServerName.Text,
-                                                this.textBoxPort.Text, 
-                                                this.textBoxDatabaseName.Text,
-                                                this.textBoxLoginName.Text,
-                                                this.textBoxLoginPassword.Text,
-                                                driverName, useDriverType);
+            Arguments args = new Arguments()
+            {
+                dbType = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
+                dsnName = dsn,
+                auth_type = this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex),
+                server = this.textBoxServerName.Text,
+                port = this.textBoxPort.Text,
+                database = this.textBoxDatabaseName.Text,
+                loginName = this.textBoxLoginName.Text,
+                loginpassword = this.textBoxLoginPassword.Text,
+                driverName = driverName,
+                account = this.TextBoxAccount.Text,
+            };
+            return dbExecutor.BuildConnectionString(args, useDriverType);
         }
 
         private void SaveDialogSettings ()
@@ -522,6 +523,19 @@ namespace SQLDep
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
             this.buttonRun.Enabled = false;
             this.buttonCreateAndSendFiles.Enabled = false;
+            if (GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex) == "snowflake")
+            {
+                // hide auth type switch and show Account text field
+                comboBoxAuthType.Hide();
+                TextBoxAccount.Show();
+                AuthenticationLabel.Text = "Account";
+            }
+            else
+            {
+                comboBoxAuthType.Show();
+                TextBoxAccount.Hide();
+                AuthenticationLabel.Text = "Authentication";
+            }
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
