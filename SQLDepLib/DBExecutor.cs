@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Hosting;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
@@ -157,6 +158,11 @@ namespace SQLDepLib
                     ConnectString = String.Format("account={0};user={1};password={2}", args.account, args.loginName, args.loginpassword);
                     ConnectString += !String.IsNullOrEmpty(args.database) ? String.Format(";db={0}", args.database) : "";
                     ConnectString += !String.IsNullOrEmpty(args.server) ? String.Format(";host={0}", args.server) : "";
+                    ConnectString += !String.IsNullOrEmpty(args.role) ? String.Format(";role={0}", args.role) : "";
+                    ConnectString += !String.IsNullOrEmpty(args.warehouse) ? String.Format(";warehouse={0}", args.warehouse) : "";
+
+                    Regex rgx = new Regex("password=[^;]*");
+                    Logger.Log(String.Format("Connection string: {0}", rgx.Replace(ConnectString, "password=*****")));
 
                     return this.ConnectString;
                 }

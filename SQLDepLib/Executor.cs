@@ -261,7 +261,7 @@ namespace SQLDepLib
             ret.databaseModel = new SQLDatabaseModel();
             ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
 
-            if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
+            if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres" && sqlDialect != "snowflake")
             {
                 this.ProgressInfo.SetProgressPercent(62, "Colleting DB links.");
                 Logger.Log("Getting list of dblinks");
@@ -772,7 +772,7 @@ namespace SQLDepLib
                     Logger.Log("Tables #["+ modelItem.tables.Count + "] in database" + dbName + " processed.");
 
                     // synonyms
-                    if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
+                    if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres" && sqlDialect != "snowflake")
                     {
                         Logger.Log("Getting synonyms in database " + dbName + ".");
 

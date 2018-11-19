@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Mono.Options;
 using SQLDepLib;
@@ -30,6 +31,8 @@ namespace SQLDepCmd
                 { "driver",  "driver name", v => arguments.driverName = v },
                 { "send=",  "SEND or SENDONLY, default do not send", v => arguments.sendFile = v.ToUpper() },
                 { "use-filesystem",  "Use this option to use FS. file_system.conf must be configured!", v => arguments.useFS = true},
+                { "warehouse",  "Warehouse (Snowflake only)", v => arguments.warehouse = v },
+                { "role",  "Role (Snowflake only)", v => arguments.role = v },
             };
 
             try
@@ -94,7 +97,13 @@ namespace SQLDepCmd
             }
             catch (Exception e)
             {
-                Logger.Exception(e.Message);
+               
+                string exMessage = e.Message;
+                if (e.InnerException != null)
+                {
+                    exMessage += "\nInner exception: " + e.InnerException.Message;
+                }
+                Logger.Exception(exMessage);
                 return -1;
             }
             return 0; // standard success

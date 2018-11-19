@@ -25,6 +25,8 @@ namespace SQLDepLib
         public bool useFS { get; set; }
         public string account { get; set; }
         public string exportFileName { get; set; }
+        public string warehouse { get; set; }
+        public string role { get; set; }
         public Guid myKey { get; set; }
 
         public Arguments()
@@ -44,7 +46,9 @@ namespace SQLDepLib
             driverName = string.Empty;
             dsnName = string.Empty;
             account = string.Empty; // used in snowflake connection
-            useFS = false; 
+            useFS = false;
+            warehouse = string.Empty;
+            role = string.Empty;
         }
 
 

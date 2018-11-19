@@ -318,6 +318,8 @@ namespace SQLDep
                 loginpassword = this.textBoxLoginPassword.Text,
                 driverName = driverName,
                 account = this.TextBoxAccount.Text,
+                warehouse = this.textBoxWarehouse.Text,
+                role = this.textBoxRole.Text
             };
             return dbExecutor.BuildConnectionString(args, useDriverType);
         }
@@ -500,7 +502,14 @@ namespace SQLDep
             {
                 this.buttonRun.Enabled = false;
                 this.buttonCreateAndSendFiles.Enabled = false;
-                MessageBox.Show("Database not connected! \nError: " + ex.Message);
+                string exceptionMessage = "Database not connected! \nError: " + ex.Message;
+                if (ex.InnerException != null)
+                {
+                    exceptionMessage += "\n\nInner exception: " + ex.InnerException.Message;
+                }
+
+                MessageBox.Show(exceptionMessage);
+                Logger.Log(exceptionMessage);
             }
         }
 
@@ -523,19 +532,39 @@ namespace SQLDep
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
             this.buttonRun.Enabled = false;
             this.buttonCreateAndSendFiles.Enabled = false;
-            if (GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex) == "snowflake")
+
+            switch (GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex))
             {
-                // hide auth type switch and show Account text field
-                comboBoxAuthType.Hide();
-                TextBoxAccount.Show();
-                AuthenticationLabel.Text = "Account";
+                case "snowflake":
+                    enableSnowflakeFields();
+                    break;
+                default:
+                    showDefaultFields();
+                    break;
             }
-            else
-            {
-                comboBoxAuthType.Show();
-                TextBoxAccount.Hide();
-                AuthenticationLabel.Text = "Authentication";
-            }
+        }
+
+        private void showDefaultFields()
+        {
+            comboBoxAuthType.Show();
+            TextBoxAccount.Hide();
+            AuthenticationLabel.Text = "Authentication";
+            textBoxWarehouse.Hide();
+            textBoxRole.Hide();
+            labelRole.Hide();
+            labelWarehouse.Hide();
+        }
+
+        private void enableSnowflakeFields()
+        {
+            // hide auth type switch and show Account, Warehouse, Role text fields
+            comboBoxAuthType.Hide();
+            TextBoxAccount.Show();
+            AuthenticationLabel.Text = "Account";
+            textBoxWarehouse.Show();
+            textBoxRole.Show();
+            labelRole.Show();
+            labelWarehouse.Show();
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -573,6 +602,16 @@ namespace SQLDep
                 }
                 this.Text = form1Text;
             }
+        }
+
+        private void label6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label17_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
