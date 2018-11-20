@@ -1,5 +1,8 @@
 /* IMPORTANT: If you modify this file, rename it to cmd.sql (so it won't be overwritten when you upgrade lionfish).
 Only cmd.sql will be used when both exist.*/
+
+use database ##DBNAME##;
+
 select
   t.table_catalog as dbName,
   t.table_schema as schemaName,

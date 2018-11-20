@@ -1,5 +1,8 @@
 /* IMPORTANT: If you modify this file, rename it to cmd.sql (so it won't be overwritten when you upgrade lionfish).
 Only cmd.sql will be used when both exist.*/
+
+use database ##DBNAME##;
+
 select 
   v.view_definition as sourceCode,
   v.table_name as viewName,
@@ -7,4 +10,4 @@ select
   v.table_catalog as databaseName,
   v.table_schema as schemaName
 from information_schema.views v
-where v.table_schema not in ('pg_catalog', 'information_schema');
+where upper(v.table_schema) not in ('INFORMATION_SCHEMA');
