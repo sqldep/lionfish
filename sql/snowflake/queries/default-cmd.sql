@@ -3,6 +3,8 @@ Only cmd.sql will be used when both exist.*/
 
 use database ##DBNAME##;
 
+--split
+
 select 
   v.view_definition as sourceCode,
   v.table_name as viewName,

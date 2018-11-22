@@ -3,6 +3,8 @@ Only cmd.sql will be used when both exist.*/
 
 use database ##DBNAME##;
 
+--split
+
 select
   t.table_catalog as dbName,
   t.table_schema as schemaName,

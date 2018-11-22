@@ -40,6 +40,9 @@ namespace SQLDep
             this.textBoxDefautSchema.Text = UIConfig.Get(UIConfig.FS_DEFAULT_SCHEMA, "");
             this.textBoxRootDirectory.Text = UIConfig.Get(UIConfig.FS_PATH, "");
             this.textBoxFileMask.Text = UIConfig.Get(UIConfig.FS_MASK, "*.sql");
+            this.textBoxWarehouse.Text = UIConfig.Get(UIConfig.SNOWFLAKE_WAREHOUSE, "");
+            this.TextBoxAccount.Text = UIConfig.Get(UIConfig.SNOWFLAKE_ACCOUNT, "");
+            this.textBoxRole.Text = UIConfig.Get(UIConfig.SNOWFLAKE_ROLE, "");
             this.buttonRun.Enabled = false;
             this.buttonCreateAndSendFiles.Enabled = false;
             this.InitializeDSNNames(string.Empty);
@@ -341,6 +344,9 @@ namespace SQLDep
             UIConfig.Set(UIConfig.FS_MASK, this.textBoxFileMask.Text);
             UIConfig.Set(UIConfig.FS_DEFAULT_SCHEMA, this.textBoxDefautSchema.Text);
             UIConfig.Set(UIConfig.FS_DEFAULT_DB, this.textBoxDefaultDatabase.Text);
+            UIConfig.Set(UIConfig.SNOWFLAKE_ACCOUNT, this.TextBoxAccount.Text);
+            UIConfig.Set(UIConfig.SNOWFLAKE_ROLE, this.textBoxRole.Text);
+            UIConfig.Set(UIConfig.SNOWFLAKE_WAREHOUSE, this.textBoxWarehouse.Text);
         }
 
         public AsyncExecutor AsyncExecutor { get; set; }
@@ -410,11 +416,13 @@ namespace SQLDep
             {
                 // known errors - do not show details about stack
                 string msg = ex.Message;
+                Logger.Log(msg);
                 MessageBox.Show(msg);
             }
             catch (Exception ex)
             {
                 string msg = ex.Message;
+                Logger.Log(msg);
                 MessageBox.Show(msg);
             }
         }
@@ -491,11 +499,11 @@ namespace SQLDep
             this.BuildConnectionString(dbExecutor);
             try
             {
+                this.SaveDialogSettings();
                 dbExecutor.Connect();
                 dbExecutor.Close();
                 this.buttonRun.Enabled = true;
                 this.buttonCreateAndSendFiles.Enabled = true;
-                this.SaveDialogSettings();
                 MessageBox.Show("Database connected!");
             }
             catch (Exception ex)

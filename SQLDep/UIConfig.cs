@@ -28,6 +28,9 @@ namespace SQLDep
         public const string FS_DEFAULT_SCHEMA = "fs_default_schema";
         public const string FS_DEFAULT_DB = "fs_default_db";
         public const string DRIVER_NAME_NATIVE = "Native Driver";
+        public const string SNOWFLAKE_WAREHOUSE = "Warehouse";
+        public const string SNOWFLAKE_ACCOUNT = "Account";
+        public const string SNOWFLAKE_ROLE= "Role";
 
         private const string ConfigFilename = "UIConfig.xml";
 
