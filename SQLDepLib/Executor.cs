@@ -287,11 +287,10 @@ namespace SQLDepLib
             List<string> ret = new List<string>();
             foreach (var item in result)
             {
-                Logger.Log(string.Format("GetDBNames - adding {0}", item));
                 ret.Add(item.Column0);
             }
 
-            Logger.Log(string.Format("GetDBNames - count {0}", ret != null ? (ret.Count).ToString() : "null"));
+            Logger.Log(string.Format("GetDBNames found {0} dbs: {1}.", ret.Count, string.Join(", ", ret)));
 
             return ret;
         }
@@ -334,7 +333,11 @@ namespace SQLDepLib
 
                     foreach (var item in firstBlock)
                     {
-                        this.ProgressInfo.SetProgressPercent(15 + 30 * (counter / firstBlock.Count), "Collecting queries.");
+                        if (firstBlock.Count != 0)
+                        {
+                            this.ProgressInfo.SetProgressPercent(15 + 30 * (counter / firstBlock.Count), "Collecting queries.");
+                        }
+
                         if (item.Column5.Equals("1")) { // dump previous wholeCode
 
                             if (counter > 0)
@@ -453,49 +456,57 @@ namespace SQLDepLib
             bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
             {
-                //this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
-                try
+                Logger.Log(String.Format("1. Processing queries in db [{0}].", dbName));
+                // sql commands
+                List<StrReplace> replaces = new List<StrReplace>();
+                StrReplace itemForReplace = new StrReplace()
                 {
-                    // sql commands
-                    List<StrReplace> replaces = new List<StrReplace>();
-                    StrReplace itemForReplace = new StrReplace()
-                    {
-                        SearchText = "##DBNAME##",
-                        ReplaceText = dbName
-                    };
-                    replaces.Add(itemForReplace);
+                    SearchText = "##DBNAME##",
+                    ReplaceText = dbName
+                };
+                replaces.Add(itemForReplace);
 
-                    List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
-                    firstSqlCommands = false;
+                List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
+                firstSqlCommands = false;
 
-                    List<SQLResult> result = new List<SQLResult>();
-                    foreach (var item in sqls)
-                    {
-                        DBExecutor.RunSql(result, item);
-                    }
+                List<SQLResult> result = new List<SQLResult>();
+                Logger.Log(String.Format("2. Running sql for queries in db [{0}].", dbName));
 
-                    foreach (var item in result)
+
+                foreach (var item in sqls)
+                {
+                    DBExecutor.RunSql(result, item);
+                }
+
+                Logger.Log(String.Format("3. Received {0} queries, saving them...", result.Count));
+
+                int savingQueryCnt = 0;
+                foreach (var item in result)
+                {
+                    Logger.Log(String.Format("\tSaving query {0}.", savingQueryCnt));
+
+                    if (result.Count != 0)
                     {
                         this.ProgressInfo.SetProgressPercent(15 + 40 * (count / result.Count), "Collecting queries.");
-                        SQLQuery queryItem = new SQLQuery()
-                        {
-                            sourceCode = item.Column0,
-                            name = item.Column1,
-                            groupName = item.Column2,
-                            database = item.Column3,
-                            schema = item.Column4
-                        };
-
-
-                        ret.Add(queryItem);
-                        count++;
                     }
+
+                    SQLQuery queryItem = new SQLQuery()
+                    {
+                        sourceCode = item.Column0,
+                        name = item.Column1,
+                        groupName = item.Column2,
+                        database = item.Column3,
+                        schema = item.Column4
+                    };
+
+                    savingQueryCnt++;
+                    ret.Add(queryItem);
+                    count++;
                 }
-                catch (Exception)
-                {
-                    throw;
-                }
+
+                Logger.Log(String.Format("4. Queries saved in variable."));
             }
+
             return ret;
         }
 
@@ -554,11 +565,17 @@ namespace SQLDepLib
         protected List<string> GetSQLCommands(string sqlDialect, Purpose enumPurpose, bool isFirstOfThisType, List<StrReplace> list)
         {
             string purpose = enumPurpose.ToString().ToLower();
+            Logger.Log(String.Format("\tGetting SQL commands. (Args: sqlDialect: {0}, purpose: {1}, is_first {2})", sqlDialect, purpose, isFirstOfThisType));
 
             // tyto jsou povinne
             string sqlCommands;
             string customFilepath = "./sql/" + sqlDialect + "/" + purpose + "/cmd.sql";
             string defaultFilepath = "./sql/" + sqlDialect + "/" + purpose + "/default-cmd.sql";
+
+            Logger.Log(String.Format("\tLoading SQL commands from file: {0}",
+                File.Exists(customFilepath) ? customFilepath : defaultFilepath)
+            );
+
             sqlCommands = File.Exists(customFilepath)
                 ? File.ReadAllText(customFilepath)
                 : File.ReadAllText(defaultFilepath);
@@ -585,7 +602,7 @@ namespace SQLDepLib
 
                     if (Directory.Exists(customPath))
                     {
-                        Logger.Log(string.Format("Checked custom sql files in {0} - directory exists.", customPath));
+                        Logger.Log(string.Format("\tChecked custom sql files in {0} - directory exists.", customPath));
                         foreach (var file in Directory.GetFiles(customPath))
                         {
                             if (file.EndsWith("sql", StringComparison.InvariantCultureIgnoreCase))
@@ -597,30 +614,33 @@ namespace SQLDepLib
                                 sqlCommands += customSqlCommands;
 
                                 // log it
-                                Logger.Log(string.Format("ConfFile {0} in custom directory succesfully added ({1} characters read).", file, customSqlCommands.Length));
+                                Logger.Log(string.Format("\tConfFile {0} in custom directory succesfully added ({1} characters read).", file, customSqlCommands.Length));
                             }
                             else
                             {
-                                Logger.Log(string.Format("ConfFile {0} in custom directory ignored - expected extension sql.", customPath));
+                                Logger.Log(string.Format("\tConfFile {0} in custom directory ignored - expected extension sql.", customPath));
                             }
                         }
                     }
                     else
                     {
-                        Logger.Log(string.Format("Checked custom sql files in {0} - directory does not exist.", customPath));
+                        Logger.Log(string.Format("\tChecked custom sql files in {0} - directory does not exist.", customPath));
                     }
                 }
             }
 
+            Logger.Log(String.Format("\tReplacing items to replace"));
             // a dale jedeme jako posledne
             if (list != null)
             {
                 foreach (var item in list)
                 {
+                    Logger.Log(String.Format("\tReplacing {0} with {1}", item.SearchText, item.ReplaceText));
                     sqlCommands = sqlCommands.Replace(item.SearchText, item.ReplaceText);
                 }
             }
 
+            Logger.Log(String.Format("\tSplitting"));
             string[] separator = { "--split" };
             List<string> sqlCommandsList = sqlCommands.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
 

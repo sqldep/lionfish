@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.comboBoxDatabase = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -57,6 +58,7 @@
             this.comboBoxDSNName = new System.Windows.Forms.ComboBox();
             this.tabControlMain = new System.Windows.Forms.TabControl();
             this.tabPageBasic = new System.Windows.Forms.TabPage();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.labelRole = new System.Windows.Forms.Label();
             this.labelWarehouse = new System.Windows.Forms.Label();
             this.textBoxRole = new System.Windows.Forms.TextBox();
@@ -76,8 +78,10 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.checkboxUseFS = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControlMain.SuspendLayout();
             this.tabPageBasic.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabPageAdvanced.SuspendLayout();
             this.Filesystem.SuspendLayout();
             this.SuspendLayout();
@@ -341,6 +345,7 @@
             // 
             // tabPageBasic
             // 
+            this.tabPageBasic.Controls.Add(this.pictureBox1);
             this.tabPageBasic.Controls.Add(this.labelRole);
             this.tabPageBasic.Controls.Add(this.labelWarehouse);
             this.tabPageBasic.Controls.Add(this.textBoxRole);
@@ -375,6 +380,18 @@
             this.tabPageBasic.TabIndex = 0;
             this.tabPageBasic.Text = "Basic";
             this.tabPageBasic.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::SQLDep.Properties.Resources.icons8_help_26;
+            this.pictureBox1.Location = new System.Drawing.Point(64, 276);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(18, 18);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 17;
+            this.pictureBox1.TabStop = false;
+            this.toolTip1.SetToolTip(this.pictureBox1, "Visit https://app.sqldep.com/queryflow/upload/api/ to obtain your API key.");
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // labelRole
             // 
@@ -567,6 +584,12 @@
             this.checkboxUseFS.UseVisualStyleBackColor = true;
             this.checkboxUseFS.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // toolTip1
+            // 
+            this.toolTip1.IsBalloon = true;
+            this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.toolTip1.ToolTipTitle = "API key";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -580,6 +603,7 @@
             this.tabControlMain.ResumeLayout(false);
             this.tabPageBasic.ResumeLayout(false);
             this.tabPageBasic.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabPageAdvanced.ResumeLayout(false);
             this.tabPageAdvanced.PerformLayout();
             this.Filesystem.ResumeLayout(false);
@@ -637,6 +661,8 @@
         private System.Windows.Forms.TextBox textBoxRole;
         private System.Windows.Forms.TextBox textBoxWarehouse;
         private System.Windows.Forms.Label labelRole;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 

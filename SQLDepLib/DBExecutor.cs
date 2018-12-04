@@ -482,6 +482,7 @@ namespace SQLDepLib
         {
 
             OracleCommand toGo = this.OleDbConnection.CreateCommand();
+            
             toGo.CommandTimeout = 3600 * 12;
             toGo.CommandText = cmd;
             toGo.InitialLONGFetchSize = -1;

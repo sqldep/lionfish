@@ -62,6 +62,7 @@ namespace SQLDepLib
             catch (Exception ex)
             {
                 string msg = ex.Message;
+                Logger.Log(msg);
                 MessageBox.Show(msg);
             }
             this.IsRunning = false;

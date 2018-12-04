@@ -221,6 +221,7 @@ namespace SQLDep
         {
             switch (sqlDialect)
             {
+                case "snowflake": return 6;
                 case "teradata": return 2;
                 case "oracle": return 0;
                 default: return 1;
@@ -382,7 +383,6 @@ namespace SQLDep
 
                 saveFolder = fbd.SelectedPath;
             }
-
             try
             {
                 this.SaveDialogSettings();
@@ -402,7 +402,6 @@ namespace SQLDep
 
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
 
-                List<string> failedDbs = new List<string>();
                 Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, sqlDialect);
                 string filename = "DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
                 string exportFileName = Path.Combine(saveFolder, filename);
@@ -410,14 +409,8 @@ namespace SQLDep
                 this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor, checkboxUseFS.Checked, sendFiles);
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
                 this.AsyncExecutorThread.Start();
-                new Thread(this.ShowProgress).Start();
-            }
-            catch (SQLDepException ex)
-            {
-                // known errors - do not show details about stack
-                string msg = ex.Message;
-                Logger.Log(msg);
-                MessageBox.Show(msg);
+                //new Thread(this.ShowProgress).Start();
+
             }
             catch (Exception ex)
             {
@@ -618,6 +611,11 @@ namespace SQLDep
         }
 
         private void label17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
         {
 
         }
