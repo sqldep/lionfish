@@ -470,8 +470,6 @@ namespace SQLDepLib
                 firstSqlCommands = false;
 
                 List<SQLResult> result = new List<SQLResult>();
-                Logger.Log(String.Format("2. Running sql for queries in db [{0}].", dbName));
-
 
                 foreach (var item in sqls)
                 {
@@ -483,8 +481,6 @@ namespace SQLDepLib
                 int savingQueryCnt = 0;
                 foreach (var item in result)
                 {
-                    Logger.Log(String.Format("\tSaving query {0}.", savingQueryCnt));
-
                     if (result.Count != 0)
                     {
                         this.ProgressInfo.SetProgressPercent(15 + 40 * (count / result.Count), "Collecting queries.");
@@ -503,8 +499,6 @@ namespace SQLDepLib
                     ret.Add(queryItem);
                     count++;
                 }
-
-                Logger.Log(String.Format("4. Queries saved in variable."));
             }
 
             return ret;
@@ -565,9 +559,7 @@ namespace SQLDepLib
         protected List<string> GetSQLCommands(string sqlDialect, Purpose enumPurpose, bool isFirstOfThisType, List<StrReplace> list)
         {
             string purpose = enumPurpose.ToString().ToLower();
-            Logger.Log(String.Format("\tGetting SQL commands. (Args: sqlDialect: {0}, purpose: {1}, is_first {2})", sqlDialect, purpose, isFirstOfThisType));
 
-            // tyto jsou povinne
             string sqlCommands;
             string customFilepath = "./sql/" + sqlDialect + "/" + purpose + "/cmd.sql";
             string defaultFilepath = "./sql/" + sqlDialect + "/" + purpose + "/default-cmd.sql";
@@ -629,18 +621,15 @@ namespace SQLDepLib
                 }
             }
 
-            Logger.Log(String.Format("\tReplacing items to replace"));
             // a dale jedeme jako posledne
             if (list != null)
             {
                 foreach (var item in list)
                 {
-                    Logger.Log(String.Format("\tReplacing {0} with {1}", item.SearchText, item.ReplaceText));
                     sqlCommands = sqlCommands.Replace(item.SearchText, item.ReplaceText);
                 }
             }
 
-            Logger.Log(String.Format("\tSplitting"));
             string[] separator = { "--split" };
             List<string> sqlCommandsList = sqlCommands.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
 
