@@ -23,7 +23,7 @@ namespace SQLDepLib
         public static void Exception(string msg, string filename = "SQLdepLog.txt")
         {
             {
-                msg = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\t" + "Exception " + msg;
+                msg = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\t" + "Exception: " + msg;
                 Console.WriteLine(msg);
                 StreamWriter wr = File.AppendText(filename);
                 wr.WriteLine(msg);

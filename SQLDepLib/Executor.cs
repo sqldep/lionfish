@@ -36,7 +36,7 @@ namespace SQLDepLib
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                // coult be useful
+                // could be useful
                 Logger.Log(Environment.Is64BitOperatingSystem ? "64bit system" : "32bit system");
 
                 DBExecutor.Connect();
@@ -61,7 +61,7 @@ namespace SQLDepLib
 
                 if (dbStructure.queries.Count == 0 && totalTablesCount == 0)
                 {
-                    throw new Exception("None data collected. Missinq any querry or table.");
+                    throw new Exception("None data collected. Missing any querry or table.");
                 }
 
                 dbStructure.dialect = sqlDialect;
@@ -72,11 +72,6 @@ namespace SQLDepLib
                 this.ProgressInfo.SetProgressPercent(95, "Saving collected data to file.");
                 myJson = this.SaveStructureToFile(dbStructure, exportFileName);
                 DBExecutor.Close();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("Error " + ex.Message);
-                throw;
             }
             finally
             {
@@ -266,7 +261,7 @@ namespace SQLDepLib
             ret.databaseModel = new SQLDatabaseModel();
             ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
 
-            if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
+            if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres" && sqlDialect != "snowflake")
             {
                 this.ProgressInfo.SetProgressPercent(62, "Colleting DB links.");
                 Logger.Log("Getting list of dblinks");
@@ -292,11 +287,10 @@ namespace SQLDepLib
             List<string> ret = new List<string>();
             foreach (var item in result)
             {
-                Logger.Log(string.Format("GetDBNames - adding {0}", item));
                 ret.Add(item.Column0);
             }
 
-            Logger.Log(string.Format("GetDBNames - count {0}", ret != null ? (ret.Count).ToString() : "null"));
+            Logger.Log(string.Format("GetDBNames found {0} dbs: {1}.", ret.Count, string.Join(", ", ret)));
 
             return ret;
         }
@@ -339,7 +333,11 @@ namespace SQLDepLib
 
                     foreach (var item in firstBlock)
                     {
-                        this.ProgressInfo.SetProgressPercent(15 + 30 * (counter / firstBlock.Count), "Collecting queries.");
+                        if (firstBlock.Count != 0)
+                        {
+                            this.ProgressInfo.SetProgressPercent(15 + 30 * (counter / firstBlock.Count), "Collecting queries.");
+                        }
+
                         if (item.Column5.Equals("1")) { // dump previous wholeCode
 
                             if (counter > 0)
@@ -458,49 +456,51 @@ namespace SQLDepLib
             bool firstSqlCommands = true;
             foreach (var dbName in dbNames)
             {
-                //this.ProgressInfo.SetProgressDone((double)100 * ++iiDbCounter / dbNames.Count, dbName);
-                try
+                Logger.Log(String.Format("1. Processing queries in db [{0}].", dbName));
+                // sql commands
+                List<StrReplace> replaces = new List<StrReplace>();
+                StrReplace itemForReplace = new StrReplace()
                 {
-                    // sql commands
-                    List<StrReplace> replaces = new List<StrReplace>();
-                    StrReplace itemForReplace = new StrReplace()
-                    {
-                        SearchText = "##DBNAME##",
-                        ReplaceText = dbName
-                    };
-                    replaces.Add(itemForReplace);
+                    SearchText = "##DBNAME##",
+                    ReplaceText = dbName
+                };
+                replaces.Add(itemForReplace);
 
-                    List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
-                    firstSqlCommands = false;
+                List<string> sqls = this.GetSQLCommands(sqlDialect, Purpose.QUERIES, firstSqlCommands, replaces);
+                firstSqlCommands = false;
 
-                    List<SQLResult> result = new List<SQLResult>();
-                    foreach (var item in sqls)
-                    {
-                        DBExecutor.RunSql(result, item);
-                    }
+                List<SQLResult> result = new List<SQLResult>();
 
-                    foreach (var item in result)
+                foreach (var item in sqls)
+                {
+                    DBExecutor.RunSql(result, item);
+                }
+
+                Logger.Log(String.Format("3. Received {0} queries, saving them...", result.Count));
+
+                int savingQueryCnt = 0;
+                foreach (var item in result)
+                {
+                    if (result.Count != 0)
                     {
                         this.ProgressInfo.SetProgressPercent(15 + 40 * (count / result.Count), "Collecting queries.");
-                        SQLQuery queryItem = new SQLQuery()
-                        {
-                            sourceCode = item.Column0,
-                            name = item.Column1,
-                            groupName = item.Column2,
-                            database = item.Column3,
-                            schema = item.Column4
-                        };
-
-
-                        ret.Add(queryItem);
-                        count++;
                     }
-                }
-                catch (Exception)
-                {
-                    throw;
+
+                    SQLQuery queryItem = new SQLQuery()
+                    {
+                        sourceCode = item.Column0,
+                        name = item.Column1,
+                        groupName = item.Column2,
+                        database = item.Column3,
+                        schema = item.Column4
+                    };
+
+                    savingQueryCnt++;
+                    ret.Add(queryItem);
+                    count++;
                 }
             }
+
             return ret;
         }
 
@@ -526,7 +526,7 @@ namespace SQLDepLib
 
                 foreach (var item in result)
                 {
-                    this.ProgressInfo.SetProgressPercent(62 + 20*(count/result.Count), String.Format("Colleting DB links({}/{}).", count, result.Count));
+                    this.ProgressInfo.SetProgressPercent(62 + 20*(count/result.Count), String.Format("Colleting DB links({0}/{1}).", count, result.Count));
 
                     SQLDBLink dblinkItem = new SQLDBLink()
                     {
@@ -560,10 +560,14 @@ namespace SQLDepLib
         {
             string purpose = enumPurpose.ToString().ToLower();
 
-            // tyto jsou povinne
             string sqlCommands;
             string customFilepath = "./sql/" + sqlDialect + "/" + purpose + "/cmd.sql";
             string defaultFilepath = "./sql/" + sqlDialect + "/" + purpose + "/default-cmd.sql";
+
+            Logger.Log(String.Format("\tLoading SQL commands from file: {0}",
+                File.Exists(customFilepath) ? customFilepath : defaultFilepath)
+            );
+
             sqlCommands = File.Exists(customFilepath)
                 ? File.ReadAllText(customFilepath)
                 : File.ReadAllText(defaultFilepath);
@@ -590,7 +594,7 @@ namespace SQLDepLib
 
                     if (Directory.Exists(customPath))
                     {
-                        Logger.Log(string.Format("Checked custom sql files in {0} - directory exists.", customPath));
+                        Logger.Log(string.Format("\tChecked custom sql files in {0} - directory exists.", customPath));
                         foreach (var file in Directory.GetFiles(customPath))
                         {
                             if (file.EndsWith("sql", StringComparison.InvariantCultureIgnoreCase))
@@ -602,17 +606,17 @@ namespace SQLDepLib
                                 sqlCommands += customSqlCommands;
 
                                 // log it
-                                Logger.Log(string.Format("ConfFile {0} in custom directory succesfully added ({1} characters read).", file, customSqlCommands.Length));
+                                Logger.Log(string.Format("\tConfFile {0} in custom directory succesfully added ({1} characters read).", file, customSqlCommands.Length));
                             }
                             else
                             {
-                                Logger.Log(string.Format("ConfFile {0} in custom directory ignored - expected extension sql.", customPath));
+                                Logger.Log(string.Format("\tConfFile {0} in custom directory ignored - expected extension sql.", customPath));
                             }
                         }
                     }
                     else
                     {
-                        Logger.Log(string.Format("Checked custom sql files in {0} - directory does not exist.", customPath));
+                        Logger.Log(string.Format("\tChecked custom sql files in {0} - directory does not exist.", customPath));
                     }
                 }
             }
@@ -634,7 +638,7 @@ namespace SQLDepLib
 
         private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
         {
-            querries.createdBy = "SQLdep v1.6.1";
+            querries.createdBy = "SQLdep v1.6.2";
             querries.exportId = this.runId;
             querries.physicalInstance = this.DBExecutor.Server;
 
@@ -777,7 +781,7 @@ namespace SQLDepLib
                     Logger.Log("Tables #["+ modelItem.tables.Count + "] in database" + dbName + " processed.");
 
                     // synonyms
-                    if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres")
+                    if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres" && sqlDialect != "snowflake")
                     {
                         Logger.Log("Getting synonyms in database " + dbName + ".");
 

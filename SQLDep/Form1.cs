@@ -40,6 +40,9 @@ namespace SQLDep
             this.textBoxDefautSchema.Text = UIConfig.Get(UIConfig.FS_DEFAULT_SCHEMA, "");
             this.textBoxRootDirectory.Text = UIConfig.Get(UIConfig.FS_PATH, "");
             this.textBoxFileMask.Text = UIConfig.Get(UIConfig.FS_MASK, "*.sql");
+            this.textBoxWarehouse.Text = UIConfig.Get(UIConfig.SNOWFLAKE_WAREHOUSE, "");
+            this.TextBoxAccount.Text = UIConfig.Get(UIConfig.SNOWFLAKE_ACCOUNT, "");
+            this.textBoxRole.Text = UIConfig.Get(UIConfig.SNOWFLAKE_ROLE, "");
             this.buttonRun.Enabled = false;
             this.buttonCreateAndSendFiles.Enabled = false;
             this.InitializeDSNNames(string.Empty);
@@ -173,11 +176,6 @@ namespace SQLDep
 
                 idx++;
             }
-
-            if(comboBoxDriverName.SelectedIndex < 0)
-            {
-                comboBoxDriverName.SelectedIndex = 0;
-            }
         }
 
         public void EnableAuthSettings()
@@ -223,6 +221,7 @@ namespace SQLDep
         {
             switch (sqlDialect)
             {
+                case "snowflake": return 6;
                 case "teradata": return 2;
                 case "oracle": return 0;
                 default: return 1;
@@ -239,6 +238,7 @@ namespace SQLDep
                 case 3: return "greenplum";
                 case 4: return "redshift";
                 case 5: return "postgres";
+                case 6: return "snowflake";
                 default: return "mssql";
             }
         }
@@ -310,15 +310,22 @@ namespace SQLDep
 
             ComboBoxDSNItem dsnItem = this.GetSelectedDSNName();
             string dsn = dsnItem.IsDSN ? dsnItem.Text : string.Empty;
-            return dbExecutor.BuildConnectionString(this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
-                                                dsn,
-                                                this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex),
-                                                this.textBoxServerName.Text,
-                                                this.textBoxPort.Text, 
-                                                this.textBoxDatabaseName.Text,
-                                                this.textBoxLoginName.Text,
-                                                this.textBoxLoginPassword.Text,
-                                                driverName, useDriverType);
+            Arguments args = new Arguments()
+            {
+                dbType = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
+                dsnName = dsn,
+                auth_type = this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex),
+                server = this.textBoxServerName.Text,
+                port = this.textBoxPort.Text,
+                database = this.textBoxDatabaseName.Text,
+                loginName = this.textBoxLoginName.Text,
+                loginpassword = this.textBoxLoginPassword.Text,
+                driverName = driverName,
+                account = this.TextBoxAccount.Text,
+                warehouse = this.textBoxWarehouse.Text,
+                role = this.textBoxRole.Text
+            };
+            return dbExecutor.BuildConnectionString(args, useDriverType);
         }
 
         private void SaveDialogSettings ()
@@ -338,6 +345,9 @@ namespace SQLDep
             UIConfig.Set(UIConfig.FS_MASK, this.textBoxFileMask.Text);
             UIConfig.Set(UIConfig.FS_DEFAULT_SCHEMA, this.textBoxDefautSchema.Text);
             UIConfig.Set(UIConfig.FS_DEFAULT_DB, this.textBoxDefaultDatabase.Text);
+            UIConfig.Set(UIConfig.SNOWFLAKE_ACCOUNT, this.TextBoxAccount.Text);
+            UIConfig.Set(UIConfig.SNOWFLAKE_ROLE, this.textBoxRole.Text);
+            UIConfig.Set(UIConfig.SNOWFLAKE_WAREHOUSE, this.textBoxWarehouse.Text);
         }
 
         public AsyncExecutor AsyncExecutor { get; set; }
@@ -373,7 +383,6 @@ namespace SQLDep
 
                 saveFolder = fbd.SelectedPath;
             }
-
             try
             {
                 this.SaveDialogSettings();
@@ -393,7 +402,6 @@ namespace SQLDep
 
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
 
-                List<string> failedDbs = new List<string>();
                 Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, sqlDialect);
                 string filename = "DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
                 string exportFileName = Path.Combine(saveFolder, filename);
@@ -401,17 +409,13 @@ namespace SQLDep
                 this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor, checkboxUseFS.Checked, sendFiles);
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
                 this.AsyncExecutorThread.Start();
-                new Thread(this.ShowProgress).Start();
-            }
-            catch (SQLDepException ex)
-            {
-                // known errors - do not show details about stack
-                string msg = ex.Message;
-                MessageBox.Show(msg);
+                //new Thread(this.ShowProgress).Start();
+
             }
             catch (Exception ex)
             {
                 string msg = ex.Message;
+                Logger.Log(msg);
                 MessageBox.Show(msg);
             }
         }
@@ -488,18 +492,25 @@ namespace SQLDep
             this.BuildConnectionString(dbExecutor);
             try
             {
+                this.SaveDialogSettings();
                 dbExecutor.Connect();
                 dbExecutor.Close();
                 this.buttonRun.Enabled = true;
                 this.buttonCreateAndSendFiles.Enabled = true;
-                this.SaveDialogSettings();
                 MessageBox.Show("Database connected!");
             }
             catch (Exception ex)
             {
                 this.buttonRun.Enabled = false;
                 this.buttonCreateAndSendFiles.Enabled = false;
-                MessageBox.Show("Database not connected! \nError: " + ex.Message);
+                string exceptionMessage = "Database not connected! \nError: " + ex.Message;
+                if (ex.InnerException != null)
+                {
+                    exceptionMessage += "\n\nInner exception: " + ex.InnerException.Message;
+                }
+
+                MessageBox.Show(exceptionMessage);
+                Logger.Log(exceptionMessage);
             }
         }
 
@@ -522,6 +533,39 @@ namespace SQLDep
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
             this.buttonRun.Enabled = false;
             this.buttonCreateAndSendFiles.Enabled = false;
+
+            switch (GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex))
+            {
+                case "snowflake":
+                    enableSnowflakeFields();
+                    break;
+                default:
+                    showDefaultFields();
+                    break;
+            }
+        }
+
+        private void showDefaultFields()
+        {
+            comboBoxAuthType.Show();
+            TextBoxAccount.Hide();
+            AuthenticationLabel.Text = "Authentication";
+            textBoxWarehouse.Hide();
+            textBoxRole.Hide();
+            labelRole.Hide();
+            labelWarehouse.Hide();
+        }
+
+        private void enableSnowflakeFields()
+        {
+            // hide auth type switch and show Account, Warehouse, Role text fields
+            comboBoxAuthType.Hide();
+            TextBoxAccount.Show();
+            AuthenticationLabel.Text = "Account";
+            textBoxWarehouse.Show();
+            textBoxRole.Show();
+            labelRole.Show();
+            labelWarehouse.Show();
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -559,6 +603,21 @@ namespace SQLDep
                 }
                 this.Text = form1Text;
             }
+        }
+
+        private void label6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

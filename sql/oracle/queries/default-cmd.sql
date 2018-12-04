@@ -1,5 +1,11 @@
-/* IMPORTANT: If you modify this file, rename it to cmd.sql (so it won't be overwritten when you upgrade lionfish).
-Only cmd.sql will be used when both exist.*/
+/*
+IMPORTANT: 
+1) If you modify this file, rename it to cmd.sql (so it won't be overwritten when you upgrade lionfish). 
+Only cmd.sql will be used when both exist.
+
+2)  This file needs to contain exactly 3 queries divided by '--split'. 
+If you do not wish to include the results from some queries, add '1=0' to WHERE condition
+*/
 SELECT
   src.TEXT as sourceCode,
   src.NAME as name,

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.comboBoxDatabase = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -37,7 +38,7 @@
             this.textBoxUserName = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
+            this.AuthenticationLabel = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.comboBoxAuthType = new System.Windows.Forms.ComboBox();
@@ -57,6 +58,13 @@
             this.comboBoxDSNName = new System.Windows.Forms.ComboBox();
             this.tabControlMain = new System.Windows.Forms.TabControl();
             this.tabPageBasic = new System.Windows.Forms.TabPage();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.labelRole = new System.Windows.Forms.Label();
+            this.labelWarehouse = new System.Windows.Forms.Label();
+            this.textBoxRole = new System.Windows.Forms.TextBox();
+            this.textBoxWarehouse = new System.Windows.Forms.TextBox();
+            this.TextBoxAccount = new System.Windows.Forms.TextBox();
+            this.buttonSendOnly = new System.Windows.Forms.Button();
             this.tabPageAdvanced = new System.Windows.Forms.TabPage();
             this.label12 = new System.Windows.Forms.Label();
             this.Filesystem = new System.Windows.Forms.TabPage();
@@ -70,9 +78,10 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.checkboxUseFS = new System.Windows.Forms.CheckBox();
-            this.buttonSendOnly = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControlMain.SuspendLayout();
             this.tabPageBasic.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabPageAdvanced.SuspendLayout();
             this.Filesystem.SuspendLayout();
             this.SuspendLayout();
@@ -87,7 +96,8 @@
             "Teradata",
             "Greenplum",
             "Amazon Redshift",
-            "PostgreSQL"});
+            "PostgreSQL",
+            "Snowflake"});
             this.comboBoxDatabase.Location = new System.Drawing.Point(103, 16);
             this.comboBoxDatabase.Name = "comboBoxDatabase";
             this.comboBoxDatabase.Size = new System.Drawing.Size(234, 21);
@@ -106,7 +116,7 @@
             // 
             // buttonRun
             // 
-            this.buttonRun.Location = new System.Drawing.Point(354, 156);
+            this.buttonRun.Location = new System.Drawing.Point(354, 190);
             this.buttonRun.Name = "buttonRun";
             this.buttonRun.Size = new System.Drawing.Size(111, 32);
             this.buttonRun.TabIndex = 10;
@@ -117,7 +127,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 227);
+            this.label3.Location = new System.Drawing.Point(13, 279);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(45, 13);
             this.label3.TabIndex = 4;
@@ -125,14 +135,14 @@
             // 
             // textBoxKey
             // 
-            this.textBoxKey.Location = new System.Drawing.Point(103, 224);
+            this.textBoxKey.Location = new System.Drawing.Point(103, 276);
             this.textBoxKey.Name = "textBoxKey";
             this.textBoxKey.Size = new System.Drawing.Size(234, 20);
             this.textBoxKey.TabIndex = 8;
             // 
             // textBoxUserName
             // 
-            this.textBoxUserName.Location = new System.Drawing.Point(103, 250);
+            this.textBoxUserName.Location = new System.Drawing.Point(103, 302);
             this.textBoxUserName.Name = "textBoxUserName";
             this.textBoxUserName.Size = new System.Drawing.Size(234, 20);
             this.textBoxUserName.TabIndex = 9;
@@ -141,7 +151,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 253);
+            this.label4.Location = new System.Drawing.Point(13, 305);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(35, 13);
             this.label4.TabIndex = 4;
@@ -157,15 +167,15 @@
             this.label5.Text = "Hostname";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // label6
+            // AuthenticationLabel
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(12, 103);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(75, 13);
-            this.label6.TabIndex = 1;
-            this.label6.Text = "Authentication";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.AuthenticationLabel.AutoSize = true;
+            this.AuthenticationLabel.Location = new System.Drawing.Point(12, 103);
+            this.AuthenticationLabel.Name = "AuthenticationLabel";
+            this.AuthenticationLabel.Size = new System.Drawing.Size(75, 13);
+            this.AuthenticationLabel.TabIndex = 1;
+            this.AuthenticationLabel.Text = "Authentication";
+            this.AuthenticationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label7
             // 
@@ -269,14 +279,14 @@
             // 
             // progressBarCalc
             // 
-            this.progressBarCalc.Location = new System.Drawing.Point(6, 340);
+            this.progressBarCalc.Location = new System.Drawing.Point(6, 381);
             this.progressBarCalc.Name = "progressBarCalc";
             this.progressBarCalc.Size = new System.Drawing.Size(480, 29);
             this.progressBarCalc.TabIndex = 11;
             // 
             // buttonCreateAndSendFiles
             // 
-            this.buttonCreateAndSendFiles.Location = new System.Drawing.Point(354, 250);
+            this.buttonCreateAndSendFiles.Location = new System.Drawing.Point(354, 290);
             this.buttonCreateAndSendFiles.Name = "buttonCreateAndSendFiles";
             this.buttonCreateAndSendFiles.Size = new System.Drawing.Size(111, 32);
             this.buttonCreateAndSendFiles.TabIndex = 10;
@@ -330,18 +340,24 @@
             this.tabControlMain.Location = new System.Drawing.Point(6, 12);
             this.tabControlMain.Name = "tabControlMain";
             this.tabControlMain.SelectedIndex = 0;
-            this.tabControlMain.Size = new System.Drawing.Size(484, 322);
+            this.tabControlMain.Size = new System.Drawing.Size(484, 363);
             this.tabControlMain.TabIndex = 12;
             // 
             // tabPageBasic
             // 
+            this.tabPageBasic.Controls.Add(this.pictureBox1);
+            this.tabPageBasic.Controls.Add(this.labelRole);
+            this.tabPageBasic.Controls.Add(this.labelWarehouse);
+            this.tabPageBasic.Controls.Add(this.textBoxRole);
+            this.tabPageBasic.Controls.Add(this.textBoxWarehouse);
+            this.tabPageBasic.Controls.Add(this.TextBoxAccount);
             this.tabPageBasic.Controls.Add(this.buttonSendOnly);
             this.tabPageBasic.Controls.Add(this.comboBoxDatabase);
             this.tabPageBasic.Controls.Add(this.label1);
             this.tabPageBasic.Controls.Add(this.textBoxPort);
             this.tabPageBasic.Controls.Add(this.label5);
             this.tabPageBasic.Controls.Add(this.label2);
-            this.tabPageBasic.Controls.Add(this.label6);
+            this.tabPageBasic.Controls.Add(this.AuthenticationLabel);
             this.tabPageBasic.Controls.Add(this.textBoxDatabaseName);
             this.tabPageBasic.Controls.Add(this.label7);
             this.tabPageBasic.Controls.Add(this.textBoxLoginName);
@@ -360,10 +376,78 @@
             this.tabPageBasic.Location = new System.Drawing.Point(4, 22);
             this.tabPageBasic.Name = "tabPageBasic";
             this.tabPageBasic.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageBasic.Size = new System.Drawing.Size(476, 296);
+            this.tabPageBasic.Size = new System.Drawing.Size(476, 337);
             this.tabPageBasic.TabIndex = 0;
             this.tabPageBasic.Text = "Basic";
             this.tabPageBasic.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::SQLDep.Properties.Resources.icons8_help_26;
+            this.pictureBox1.Location = new System.Drawing.Point(64, 276);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(18, 18);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 17;
+            this.pictureBox1.TabStop = false;
+            this.toolTip1.SetToolTip(this.pictureBox1, "Visit https://app.sqldep.com/queryflow/upload/api/ to obtain your API key.");
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            // 
+            // labelRole
+            // 
+            this.labelRole.AutoSize = true;
+            this.labelRole.Location = new System.Drawing.Point(12, 238);
+            this.labelRole.Name = "labelRole";
+            this.labelRole.Size = new System.Drawing.Size(29, 13);
+            this.labelRole.TabIndex = 16;
+            this.labelRole.Text = "Role";
+            this.labelRole.Visible = false;
+            this.labelRole.Click += new System.EventHandler(this.label17_Click);
+            // 
+            // labelWarehouse
+            // 
+            this.labelWarehouse.AutoSize = true;
+            this.labelWarehouse.Location = new System.Drawing.Point(13, 212);
+            this.labelWarehouse.Name = "labelWarehouse";
+            this.labelWarehouse.Size = new System.Drawing.Size(62, 13);
+            this.labelWarehouse.TabIndex = 15;
+            this.labelWarehouse.Text = "Warehouse";
+            this.labelWarehouse.Visible = false;
+            this.labelWarehouse.Click += new System.EventHandler(this.label6_Click);
+            // 
+            // textBoxRole
+            // 
+            this.textBoxRole.Location = new System.Drawing.Point(103, 235);
+            this.textBoxRole.Name = "textBoxRole";
+            this.textBoxRole.Size = new System.Drawing.Size(234, 20);
+            this.textBoxRole.TabIndex = 14;
+            this.textBoxRole.Visible = false;
+            // 
+            // textBoxWarehouse
+            // 
+            this.textBoxWarehouse.Location = new System.Drawing.Point(103, 209);
+            this.textBoxWarehouse.Name = "textBoxWarehouse";
+            this.textBoxWarehouse.Size = new System.Drawing.Size(234, 20);
+            this.textBoxWarehouse.TabIndex = 13;
+            this.textBoxWarehouse.Visible = false;
+            // 
+            // TextBoxAccount
+            // 
+            this.TextBoxAccount.Location = new System.Drawing.Point(103, 103);
+            this.TextBoxAccount.Name = "TextBoxAccount";
+            this.TextBoxAccount.Size = new System.Drawing.Size(234, 20);
+            this.TextBoxAccount.TabIndex = 12;
+            this.TextBoxAccount.Visible = false;
+            // 
+            // buttonSendOnly
+            // 
+            this.buttonSendOnly.Location = new System.Drawing.Point(354, 228);
+            this.buttonSendOnly.Name = "buttonSendOnly";
+            this.buttonSendOnly.Size = new System.Drawing.Size(111, 32);
+            this.buttonSendOnly.TabIndex = 11;
+            this.buttonSendOnly.Text = "Send file(s)";
+            this.buttonSendOnly.UseVisualStyleBackColor = true;
+            this.buttonSendOnly.Click += new System.EventHandler(this.buttonSendOnly_Click);
             // 
             // tabPageAdvanced
             // 
@@ -375,7 +459,7 @@
             this.tabPageAdvanced.Location = new System.Drawing.Point(4, 22);
             this.tabPageAdvanced.Name = "tabPageAdvanced";
             this.tabPageAdvanced.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAdvanced.Size = new System.Drawing.Size(476, 296);
+            this.tabPageAdvanced.Size = new System.Drawing.Size(476, 337);
             this.tabPageAdvanced.TabIndex = 1;
             this.tabPageAdvanced.Text = "Advanced";
             this.tabPageAdvanced.UseVisualStyleBackColor = true;
@@ -405,7 +489,7 @@
             this.Filesystem.Location = new System.Drawing.Point(4, 22);
             this.Filesystem.Name = "Filesystem";
             this.Filesystem.Padding = new System.Windows.Forms.Padding(3);
-            this.Filesystem.Size = new System.Drawing.Size(476, 296);
+            this.Filesystem.Size = new System.Drawing.Size(476, 337);
             this.Filesystem.TabIndex = 2;
             this.Filesystem.Text = "File system";
             this.Filesystem.UseVisualStyleBackColor = true;
@@ -500,29 +584,26 @@
             this.checkboxUseFS.UseVisualStyleBackColor = true;
             this.checkboxUseFS.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
-            // buttonSendOnly
+            // toolTip1
             // 
-            this.buttonSendOnly.Location = new System.Drawing.Point(354, 194);
-            this.buttonSendOnly.Name = "buttonSendOnly";
-            this.buttonSendOnly.Size = new System.Drawing.Size(111, 32);
-            this.buttonSendOnly.TabIndex = 11;
-            this.buttonSendOnly.Text = "Send file(s)";
-            this.buttonSendOnly.UseVisualStyleBackColor = true;
-            this.buttonSendOnly.Click += new System.EventHandler(this.buttonSendOnly_Click);
+            this.toolTip1.IsBalloon = true;
+            this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.toolTip1.ToolTipTitle = "API key";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(501, 377);
+            this.ClientSize = new System.Drawing.Size(501, 422);
             this.Controls.Add(this.tabControlMain);
             this.Controls.Add(this.progressBarCalc);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "SQLdep v1.6.1";
+            this.Text = "SQLdep v1.6.2";
             this.tabControlMain.ResumeLayout(false);
             this.tabPageBasic.ResumeLayout(false);
             this.tabPageBasic.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabPageAdvanced.ResumeLayout(false);
             this.tabPageAdvanced.PerformLayout();
             this.Filesystem.ResumeLayout(false);
@@ -541,7 +622,7 @@
         private System.Windows.Forms.TextBox textBoxUserName;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label AuthenticationLabel;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox comboBoxAuthType;
@@ -575,6 +656,13 @@
         private System.Windows.Forms.TextBox textBoxDefaultDatabase;
         private System.Windows.Forms.Button ButtonBrowse;
         private System.Windows.Forms.Button buttonSendOnly;
+        private System.Windows.Forms.TextBox TextBoxAccount;
+        private System.Windows.Forms.Label labelWarehouse;
+        private System.Windows.Forms.TextBox textBoxRole;
+        private System.Windows.Forms.TextBox textBoxWarehouse;
+        private System.Windows.Forms.Label labelRole;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 
