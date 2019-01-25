@@ -16,7 +16,7 @@ namespace SQLDepCmd
             Arguments arguments = new Arguments();
 
             var p = new OptionSet() {
-                { "dbType=", "database type: mssql|oracle|greenplum|postgres|redshift|snowflake", v => arguments.dbType = v },
+                { "dbType=", "database type: mssql|oracle|greenplum|postgres|redshift|snowflake|netezza", v => arguments.dbType = v },
                 { "a|auth=",  "authorization SQL(default: sql_auth)/ Windows(win_auth)", v => { if (v != null) arguments.auth_type = v; } },
                 { "s|server=",  "server", v => arguments.server = v },
                 { "acc|account=",  "account", v => arguments.account = v },

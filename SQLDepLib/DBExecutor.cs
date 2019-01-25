@@ -30,6 +30,7 @@ namespace SQLDepLib
             TERADATA = 3,
             POSTGRESQL = 4,
             SNOWFLAKE = 5,
+            NETEZZA = 6,
         };
 
         public DBExecutor ()
@@ -74,6 +75,29 @@ namespace SQLDepLib
                     this.MyDriver = DBExecutor.UseDriver.ORACLE;
                     this.ConnectString = String.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={4})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={3})));User Id = {1}; Password = {2}; ",
                         args.server, args.loginName, args.loginpassword, args.database, args.port);
+
+                    return this.ConnectString;
+                }
+            }
+
+            if (useDriverType == UseDriver.DEFAULT)
+            {
+                // ODBC driver for netezza must be installed
+                if (args.dbType == "netezza")
+                {
+                    if (string.IsNullOrEmpty(args.port))
+                    {
+                        args.port = "5480";
+                    }
+                    this.MyDriver = DBExecutor.UseDriver.ODBC;
+                    this.ConnectString = String.Format(
+                        "Driver={{NetezzaSQL}};servername={0};port={1};DataBase={2};username={3};password={4}",
+                        args.server, args.port, args.database, args.loginName,  args.loginpassword);
+                
+                    Logger.Log("Connection string: \"" + String.Format(
+                              "Driver={{NetezzaSQL}};servername={0};port={1};DataBase={2};username={3};password={4}",
+                               args.server, args.port, args.database, args.loginName, "**pwd**")
+                                + "\"");
 
                     return this.ConnectString;
                 }

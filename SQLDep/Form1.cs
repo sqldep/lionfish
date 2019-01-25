@@ -224,6 +224,7 @@ namespace SQLDep
                 case "snowflake": return 6;
                 case "teradata": return 2;
                 case "oracle": return 0;
+                case "netezza": return 7;
                 default: return 1;
             }
         }
@@ -239,6 +240,7 @@ namespace SQLDep
                 case 4: return "redshift";
                 case 5: return "postgres";
                 case 6: return "snowflake";
+                case 7: return "netezza";
                 default: return "mssql";
             }
         }

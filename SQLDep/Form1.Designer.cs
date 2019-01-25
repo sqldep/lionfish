@@ -97,7 +97,8 @@
             "Greenplum",
             "Amazon Redshift",
             "PostgreSQL",
-            "Snowflake"});
+            "Snowflake",
+            "Netezza"});
             this.comboBoxDatabase.Location = new System.Drawing.Point(103, 16);
             this.comboBoxDatabase.Name = "comboBoxDatabase";
             this.comboBoxDatabase.Size = new System.Drawing.Size(234, 21);
