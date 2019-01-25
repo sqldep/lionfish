@@ -14,8 +14,8 @@ select
   c.data_type,
   null as comments
 from
-  ##DBNAME##.information_schema.tables t,
-  ##DBNAME##.information_schema.columns c
+  "##DBNAME##".information_schema.tables t,
+  "##DBNAME##".information_schema.columns c
 where
   t.table_catalog = c.table_catalog
   and t.table_schema = c.table_schema

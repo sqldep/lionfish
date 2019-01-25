@@ -252,7 +252,7 @@ namespace SQLDepLib
                             {
                                 name = column.Column2,
                                 dataType = column.Column3,
-                                comment = "" // item.Column6
+                                comment = String.IsNullOrEmpty(column.Column4) ? "" : column.Column4,
                             };
                             tableModelItem.columns.Add(columnModelItem);
                         }

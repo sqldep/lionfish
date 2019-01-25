@@ -70,6 +70,11 @@ namespace SQLDepLib
                 sw.Stop();
                 dbStructure.exportTime = sw.ElapsedMilliseconds.ToString();
                 this.ProgressInfo.SetProgressPercent(95, "Saving collected data to file.");
+                if (sqlDialect == "snowflake")
+                {
+                    makeDbModelCaseSensitive(dbStructure);
+                }
+
                 myJson = this.SaveStructureToFile(dbStructure, exportFileName);
                 DBExecutor.Close();
             }
@@ -78,6 +83,23 @@ namespace SQLDepLib
                 this.ProgressInfo.RemoveProgress();
             }
 
+        }
+
+        private void makeDbModelCaseSensitive(SQLCompleteStructure dbStructure)
+        {
+            foreach (var database in dbStructure.databaseModel.databases)
+            {
+                database.name = String.Format("\"{0}\"", database.name);
+                foreach (var table in database.tables)
+                {
+                    table.name = String.Format("\"{0}\"", table.name);
+                    table.schema = String.Format("\"{0}\"", table.schema);
+                    foreach (var column in table.columns)
+                    {
+                        column.name = String.Format("\"{0}\"", column.name);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -382,7 +404,7 @@ namespace SQLDepLib
                     {
                         SQLQuery queryItem = new SQLQuery()
                         {
-                            sourceCode = "CREATE OR REPLACE FORCE VIEW " + item.Column2 + " (" + item.Column5 + ") AS " +  item.Column0,
+                            sourceCode = "CREATE OR REPLACE FORCE VIEW \"" + item.Column2 + "\" (\"" + item.Column5 + "\") AS \"" +  item.Column0 + "\"",
                             name = item.Column1,
                             groupName = item.Column2,
                             database = item.Column3,
@@ -636,15 +658,17 @@ namespace SQLDepLib
             return sqlCommandsList;
         }
 
-        private string SaveStructureToFile(SQLCompleteStructure querries, string logJSONName)
+        private string SaveStructureToFile(SQLCompleteStructure completeJson, string logJSONName)
         {
-            querries.createdBy = "SQLdep v1.6.2";
-            querries.exportId = this.runId;
-            querries.physicalInstance = this.DBExecutor.Server;
+            completeJson.createdBy = "SQLdep v1.6.3";
+            completeJson.exportId = this.runId;
+            completeJson.physicalInstance = this.DBExecutor.Server;
 
             var jsonSerialiser = new JavaScriptSerializer();
             jsonSerialiser.MaxJsonLength = Int32.MaxValue;
-            var json = jsonSerialiser.Serialize(querries);
+            var json = jsonSerialiser.Serialize(completeJson);
+
+            
 
             // post data
             //string URI = " https://dev-jessie.sqldep.com/api/rest/sqlset/create/";
@@ -774,7 +798,7 @@ namespace SQLDepLib
                         {
                             name = item.Column4,
                             dataType = item.Column5,
-                            comment = "" // item.Column6
+                            comment = String.IsNullOrEmpty(item.Column6) ? "" : item.Column6,
                         };
                         tableModelItem.columns.Add(columnModelItem);
                     }

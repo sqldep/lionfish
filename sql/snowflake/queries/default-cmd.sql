@@ -9,5 +9,5 @@ select
   null as groupName,
   v.table_catalog as databaseName,
   v.table_schema as schemaName
-from ##DBNAME##.information_schema.views v
+from "##DBNAME##".information_schema.views v
 where upper(v.table_schema) not in ('INFORMATION_SCHEMA');
