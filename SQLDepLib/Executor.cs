@@ -402,9 +402,17 @@ namespace SQLDepLib
 
                     foreach (var item in secondBlock)
                     {
+                        string[] colArr = item.Column5.Split(',');
+                        for (int i = 0; i < colArr.Length; i++)
+                        {
+                            colArr[i] = String.Format("\"{0}\"", colArr[i]);
+                        }
+
+                        string columns = String.Join(",", colArr);
+
                         SQLQuery queryItem = new SQLQuery()
                         {
-                            sourceCode = "CREATE OR REPLACE FORCE VIEW \"" + item.Column2 + "\" (\"" + item.Column5 + "\") AS \"" +  item.Column0 + "\"",
+                            sourceCode = "CREATE OR REPLACE FORCE VIEW \"" + item.Column2 + "\" (" + columns + ") AS " +  item.Column0,
                             name = item.Column1,
                             groupName = item.Column2,
                             database = item.Column3,
