@@ -243,7 +243,7 @@ namespace SQLDepLib
 
         public void Connect ()
         {
-            Logger.Log("Connecting to server");
+            Logger.Log(String.Format("Connecting to server using {0} driver.", MyDriver.ToString()));
             if (this.MyDriver == UseDriver.ODBC)
             {
                 OdbcConnection connection = new OdbcConnection(this.ConnectString);
