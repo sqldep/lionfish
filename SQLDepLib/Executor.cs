@@ -412,7 +412,7 @@ namespace SQLDepLib
 
                         SQLQuery queryItem = new SQLQuery()
                         {
-                            sourceCode = "CREATE OR REPLACE FORCE VIEW \"" + item.Column2 + "\" (" + columns + ") AS " +  item.Column0,
+                            sourceCode = "CREATE OR REPLACE FORCE VIEW " + item.Column2 + " (" + columns + ") AS " +  item.Column0,
                             name = item.Column1,
                             groupName = item.Column2,
                             database = item.Column3,
