@@ -260,14 +260,18 @@ namespace SQLDepLib
             //
             // Expect columns in this order: Owner, Name, UserName, Host
 
+            this.ProgressInfo.SetProgressPercent(15, "Collecting database model.");
+            ret.databaseModel = new SQLDatabaseModel();
+            ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
+
             Logger.Log("Getting list of querries");
-            this.ProgressInfo.SetProgressPercent(15, "Collecting queries.");
+            this.ProgressInfo.SetProgressPercent(60, "Collecting queries.");
             if (!useFS)
             {
                 if (sqlDialect == "oracle")
                 {
                     Logger.Log("Using Oracle dialect");
-                    ret.queries = this.GetOracleQuerries(sqlDialect, dbNames);
+                    ret.queries = this.GetOracleQuerries(sqlDialect, dbNames, ret.databaseModel);
                 }
                 else
                 {
@@ -279,9 +283,6 @@ namespace SQLDepLib
             {
                 ret.queries = new List<SQLQuery>();
             }
-            this.ProgressInfo.SetProgressPercent(60, "Collecting database model.");
-            ret.databaseModel = new SQLDatabaseModel();
-            ret.databaseModel.databases = this.GetDatabaseModels(sqlDialect, dbNames);
 
             if (sqlDialect != "greenplum" && sqlDialect != "redshift" && sqlDialect != "postgres" && sqlDialect != "snowflake")
             {
@@ -317,7 +318,23 @@ namespace SQLDepLib
             return ret;
         }
 
-        private List<SQLQuery> GetOracleQuerries(string sqlDialect, List<string> dbNames)
+        private List<String> GetColumnsFromDbModel(SQLDatabaseModel dbModel, string tableName, string schemaName, string DbName)
+        {
+            try
+            {
+                return dbModel.databases
+                    .Find(x => x.name == DbName).tables
+                    .Find(x => x.name == tableName && x.schema == schemaName).columns
+                    .Select(x => x.name).ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex.Message);
+                return null;
+            }
+        }
+
+        private List<SQLQuery> GetOracleQuerries(string sqlDialect, List<string> dbNames, SQLDatabaseModel databaseModel)
         {
             List<SQLQuery> ret = new List<SQLQuery>();
 
@@ -402,8 +419,13 @@ namespace SQLDepLib
 
                     foreach (var item in secondBlock)
                     {
-                        string[] colArr = item.Column5.Split(',');
-                        for (int i = 0; i < colArr.Length; i++)
+                        List<String> colArr = GetColumnsFromDbModel(databaseModel, item.Column1, item.Column3, item.Column3);
+                        if (colArr == null)
+                        {
+                            Logger.Log(String.Format("Skipping table {}, columns not found in database model.", item.Column2));
+                        }
+
+                        for (int i = 0; i < colArr.Count; i++)
                         {
                             colArr[i] = String.Format("\"{0}\"", colArr[i]);
                         }
