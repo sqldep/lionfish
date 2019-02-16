@@ -329,7 +329,7 @@ namespace SQLDepLib
             }
             catch (Exception ex)
             {
-                Logger.Exception(ex.Message);
+                Logger.Exception(String.Format("Exception during getting columns: {}", ex.Message));
                 return null;
             }
         }
@@ -417,12 +417,14 @@ namespace SQLDepLib
                     List<SQLResult> secondBlock = new List<SQLResult>();
                     DBExecutor.RunQuerySql(secondBlock, sqls.FirstOrDefault());
 
+                    Logger.Log("Processing second block.");
                     foreach (var item in secondBlock)
                     {
-                        List<String> colArr = GetColumnsFromDbModel(databaseModel, item.Column1, item.Column3, item.Column3);
+                        List<String> colArr = GetColumnsFromDbModel(databaseModel, item.Column1, item.Column4, item.Column3);
                         if (colArr == null)
                         {
                             Logger.Log(String.Format("Skipping table {}, columns not found in database model.", item.Column2));
+                            continue;
                         }
 
                         for (int i = 0; i < colArr.Count; i++)
