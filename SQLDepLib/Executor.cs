@@ -449,12 +449,26 @@ namespace SQLDepLib
                     sqls.RemoveAt(0);
                     List<SQLResult> thirdBlock = new List<SQLResult>();
                     DBExecutor.RunQuerySql(thirdBlock, sqls.FirstOrDefault());
-
+                    Logger.Log("Processing third block.");
                     foreach (var item in thirdBlock)
                     {
+                        List<String> colArr = GetColumnsFromDbModel(databaseModel, item.Column1, item.Column4, item.Column3);
+                        if (colArr == null)
+                        {
+                            Logger.Log(String.Format("Skipping table {}, columns not found in database model.", item.Column2));
+                            continue;
+                        }
+
+                        for (int i = 0; i < colArr.Count; i++)
+                        {
+                            colArr[i] = String.Format("\"{0}\"", colArr[i]);
+                        }
+
+                        string columns = String.Join(",", colArr);
+
                         SQLQuery queryItem = new SQLQuery()
                         {
-                            sourceCode = "CREATE MATERIALIZED VIEW " + item.Column2 + " (" + item.Column5 + ") AS " + item.Column0,
+                            sourceCode = "CREATE MATERIALIZED VIEW " + item.Column2 + " (" + columns + ") AS " + item.Column0,
                             name = item.Column1,
                             groupName = item.Column2,
                             database = item.Column3,

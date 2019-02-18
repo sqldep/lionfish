@@ -86,15 +86,8 @@ SELECT
 	mv.MVIEW_NAME as name,
 	mv.OWNER||'.'||mv.MVIEW_NAME as groupName,
 	'##DBNAME##' as databaseName,
-	mv.OWNER as schemaName,
-	c.columnList
+	mv.OWNER as schemaName
 FROM all_mviews mv
-JOIN (
-	SELECT OWNER, TABLE_NAME, listagg(COLUMN_NAME,',') within group(order by COLUMN_ID) columnList
-	FROM all_tab_columns
-	GROUP BY OWNER, TABLE_NAME
-) c
-ON c.OWNER = mv.OWNER AND c.TABLE_NAME = mv.MVIEW_NAME
 WHERE  mv.OWNER NOT IN (
 	'APEX_040200',
 	'CTXSYS',
