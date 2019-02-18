@@ -40,6 +40,7 @@ namespace SQLDep
             this.textBoxDefautSchema.Text = UIConfig.Get(UIConfig.FS_DEFAULT_SCHEMA, "");
             this.textBoxRootDirectory.Text = UIConfig.Get(UIConfig.FS_PATH, "");
             this.textBoxFileMask.Text = UIConfig.Get(UIConfig.FS_MASK, "*.sql");
+            this.checkboxUseFS.Checked = UIConfig.Get(UIConfig.FS_ENABLED, false);
             this.textBoxWarehouse.Text = UIConfig.Get(UIConfig.SNOWFLAKE_WAREHOUSE, "");
             this.TextBoxAccount.Text = UIConfig.Get(UIConfig.SNOWFLAKE_ACCOUNT, "");
             this.textBoxRole.Text = UIConfig.Get(UIConfig.SNOWFLAKE_ROLE, "");
@@ -47,6 +48,13 @@ namespace SQLDep
             this.buttonCreateAndSendFiles.Enabled = false;
             this.InitializeDSNNames(string.Empty);
             this.InitializeDrivers(UIConfig.Get(UIConfig.DRIVER_NAME, ""));
+
+            this.textInformaticaRootDir.Text = UIConfig.Get(UIConfig.EXT_INFA_FOLDER, "");
+            this.textSAPDir.Text = UIConfig.Get(UIConfig.EXT_SAP_FOLDER, "");
+            this.textSSISDir.Text = UIConfig.Get(UIConfig.EXT_SSIS_FOLDER, "");
+            this.checkBoxInformaticaEnable.Checked = UIConfig.Get(UIConfig.EXT_INFA_ENABLE, false);
+            this.checkBoxSAPEnable.Checked = UIConfig.Get(UIConfig.EXT_SAP_ENABLE, false);
+            this.checkBoxSSISEnable.Checked = UIConfig.Get(UIConfig.EXT_SSIS_ENABLE, false);
 
             this.EnableAuthSettings();
             CheckForIllegalCrossThreadCalls = false;
@@ -345,9 +353,16 @@ namespace SQLDep
             UIConfig.Set(UIConfig.FS_MASK, this.textBoxFileMask.Text);
             UIConfig.Set(UIConfig.FS_DEFAULT_SCHEMA, this.textBoxDefautSchema.Text);
             UIConfig.Set(UIConfig.FS_DEFAULT_DB, this.textBoxDefaultDatabase.Text);
+            UIConfig.Set(UIConfig.FS_ENABLED, this.checkboxUseFS.Checked);
             UIConfig.Set(UIConfig.SNOWFLAKE_ACCOUNT, this.TextBoxAccount.Text);
             UIConfig.Set(UIConfig.SNOWFLAKE_ROLE, this.textBoxRole.Text);
             UIConfig.Set(UIConfig.SNOWFLAKE_WAREHOUSE, this.textBoxWarehouse.Text);
+            UIConfig.Set(UIConfig.EXT_SAP_FOLDER, this.textSAPDir.Text);
+            UIConfig.Set(UIConfig.EXT_SSIS_FOLDER, this.textSSISDir.Text);
+            UIConfig.Set(UIConfig.EXT_INFA_FOLDER, this.textInformaticaRootDir.Text);
+            UIConfig.Set(UIConfig.EXT_SAP_ENABLE, this.checkBoxSAPEnable.Checked);
+            UIConfig.Set(UIConfig.EXT_SSIS_ENABLE, this.checkBoxSSISEnable.Checked);
+            UIConfig.Set(UIConfig.EXT_INFA_ENABLE, this.checkBoxInformaticaEnable.Checked);
         }
 
         public AsyncExecutor AsyncExecutor { get; set; }
@@ -616,6 +631,68 @@ namespace SQLDep
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label6_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox1_CheckedChanged_1(object sender, EventArgs e)
+        {
+            SaveDialogSettings();
+        }
+
+        private void label20_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonSAPBrowse_Click(object sender, EventArgs e)
+        {
+            var FD = new FolderBrowserDialog();
+            if (FD.ShowDialog() == DialogResult.OK)
+            {
+                textSAPDir.Text = FD.SelectedPath;
+            }
+        }
+
+        private void buttonInfaDirBrowse_Click(object sender, EventArgs e)
+        {
+            var FD = new FolderBrowserDialog();
+            if (FD.ShowDialog() == DialogResult.OK)
+            {
+                textInformaticaRootDir.Text = FD.SelectedPath;
+            }
+        }
+
+        private void buttonSSASBrowse_Click(object sender, EventArgs e)
+        {
+            var FD = new FolderBrowserDialog();
+            if (FD.ShowDialog() == DialogResult.OK)
+            {
+                textSSISDir.Text = FD.SelectedPath;
+            }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            SaveDialogSettings();
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            SaveDialogSettings();
+        }
+
+        private void textInformaticaRootDir_TextChanged(object sender, EventArgs e)
         {
 
         }

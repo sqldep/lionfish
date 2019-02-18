@@ -78,12 +78,35 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.checkboxUseFS = new System.Windows.Forms.CheckBox();
+            this.tabExternalFiles = new System.Windows.Forms.TabPage();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabInformatica = new System.Windows.Forms.TabPage();
+            this.buttonInfaDirBrowse = new System.Windows.Forms.Button();
+            this.textInformaticaRootDir = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.tabSSIS = new System.Windows.Forms.TabPage();
+            this.buttonSSASBrowse = new System.Windows.Forms.Button();
+            this.textSSISDir = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.tabSAP = new System.Windows.Forms.TabPage();
+            this.buttonSAPBrowse = new System.Windows.Forms.Button();
+            this.textSAPDir = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.checkBoxSAPEnable = new System.Windows.Forms.CheckBox();
+            this.checkBoxSSISEnable = new System.Windows.Forms.CheckBox();
+            this.checkBoxInformaticaEnable = new System.Windows.Forms.CheckBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControlMain.SuspendLayout();
             this.tabPageBasic.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabPageAdvanced.SuspendLayout();
             this.Filesystem.SuspendLayout();
+            this.tabExternalFiles.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabInformatica.SuspendLayout();
+            this.tabSSIS.SuspendLayout();
+            this.tabSAP.SuspendLayout();
             this.SuspendLayout();
             // 
             // comboBoxDatabase
@@ -337,6 +360,7 @@
             this.tabControlMain.Controls.Add(this.tabPageBasic);
             this.tabControlMain.Controls.Add(this.tabPageAdvanced);
             this.tabControlMain.Controls.Add(this.Filesystem);
+            this.tabControlMain.Controls.Add(this.tabExternalFiles);
             this.tabControlMain.Location = new System.Drawing.Point(6, 12);
             this.tabControlMain.Name = "tabControlMain";
             this.tabControlMain.SelectedIndex = 0;
@@ -584,6 +608,193 @@
             this.checkboxUseFS.UseVisualStyleBackColor = true;
             this.checkboxUseFS.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // tabExternalFiles
+            // 
+            this.tabExternalFiles.Controls.Add(this.tabControl1);
+            this.tabExternalFiles.Controls.Add(this.label6);
+            this.tabExternalFiles.Location = new System.Drawing.Point(4, 22);
+            this.tabExternalFiles.Name = "tabExternalFiles";
+            this.tabExternalFiles.Size = new System.Drawing.Size(476, 337);
+            this.tabExternalFiles.TabIndex = 3;
+            this.tabExternalFiles.Text = "External files";
+            this.tabExternalFiles.UseVisualStyleBackColor = true;
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Appearance = System.Windows.Forms.TabAppearance.Buttons;
+            this.tabControl1.Controls.Add(this.tabInformatica);
+            this.tabControl1.Controls.Add(this.tabSSIS);
+            this.tabControl1.Controls.Add(this.tabSAP);
+            this.tabControl1.Location = new System.Drawing.Point(17, 40);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(440, 285);
+            this.tabControl1.TabIndex = 4;
+            // 
+            // tabInformatica
+            // 
+            this.tabInformatica.Controls.Add(this.buttonInfaDirBrowse);
+            this.tabInformatica.Controls.Add(this.textInformaticaRootDir);
+            this.tabInformatica.Controls.Add(this.label18);
+            this.tabInformatica.Controls.Add(this.checkBoxInformaticaEnable);
+            this.tabInformatica.Location = new System.Drawing.Point(4, 25);
+            this.tabInformatica.Name = "tabInformatica";
+            this.tabInformatica.Padding = new System.Windows.Forms.Padding(3);
+            this.tabInformatica.Size = new System.Drawing.Size(432, 256);
+            this.tabInformatica.TabIndex = 0;
+            this.tabInformatica.Text = "Informatica";
+            this.tabInformatica.UseVisualStyleBackColor = true;
+            // 
+            // buttonInfaDirBrowse
+            // 
+            this.buttonInfaDirBrowse.Location = new System.Drawing.Point(211, 52);
+            this.buttonInfaDirBrowse.Name = "buttonInfaDirBrowse";
+            this.buttonInfaDirBrowse.Size = new System.Drawing.Size(75, 23);
+            this.buttonInfaDirBrowse.TabIndex = 9;
+            this.buttonInfaDirBrowse.Text = "Browse";
+            this.buttonInfaDirBrowse.UseVisualStyleBackColor = true;
+            this.buttonInfaDirBrowse.Click += new System.EventHandler(this.buttonInfaDirBrowse_Click);
+            // 
+            // textInformaticaRootDir
+            // 
+            this.textInformaticaRootDir.Location = new System.Drawing.Point(9, 54);
+            this.textInformaticaRootDir.Name = "textInformaticaRootDir";
+            this.textInformaticaRootDir.Size = new System.Drawing.Size(196, 20);
+            this.textInformaticaRootDir.TabIndex = 8;
+            this.textInformaticaRootDir.TextChanged += new System.EventHandler(this.textInformaticaRootDir_TextChanged);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(6, 38);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(126, 13);
+            this.label18.TabIndex = 7;
+            this.label18.Text = "Informatica data directory";
+            // 
+            // tabSSIS
+            // 
+            this.tabSSIS.Controls.Add(this.buttonSSASBrowse);
+            this.tabSSIS.Controls.Add(this.textSSISDir);
+            this.tabSSIS.Controls.Add(this.label19);
+            this.tabSSIS.Controls.Add(this.checkBoxSSISEnable);
+            this.tabSSIS.Location = new System.Drawing.Point(4, 25);
+            this.tabSSIS.Name = "tabSSIS";
+            this.tabSSIS.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSSIS.Size = new System.Drawing.Size(432, 256);
+            this.tabSSIS.TabIndex = 1;
+            this.tabSSIS.Text = "SSIS";
+            this.tabSSIS.UseVisualStyleBackColor = true;
+            // 
+            // buttonSSASBrowse
+            // 
+            this.buttonSSASBrowse.Location = new System.Drawing.Point(212, 54);
+            this.buttonSSASBrowse.Name = "buttonSSASBrowse";
+            this.buttonSSASBrowse.Size = new System.Drawing.Size(75, 23);
+            this.buttonSSASBrowse.TabIndex = 12;
+            this.buttonSSASBrowse.Text = "Browse";
+            this.buttonSSASBrowse.UseVisualStyleBackColor = true;
+            this.buttonSSASBrowse.Click += new System.EventHandler(this.buttonSSASBrowse_Click);
+            // 
+            // textSSISDir
+            // 
+            this.textSSISDir.Location = new System.Drawing.Point(10, 56);
+            this.textSSISDir.Name = "textSSISDir";
+            this.textSSISDir.Size = new System.Drawing.Size(196, 20);
+            this.textSSISDir.TabIndex = 11;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(7, 40);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(78, 13);
+            this.label19.TabIndex = 10;
+            this.label19.Text = "SSAS directory";
+            // 
+            // tabSAP
+            // 
+            this.tabSAP.Controls.Add(this.buttonSAPBrowse);
+            this.tabSAP.Controls.Add(this.textSAPDir);
+            this.tabSAP.Controls.Add(this.checkBoxSAPEnable);
+            this.tabSAP.Controls.Add(this.label20);
+            this.tabSAP.Location = new System.Drawing.Point(4, 25);
+            this.tabSAP.Name = "tabSAP";
+            this.tabSAP.Size = new System.Drawing.Size(448, 272);
+            this.tabSAP.TabIndex = 2;
+            this.tabSAP.Text = "SAP";
+            this.tabSAP.UseVisualStyleBackColor = true;
+            // 
+            // buttonSAPBrowse
+            // 
+            this.buttonSAPBrowse.Location = new System.Drawing.Point(213, 55);
+            this.buttonSAPBrowse.Name = "buttonSAPBrowse";
+            this.buttonSAPBrowse.Size = new System.Drawing.Size(75, 23);
+            this.buttonSAPBrowse.TabIndex = 15;
+            this.buttonSAPBrowse.Text = "Browse";
+            this.buttonSAPBrowse.UseVisualStyleBackColor = true;
+            this.buttonSAPBrowse.Click += new System.EventHandler(this.buttonSAPBrowse_Click);
+            // 
+            // textSAPDir
+            // 
+            this.textSAPDir.Location = new System.Drawing.Point(11, 57);
+            this.textSAPDir.Name = "textSAPDir";
+            this.textSAPDir.Size = new System.Drawing.Size(196, 20);
+            this.textSAPDir.TabIndex = 14;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(8, 41);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(74, 13);
+            this.label20.TabIndex = 13;
+            this.label20.Text = "SAP  directory";
+            this.label20.Click += new System.EventHandler(this.label20_Click);
+            // 
+            // checkBoxSAPEnable
+            // 
+            this.checkBoxSAPEnable.AutoSize = true;
+            this.checkBoxSAPEnable.Location = new System.Drawing.Point(11, 6);
+            this.checkBoxSAPEnable.Name = "checkBoxSAPEnable";
+            this.checkBoxSAPEnable.Size = new System.Drawing.Size(59, 17);
+            this.checkBoxSAPEnable.TabIndex = 3;
+            this.checkBoxSAPEnable.Text = "Enable";
+            this.checkBoxSAPEnable.UseVisualStyleBackColor = true;
+            this.checkBoxSAPEnable.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // checkBoxSSISEnable
+            // 
+            this.checkBoxSSISEnable.AutoSize = true;
+            this.checkBoxSSISEnable.Location = new System.Drawing.Point(10, 6);
+            this.checkBoxSSISEnable.Name = "checkBoxSSISEnable";
+            this.checkBoxSSISEnable.Size = new System.Drawing.Size(59, 17);
+            this.checkBoxSSISEnable.TabIndex = 2;
+            this.checkBoxSSISEnable.Text = "Enable";
+            this.checkBoxSSISEnable.UseVisualStyleBackColor = true;
+            this.checkBoxSSISEnable.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
+            // checkBoxInformaticaEnable
+            // 
+            this.checkBoxInformaticaEnable.AutoSize = true;
+            this.checkBoxInformaticaEnable.Location = new System.Drawing.Point(9, 6);
+            this.checkBoxInformaticaEnable.Name = "checkBoxInformaticaEnable";
+            this.checkBoxInformaticaEnable.Size = new System.Drawing.Size(59, 17);
+            this.checkBoxInformaticaEnable.TabIndex = 1;
+            this.checkBoxInformaticaEnable.Text = "Enable";
+            this.checkBoxInformaticaEnable.UseVisualStyleBackColor = true;
+            this.checkBoxInformaticaEnable.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged_1);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(14, 13);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(211, 13);
+            this.label6.TabIndex = 0;
+            this.label6.Text = "Configure external sources you wish to use:";
+            this.label6.Click += new System.EventHandler(this.label6_Click_1);
+            // 
             // toolTip1
             // 
             this.toolTip1.IsBalloon = true;
@@ -608,6 +819,15 @@
             this.tabPageAdvanced.PerformLayout();
             this.Filesystem.ResumeLayout(false);
             this.Filesystem.PerformLayout();
+            this.tabExternalFiles.ResumeLayout(false);
+            this.tabExternalFiles.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabInformatica.ResumeLayout(false);
+            this.tabInformatica.PerformLayout();
+            this.tabSSIS.ResumeLayout(false);
+            this.tabSSIS.PerformLayout();
+            this.tabSAP.ResumeLayout(false);
+            this.tabSAP.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -663,6 +883,24 @@
         private System.Windows.Forms.Label labelRole;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.TabPage tabExternalFiles;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.CheckBox checkBoxInformaticaEnable;
+        private System.Windows.Forms.CheckBox checkBoxSAPEnable;
+        private System.Windows.Forms.CheckBox checkBoxSSISEnable;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabInformatica;
+        private System.Windows.Forms.TabPage tabSSIS;
+        private System.Windows.Forms.TabPage tabSAP;
+        private System.Windows.Forms.Button buttonInfaDirBrowse;
+        private System.Windows.Forms.TextBox textInformaticaRootDir;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Button buttonSSASBrowse;
+        private System.Windows.Forms.TextBox textSSISDir;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Button buttonSAPBrowse;
+        private System.Windows.Forms.TextBox textSAPDir;
+        private System.Windows.Forms.Label label20;
     }
 }
 

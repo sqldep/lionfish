@@ -27,10 +27,20 @@ namespace SQLDep
         public const string FS_MASK = "fs_mask";
         public const string FS_DEFAULT_SCHEMA = "fs_default_schema";
         public const string FS_DEFAULT_DB = "fs_default_db";
+        public const string FS_ENABLED = "fs_enabled";
         public const string DRIVER_NAME_NATIVE = "Native Driver";
         public const string SNOWFLAKE_WAREHOUSE = "Warehouse";
         public const string SNOWFLAKE_ACCOUNT = "Account";
         public const string SNOWFLAKE_ROLE= "Role";
+
+        // external folder settings
+        public const string EXT_INFA_FOLDER = "ext_infa_folder";
+        public const string EXT_SAP_FOLDER = "ext_sap_folder";
+        public const string EXT_SSIS_FOLDER = "ext_ssis_folder";
+        public const string EXT_INFA_ENABLE = "ext_infa_enable";
+        public const string EXT_SAP_ENABLE = "ext_sap_enable";
+        public const string EXT_SSIS_ENABLE = "ext_ssis_enable";
+
 
         private const string ConfigFilename = "UIConfig.xml";
 
@@ -75,6 +85,17 @@ namespace SQLDep
 
             config.Save();
             ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        public static void Set(string key, bool value)
+        {
+            Set(key, value ? "true" : "false");
+        }
+
+        public static bool Get(string key, bool defaultValue)
+        {
+            String ret = Get(key, "");
+            return ret == "" ? defaultValue : ret == "true";
         }
 
         private static string Base64Encode(string plainText)
