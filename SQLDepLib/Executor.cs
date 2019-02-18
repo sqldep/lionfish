@@ -329,7 +329,7 @@ namespace SQLDepLib
             }
             catch (Exception ex)
             {
-                Logger.Exception(String.Format("Exception during getting columns: {}", ex.Message));
+                Logger.Exception(String.Format("Exception during getting columns: {0}", ex.Message));
                 return null;
             }
         }
@@ -423,7 +423,7 @@ namespace SQLDepLib
                         List<String> colArr = GetColumnsFromDbModel(databaseModel, item.Column1, item.Column4, item.Column3);
                         if (colArr == null)
                         {
-                            Logger.Log(String.Format("Skipping table {}, columns not found in database model.", item.Column2));
+                            Logger.Log(String.Format("Skipping table {0}, columns not found in database model.", item.Column2));
                             continue;
                         }
 
@@ -455,7 +455,7 @@ namespace SQLDepLib
                         List<String> colArr = GetColumnsFromDbModel(databaseModel, item.Column1, item.Column4, item.Column3);
                         if (colArr == null)
                         {
-                            Logger.Log(String.Format("Skipping table {}, columns not found in database model.", item.Column2));
+                            Logger.Log(String.Format("Skipping table {0}, columns not found in database model.", item.Column2));
                             continue;
                         }
 
