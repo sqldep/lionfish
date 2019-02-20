@@ -4,49 +4,38 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using SQLDep;
 
 namespace SQLDepLib
 {
     public class AsyncExecutor
     {
-        public AsyncExecutor(string myName, Guid myKey, string sqlDialect, string exportFileName, Executor executor, bool useFs, bool send)
+        public AsyncExecutor(Arguments args, Executor executor, bool sendFile, Form1 form)
         {
-            this.MyName = myName;
-            this.MyKey = myKey;
-            this.SqlDialect = sqlDialect;
+            this.Args = args;
             this.MyExecutor = executor;
-            this.ExportFileName = exportFileName;
-            this.UseFs = useFs;
-            this.Send = send;
+            this.Send = sendFile;
+            this.Form = form;
         }
-
-        private string MyName { get; set; }
-        private Guid MyKey { get; set; }
-
-        private string SqlDialect { get; set; }
-
-        private string ExportFileName { get; set; }
-
+        private Arguments Args { get; set; }
         public Executor MyExecutor { get; set; }
 
         public bool IsRunning { get; set; }
-        public bool UseFs { get; set; }
-        public bool Send { get; set; }
+        private bool Send { get; set; }
+        private Form1 Form { get; set; }
 
         public void Run()
         {
             this.IsRunning = true;
             try
             {
-                this.MyExecutor.Run(this.MyName, this.MyKey, this.SqlDialect, this.ExportFileName, this.UseFs);
+                this.MyExecutor.Run(Args);
                 if (Send)
                 {
-                    List<string> files = new List<string>();
-                    files.Add(ExportFileName);
                     try
                     {
-                        MyExecutor.SendFiles(files, MyKey.ToString());
-                        MessageBox.Show("File sent successfully. (" + ExportFileName + ")");
+                        MyExecutor.SendFile(Args.exportFileName, Args.myKey.ToString());
+                        MessageBox.Show("File sent successfully. (" + Args.exportFileName + ")");
                     }
                     catch (Exception e)
                     {
@@ -56,7 +45,7 @@ namespace SQLDepLib
                 }
                 else
                 {
-                    MessageBox.Show("Completed succesfully. Data are saved on disk! " + this.ExportFileName);
+                    MessageBox.Show("Completed succesfully. Data are saved on disk! " + Args.exportFileName);
                 }
             }
             catch (Exception ex)
@@ -66,6 +55,9 @@ namespace SQLDepLib
                 MessageBox.Show(msg);
             }
             this.IsRunning = false;
+
+            Form.AsyncExecutor = null;
+            Form.AsyncExecutorThread = null;
         }
     }
 }

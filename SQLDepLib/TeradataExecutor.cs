@@ -64,7 +64,7 @@ namespace SQLDepLib
             return queryItem;
         }
 
-        public override SQLCompleteStructure Run(string sqlDialect, bool useFS)
+        public override SQLCompleteStructure GetCompleteStructure(string sqlDialect, bool useFS)
         {
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();

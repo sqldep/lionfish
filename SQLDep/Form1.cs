@@ -33,7 +33,7 @@ namespace SQLDep
             this.textBoxPort.Text = UIConfig.Get(UIConfig.SERVER_PORT, "");
             this.textBoxLoginName.Text = UIConfig.Get(UIConfig.LOGIN_NAME, "");
             this.textBoxLoginPassword.Text = UIConfig.Get(UIConfig.LOGIN_PASSWORD, "");
-            this.textBoxUserName.Text = UIConfig.Get(UIConfig.DATA_SET_NAME, "My Data Set Name");
+            this.textBoxBatchName.Text = UIConfig.Get(UIConfig.BATCH_NAME, "My Data Set Name");
             this.textBoxDatabaseName.Text = UIConfig.Get(UIConfig.DATABASE_NAME, "master");
             this.textBoxKey.Text = UIConfig.Get(UIConfig.SQLDEP_KEY, "");
             this.textBoxDefaultDatabase.Text = UIConfig.Get(UIConfig.FS_DEFAULT_DB, "");
@@ -314,10 +314,24 @@ namespace SQLDep
         private string BuildConnectionString (DBExecutor dbExecutor)
         {
             DBExecutor.UseDriver useDriverType;
+            this.GetDriverName(out useDriverType);
+
+            Arguments args = getCurrentArguments();
+            return dbExecutor.BuildConnectionString(args, useDriverType);
+        }
+
+        private Arguments getCurrentArguments(string exportFileName="")
+        {
+            DBExecutor.UseDriver useDriverType;
             string driverName = this.GetDriverName(out useDriverType);
 
             ComboBoxDSNItem dsnItem = this.GetSelectedDSNName();
             string dsn = dsnItem.IsDSN ? dsnItem.Text : string.Empty;
+            Guid myKey;
+            if (!Guid.TryParse(this.textBoxKey.Text, out myKey))
+            {
+                throw new SQLDepException("Invalid or missing API key. Get one in your dashboard on SQLdep website. (https://app.sqldep.com/queryflow/upload/api/)");
+            }
             Arguments args = new Arguments()
             {
                 dbType = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex),
@@ -331,9 +345,12 @@ namespace SQLDep
                 driverName = driverName,
                 account = this.TextBoxAccount.Text,
                 warehouse = this.textBoxWarehouse.Text,
-                role = this.textBoxRole.Text
+                role = this.textBoxRole.Text,
+                exportFileName = exportFileName,
+                myKey = myKey
             };
-            return dbExecutor.BuildConnectionString(args, useDriverType);
+
+            return args;
         }
 
         private void SaveDialogSettings ()
@@ -341,7 +358,7 @@ namespace SQLDep
             DBExecutor.UseDriver useDriverType;
             UIConfig.Set(UIConfig.AUTH_TYPE, this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex));
             UIConfig.Set(UIConfig.SQL_DIALECT, this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex));
-            UIConfig.Set(UIConfig.DATA_SET_NAME, this.textBoxUserName.Text);
+            UIConfig.Set(UIConfig.BATCH_NAME, this.textBoxBatchName.Text);
             UIConfig.Set(UIConfig.SQLDEP_KEY, this.textBoxKey.Text);
             UIConfig.Set(UIConfig.SERVER_NAME, this.textBoxServerName.Text);
             UIConfig.Set(UIConfig.SERVER_PORT, this.textBoxPort.Text);
@@ -408,23 +425,24 @@ namespace SQLDep
                 if (checkboxUseFS.Checked)
                     CreateFileSystemCfgFile();
 
-                string myName = this.textBoxUserName.Text;
+                string myName = this.textBoxBatchName.Text;
                 Guid myKey;
                 if (!Guid.TryParse(this.textBoxKey.Text, out myKey))
                 {
-                    throw new SQLDepException("Invalid or missing API key. Get one in your dashboard on SQLdep website.");
+                    throw new SQLDepException("Invalid or missing API key. Get one in your dashboard on SQLdep website. (https://app.sqldep.com/queryflow/upload/api/)");
                 }
 
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
 
                 Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, sqlDialect);
-                string filename = "DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".json";
+                string filename = "DBexport_" + executor.runId + "_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".zip";
                 string exportFileName = Path.Combine(saveFolder, filename);
 
-                this.AsyncExecutor = new AsyncExecutor(myName, myKey, sqlDialect, exportFileName, executor, checkboxUseFS.Checked, sendFiles);
+                Arguments args = getCurrentArguments(exportFileName);
+                this.AsyncExecutor = new AsyncExecutor(args, executor, sendFiles, this);
                 this.AsyncExecutorThread = new Thread(AsyncExecutor.Run);
                 this.AsyncExecutorThread.Start();
-                //new Thread(this.ShowProgress).Start();
+                //this.ShowProgress();
 
             }
             catch (Exception ex)
@@ -453,7 +471,7 @@ namespace SQLDep
             this.textBoxKey.Enabled = false;
             this.textBoxPort.Enabled = false;
             this.textBoxServerName.Enabled = false;
-            this.textBoxUserName.Enabled = false;
+            this.textBoxBatchName.Enabled = false;
             this.comboBoxDatabase.Enabled = false;
             this.comboBoxAuthType.Enabled = false;
             this.textBoxLoginName.Enabled = false;
@@ -461,7 +479,6 @@ namespace SQLDep
 
             string form1Text = this.Text;
             this.Text = form1Text + " - Running - Please Wait ... ";
-
             string workingOn = string.Empty;
             double done = 0;
             while (this.AsyncExecutorThread.IsAlive)
@@ -478,7 +495,7 @@ namespace SQLDep
             this.textBoxKey.Enabled = true;
             this.textBoxPort.Enabled = true;
             this.textBoxServerName.Enabled = true;
-            this.textBoxUserName.Enabled = true;
+            this.textBoxBatchName.Enabled = true;
             this.comboBoxDatabase.Enabled = true;
             this.comboBoxAuthType.Enabled = true;
             this.textBoxLoginName.Enabled = true;
@@ -615,6 +632,7 @@ namespace SQLDep
                 catch (Exception ex)
                 {
                     MessageBox.Show("Files were not sent! " + ex.Message);
+                    Logger.Exception("Files were not sent! " + ex.Message);
                 }
                 this.Text = form1Text;
             }

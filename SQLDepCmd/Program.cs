@@ -59,7 +59,7 @@ namespace SQLDepCmd
 
                     if (runDb)
                     {
-                        executor.Run(arguments.customSqlSetName, arguments.myKey, arguments.dbType, arguments.exportFileName, arguments.useFS);
+                        executor.Run(arguments);
                     }
 
                     if (sendIt)

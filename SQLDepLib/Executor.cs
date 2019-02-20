@@ -27,9 +27,7 @@ namespace SQLDepLib
 
         public ProgressInfo ProgressInfo { get; private set; }
 
-        private string myJson = string.Empty;
-
-        public void Run(string customSqlSetName, Guid myKey, string sqlDialect, string exportFileName, bool useFs)
+        public void Run(Arguments args)
         {
             try
             {
@@ -44,10 +42,10 @@ namespace SQLDepLib
                 this.ProgressInfo.SetProgressPercent(10, "Collecting data from DB.");
 
                 // this will fill some dbStructure fields, such as queries and tables...
-                SQLCompleteStructure dbStructure = this.Run(sqlDialect, useFs);
+                SQLCompleteStructure dbStructure = this.GetCompleteStructure(args.dbType, args.useFS);
 
                 // append queries from FS
-                if (useFs)
+                if (args.useFS)
                 {
                     this.ProgressInfo.SetProgressPercent(85, "Collecting data from FileSystem.");
                     this.GetQueriesFromFS(dbStructure);
@@ -64,18 +62,18 @@ namespace SQLDepLib
                     throw new Exception("None data collected. Missing any querry or table.");
                 }
 
-                dbStructure.dialect = sqlDialect;
-                dbStructure.userAccountId = myKey.ToString();
-                dbStructure.customSqlSetName = customSqlSetName;
+                dbStructure.dialect = args.dbType;
+                dbStructure.userAccountId = args.myKey.ToString();
+                dbStructure.customSqlSetName = args.customSqlSetName;
                 sw.Stop();
                 dbStructure.exportTime = sw.ElapsedMilliseconds.ToString();
                 this.ProgressInfo.SetProgressPercent(95, "Saving collected data to file.");
-                if (sqlDialect == "snowflake")
+                if (args.dbType == "snowflake")
                 {
                     makeDbModelCaseSensitive(dbStructure);
                 }
 
-                myJson = this.SaveStructureToFile(dbStructure, exportFileName);
+                this.SaveStructureToFile(dbStructure, args.exportFileName);
                 DBExecutor.Close();
             }
             finally
@@ -126,35 +124,11 @@ namespace SQLDepLib
             }
         }
 
-        public void SendStructure()
+        public void SendFile(string file, String apiKey)
         {
-            try
-            {
-                this.SendStructure(this.myJson);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("Error " + ex.Message);
-                throw;
-            }
-        }
-
-        public void SendFiles(List<string> files, String apiKey)
-        {
-            var ms = new MemoryStream();
-            {
-                ZipFile zip = new ZipFile();
-
-                foreach (var fileName in files)
-                {
-                    zip.AddFile(fileName, "");
-                }
-
-                // store to memory stream
-                ms.Seek(0, SeekOrigin.Begin);
-                zip.Save(ms);
-                zip.Dispose();
-            }
+            FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
+            MemoryStream ms = new MemoryStream();
+            fs.CopyTo(ms);
 
             Logger.Log("Before sending zipped data.");
             var baseAddress = "https://sqldep.com/api/batch/zip/";
@@ -179,7 +153,6 @@ namespace SQLDepLib
             // vyssi verze protokolu
             http.ProtocolVersion = HttpVersion.Version11;
 
-            ASCIIEncoding encoding = new ASCIIEncoding();
             Byte[] bytes = ms.ToArray();
             http.ReadWriteTimeout = 1800 * 1000;
             http.Timeout = 1800 * 1000;
@@ -200,7 +173,42 @@ namespace SQLDepLib
             Logger.Log("Data sent.");
         }
 
-        public virtual SQLCompleteStructure Run(string sqlDialect, bool useFS)
+        public void SendFiles(List<string> files, String apiKey)
+        {
+            if (files.All(x => x.EndsWith(".json") || x.EndsWith(".JSON") || x.EndsWith(".zip") || x.EndsWith(".ZIP")))
+            {
+                List<string> jsonFiles = files.FindAll(x => x.EndsWith(".json") || x.EndsWith(".JSON"));
+                if (jsonFiles.Count > 0)
+                {
+                    string filename = "SQLdepExport_" + Guid.NewGuid() + ".zip";
+                    string saveFolder = Path.GetTempPath();
+                    string filePath = Path.Combine(saveFolder, filename);
+                    using (ZipFile zip = new ZipFile(filePath))
+                    {
+                        foreach (var fileName in jsonFiles)
+                        {
+                            zip.AddFile(fileName, "");
+                        }
+                        zip.Save();
+                    }
+
+                    Logger.Log("Zipped files saved in '" + filePath + "'.");
+                    SendFile(filePath, apiKey);
+                }
+
+                List<string> zipFiles = files.FindAll(x => x.EndsWith(".zip") || x.EndsWith(".ZIP"));
+                foreach (var fileName in zipFiles)
+                {
+                    SendFile(fileName, apiKey);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Selected files must be either '.json' or '.zip' .");
+            }
+        }
+
+        public virtual SQLCompleteStructure GetCompleteStructure(string sqlDialect, bool useFS)
         {            
             // The following SELECTS map to JSON (see example.json)
             SQLCompleteStructure ret = new SQLCompleteStructure();
@@ -704,7 +712,7 @@ namespace SQLDepLib
             return sqlCommandsList;
         }
 
-        private string SaveStructureToFile(SQLCompleteStructure completeJson, string logJSONName)
+        private void SaveStructureToFile(SQLCompleteStructure completeJson, string filename)
         {
             completeJson.createdBy = "SQLdep v1.6.7";
             completeJson.exportId = this.runId;
@@ -714,71 +722,14 @@ namespace SQLDepLib
             jsonSerialiser.MaxJsonLength = Int32.MaxValue;
             var json = jsonSerialiser.Serialize(completeJson);
 
-            
 
-            // post data
-            //string URI = " https://dev-jessie.sqldep.com/api/rest/sqlset/create/";
-            //string myParameters = json;
-            //using (WebClient wc = new WebClient())
-            //{
-            //    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-            //    string HtmlResult = wc.UploadString(URI, myParameters);
-            //}
-
-            StreamWriter wr = File.CreateText(logJSONName);
-            wr.Write(json);
-            wr.Close();
-
-            Logger.Log("Result data saved in " + logJSONName);
-            return json;
-        }
-    
-
-        private void SendStructure(string json)
-        {
-
-            // post data
-            //string URI = " https://dev-jessie.sqldep.com/api/rest/sqlset/create/";
-            //string myParameters = json;
-            //using (WebClient wc = new WebClient())
-            //{
-            //    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-            //    string HtmlResult = wc.UploadString(URI, myParameters);
-            //}
-
-            Logger.Log("Before sending data.");
-            var baseAddress = "https://sqldep.com/api/rest/sqlset/create/";
-
-            var http = (HttpWebRequest)WebRequest.Create(new Uri(baseAddress));
-
-            string proxy = WebRequest.DefaultWebProxy.GetProxy(http.Address).AbsoluteUri;
-            if (proxy != string.Empty)
+            using (ZipFile zipFile = new ZipFile(filename))
             {
-                Logger.Log("Proxy URL: " + proxy);
-                http.Proxy = WebRequest.DefaultWebProxy;
+                zipFile.AddFileFromString(filename + ".json", "", json);
+                zipFile.Save();
             }
 
-            http.Accept = "application/json";
-            http.ContentType = "application/json";
-            http.Method = "POST";
-            string parsedContent = json;
-            ASCIIEncoding encoding = new ASCIIEncoding();
-            Byte[] bytes = encoding.GetBytes(parsedContent);
-
-            Stream newStream = http.GetRequestStream();
-            newStream.Write(bytes, 0, bytes.Length);
-            newStream.Close();
-
-            var response = http.GetResponse();
-            var stream = response.GetResponseStream();
-            var sr = new StreamReader(stream);
-            var content = sr.ReadToEnd();
-
-            if (content.IndexOf("success") < 0)
-            {
-                throw new Exception("Unexpected returned message " + content);
-            }
-            Logger.Log("Data sent.");
+            Logger.Log("Result data saved in " + filename);
         }
 
         private List<SQLDatabaseModelItem> GetDatabaseModels(string sqlDialect, List<string> dbNames)

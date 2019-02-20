@@ -29,6 +29,14 @@ namespace SQLDepLib
         public string role { get; set; }
         public Guid myKey { get; set; }
 
+        // external files
+        public string ext_SAPPath { get; set; }
+        public string ext_SSISPath { get; set; }
+        public string ext_InformaticaPath { get; set; }
+        public bool ext_useSAP { get; set; }
+        public bool ext_useSSIS { get; set; }
+        public bool ext_useInformatica { get; set; }
+
         public Arguments()
         {
             dbType = string.Empty;
@@ -49,6 +57,8 @@ namespace SQLDepLib
             useFS = false;
             warehouse = string.Empty;
             role = string.Empty;
+            ext_InformaticaPath = ext_SAPPath = ext_SSISPath = string.Empty;
+            ext_useInformatica = ext_useSAP = ext_useSSIS = false;
         }
 
 

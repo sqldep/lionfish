@@ -35,7 +35,7 @@
             this.buttonRun = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxKey = new System.Windows.Forms.TextBox();
-            this.textBoxUserName = new System.Windows.Forms.TextBox();
+            this.textBoxBatchName = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.AuthenticationLabel = new System.Windows.Forms.Label();
@@ -165,11 +165,11 @@
             // 
             // textBoxUserName
             // 
-            this.textBoxUserName.Location = new System.Drawing.Point(103, 302);
-            this.textBoxUserName.Name = "textBoxUserName";
-            this.textBoxUserName.Size = new System.Drawing.Size(234, 20);
-            this.textBoxUserName.TabIndex = 9;
-            this.textBoxUserName.Text = "Your set name";
+            this.textBoxBatchName.Location = new System.Drawing.Point(103, 302);
+            this.textBoxBatchName.Name = "textBoxBatchName";
+            this.textBoxBatchName.Size = new System.Drawing.Size(234, 20);
+            this.textBoxBatchName.TabIndex = 9;
+            this.textBoxBatchName.Text = "Your set name";
             // 
             // label4
             // 
@@ -396,7 +396,7 @@
             this.tabPageBasic.Controls.Add(this.buttonTestConnection);
             this.tabPageBasic.Controls.Add(this.label3);
             this.tabPageBasic.Controls.Add(this.textBoxKey);
-            this.tabPageBasic.Controls.Add(this.textBoxUserName);
+            this.tabPageBasic.Controls.Add(this.textBoxBatchName);
             this.tabPageBasic.Location = new System.Drawing.Point(4, 22);
             this.tabPageBasic.Name = "tabPageBasic";
             this.tabPageBasic.Padding = new System.Windows.Forms.Padding(3);
@@ -839,7 +839,7 @@
         private System.Windows.Forms.Button buttonRun;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxKey;
-        private System.Windows.Forms.TextBox textBoxUserName;
+        private System.Windows.Forms.TextBox textBoxBatchName;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label AuthenticationLabel;

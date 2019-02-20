@@ -16,7 +16,7 @@ namespace SQLDep
         public const string SQL_DIALECT = "sql_dialect";
         public const string SERVER_NAME = "server_name";
         public const string SERVER_PORT = "1523";
-        public const string DATA_SET_NAME = "data_set_name";
+        public const string BATCH_NAME = "data_set_name";
         public const string SQLDEP_KEY = "SQL_dep_key";
         public const string LOGIN_NAME = "login_name";
         public const string LOGIN_PASSWORD = "login_password";
