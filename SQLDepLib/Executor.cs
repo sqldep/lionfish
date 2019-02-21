@@ -73,7 +73,7 @@ namespace SQLDepLib
                     makeDbModelCaseSensitive(dbStructure);
                 }
 
-                this.SaveStructureToFile(dbStructure, args.exportFileName);
+                this.SaveStructureToFile(dbStructure, args);
                 DBExecutor.Close();
             }
             finally
@@ -712,7 +712,7 @@ namespace SQLDepLib
             return sqlCommandsList;
         }
 
-        private void SaveStructureToFile(SQLCompleteStructure completeJson, string filename)
+        private void SaveStructureToFile(SQLCompleteStructure completeJson, Arguments args)
         {
             completeJson.createdBy = "SQLdep v1.6.7";
             completeJson.exportId = this.runId;
@@ -723,13 +723,34 @@ namespace SQLDepLib
             var json = jsonSerialiser.Serialize(completeJson);
 
 
-            using (ZipFile zipFile = new ZipFile(filename))
+            using (ZipFile zipFile = new ZipFile(args.exportFileName))
             {
-                zipFile.AddFileFromString(filename + ".json", "", json);
+                String jsonFilename = args.exportFileName.Split('.')[0] + ".json";
+                zipFile.AddFileFromString(jsonFilename, "", json);
+                addExternalFiles(zipFile, args);
                 zipFile.Save();
             }
 
-            Logger.Log("Result data saved in " + filename);
+
+            Logger.Log("Result data saved in " + args.exportFileName);
+        }
+
+        private void addExternalFiles(ZipFile zipFile, Arguments args)
+        {
+            if (args.ext_useInformatica)
+            {
+                zipFile.AddDirectory(args.ext_InformaticaPath, "__INFA__");    
+            }
+
+            if (args.ext_useSAP)
+            {
+                zipFile.AddDirectory(args.ext_SAPPath, "__SAP__");
+            }
+
+            if (args.ext_useSSIS)
+            {
+                zipFile.AddDirectory(args.ext_SSISPath, "__SSIS__");
+            }
         }
 
         private List<SQLDatabaseModelItem> GetDatabaseModels(string sqlDialect, List<string> dbNames)

@@ -18,6 +18,7 @@ namespace SQLDep
 {
     public partial class Form1 : Form
     {
+        private bool initializingValues = false;
         public Form1()
         {
             InitializeComponent();
@@ -27,6 +28,7 @@ namespace SQLDep
 
         private void InitializeValues()
         {
+            initializingValues = true;
             this.comboBoxDatabase.SelectedIndex = this.GetDatabaseTypeIdx(UIConfig.Get(UIConfig.SQL_DIALECT, "mssql"));
             this.comboBoxAuthType.SelectedIndex = this.GetAuthTypeIdx(UIConfig.Get(UIConfig.AUTH_TYPE, "sql_auth"));
             this.textBoxServerName.Text = UIConfig.Get(UIConfig.SERVER_NAME, "");
@@ -58,6 +60,8 @@ namespace SQLDep
 
             this.EnableAuthSettings();
             CheckForIllegalCrossThreadCalls = false;
+
+            initializingValues = false;
         }
 
         private void InitializeDSNNames (string defaultDSNName)
@@ -347,7 +351,15 @@ namespace SQLDep
                 warehouse = this.textBoxWarehouse.Text,
                 role = this.textBoxRole.Text,
                 exportFileName = exportFileName,
-                myKey = myKey
+                myKey = myKey,
+                ext_SAPPath = textSAPDir.Text,
+                ext_SSISPath = textSSISDir.Text,
+                ext_InformaticaPath = textInformaticaRootDir.Text,
+                ext_useSSIS = checkBoxSSISEnable.Checked,
+                ext_useSAP = checkBoxSAPEnable.Checked,
+                ext_useInformatica = checkBoxInformaticaEnable.Checked,
+                customSqlSetName = textBoxBatchName.Text
+
             };
 
             return args;
@@ -355,6 +367,11 @@ namespace SQLDep
 
         private void SaveDialogSettings ()
         {
+            if (initializingValues)
+            {
+                return;
+            }
+
             DBExecutor.UseDriver useDriverType;
             UIConfig.Set(UIConfig.AUTH_TYPE, this.GetAuthTypeName(this.comboBoxAuthType.SelectedIndex));
             UIConfig.Set(UIConfig.SQL_DIALECT, this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex));
@@ -603,6 +620,7 @@ namespace SQLDep
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             this.EnableFileSystem();
+            SaveDialogSettings();
         }
 
         private void button1_Click_1(object sender, EventArgs e)
@@ -638,40 +656,6 @@ namespace SQLDep
             }
         }
 
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label17_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void checkBox1_CheckedChanged_1(object sender, EventArgs e)
-        {
-            SaveDialogSettings();
-        }
-
-        private void label20_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void buttonSAPBrowse_Click(object sender, EventArgs e)
         {
@@ -680,6 +664,8 @@ namespace SQLDep
             {
                 textSAPDir.Text = FD.SelectedPath;
             }
+
+            SaveDialogSettings();
         }
 
         private void buttonInfaDirBrowse_Click(object sender, EventArgs e)
@@ -689,6 +675,7 @@ namespace SQLDep
             {
                 textInformaticaRootDir.Text = FD.SelectedPath;
             }
+            SaveDialogSettings();
         }
 
         private void buttonSSASBrowse_Click(object sender, EventArgs e)
@@ -698,21 +685,22 @@ namespace SQLDep
             {
                 textSSISDir.Text = FD.SelectedPath;
             }
+            SaveDialogSettings();
         }
 
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxInformaticaEnable_CheckedChanged(object sender, EventArgs e)
         {
             SaveDialogSettings();
         }
 
-        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxSSISEnable_CheckedChanged(object sender, EventArgs e)
         {
             SaveDialogSettings();
         }
 
-        private void textInformaticaRootDir_TextChanged(object sender, EventArgs e)
+        private void checkBoxSAPEnable_CheckedChanged(object sender, EventArgs e)
         {
-
+            SaveDialogSettings();
         }
     }
 }

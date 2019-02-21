@@ -84,17 +84,17 @@
             this.buttonInfaDirBrowse = new System.Windows.Forms.Button();
             this.textInformaticaRootDir = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
+            this.checkBoxInformaticaEnable = new System.Windows.Forms.CheckBox();
             this.tabSSIS = new System.Windows.Forms.TabPage();
             this.buttonSSASBrowse = new System.Windows.Forms.Button();
             this.textSSISDir = new System.Windows.Forms.TextBox();
             this.label19 = new System.Windows.Forms.Label();
+            this.checkBoxSSISEnable = new System.Windows.Forms.CheckBox();
             this.tabSAP = new System.Windows.Forms.TabPage();
             this.buttonSAPBrowse = new System.Windows.Forms.Button();
             this.textSAPDir = new System.Windows.Forms.TextBox();
-            this.label20 = new System.Windows.Forms.Label();
             this.checkBoxSAPEnable = new System.Windows.Forms.CheckBox();
-            this.checkBoxSSISEnable = new System.Windows.Forms.CheckBox();
-            this.checkBoxInformaticaEnable = new System.Windows.Forms.CheckBox();
+            this.label20 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControlMain.SuspendLayout();
@@ -163,7 +163,7 @@
             this.textBoxKey.Size = new System.Drawing.Size(234, 20);
             this.textBoxKey.TabIndex = 8;
             // 
-            // textBoxUserName
+            // textBoxBatchName
             // 
             this.textBoxBatchName.Location = new System.Drawing.Point(103, 302);
             this.textBoxBatchName.Name = "textBoxBatchName";
@@ -415,7 +415,6 @@
             this.pictureBox1.TabIndex = 17;
             this.pictureBox1.TabStop = false;
             this.toolTip1.SetToolTip(this.pictureBox1, "Visit https://app.sqldep.com/queryflow/upload/api/ to obtain your API key.");
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // labelRole
             // 
@@ -426,7 +425,6 @@
             this.labelRole.TabIndex = 16;
             this.labelRole.Text = "Role";
             this.labelRole.Visible = false;
-            this.labelRole.Click += new System.EventHandler(this.label17_Click);
             // 
             // labelWarehouse
             // 
@@ -437,7 +435,6 @@
             this.labelWarehouse.TabIndex = 15;
             this.labelWarehouse.Text = "Warehouse";
             this.labelWarehouse.Visible = false;
-            this.labelWarehouse.Click += new System.EventHandler(this.label6_Click);
             // 
             // textBoxRole
             // 
@@ -661,7 +658,6 @@
             this.textInformaticaRootDir.Name = "textInformaticaRootDir";
             this.textInformaticaRootDir.Size = new System.Drawing.Size(196, 20);
             this.textInformaticaRootDir.TabIndex = 8;
-            this.textInformaticaRootDir.TextChanged += new System.EventHandler(this.textInformaticaRootDir_TextChanged);
             // 
             // label18
             // 
@@ -671,6 +667,17 @@
             this.label18.Size = new System.Drawing.Size(126, 13);
             this.label18.TabIndex = 7;
             this.label18.Text = "Informatica data directory";
+            // 
+            // checkBoxInformaticaEnable
+            // 
+            this.checkBoxInformaticaEnable.AutoSize = true;
+            this.checkBoxInformaticaEnable.Location = new System.Drawing.Point(9, 6);
+            this.checkBoxInformaticaEnable.Name = "checkBoxInformaticaEnable";
+            this.checkBoxInformaticaEnable.Size = new System.Drawing.Size(59, 17);
+            this.checkBoxInformaticaEnable.TabIndex = 1;
+            this.checkBoxInformaticaEnable.Text = "Enable";
+            this.checkBoxInformaticaEnable.UseVisualStyleBackColor = true;
+            this.checkBoxInformaticaEnable.CheckedChanged += new System.EventHandler(this.checkBoxInformaticaEnable_CheckedChanged);
             // 
             // tabSSIS
             // 
@@ -712,6 +719,17 @@
             this.label19.TabIndex = 10;
             this.label19.Text = "SSAS directory";
             // 
+            // checkBoxSSISEnable
+            // 
+            this.checkBoxSSISEnable.AutoSize = true;
+            this.checkBoxSSISEnable.Location = new System.Drawing.Point(10, 6);
+            this.checkBoxSSISEnable.Name = "checkBoxSSISEnable";
+            this.checkBoxSSISEnable.Size = new System.Drawing.Size(59, 17);
+            this.checkBoxSSISEnable.TabIndex = 2;
+            this.checkBoxSSISEnable.Text = "Enable";
+            this.checkBoxSSISEnable.UseVisualStyleBackColor = true;
+            this.checkBoxSSISEnable.CheckedChanged += new System.EventHandler(this.checkBoxSSISEnable_CheckedChanged);
+            // 
             // tabSAP
             // 
             this.tabSAP.Controls.Add(this.buttonSAPBrowse);
@@ -720,7 +738,7 @@
             this.tabSAP.Controls.Add(this.label20);
             this.tabSAP.Location = new System.Drawing.Point(4, 25);
             this.tabSAP.Name = "tabSAP";
-            this.tabSAP.Size = new System.Drawing.Size(448, 272);
+            this.tabSAP.Size = new System.Drawing.Size(432, 256);
             this.tabSAP.TabIndex = 2;
             this.tabSAP.Text = "SAP";
             this.tabSAP.UseVisualStyleBackColor = true;
@@ -742,16 +760,6 @@
             this.textSAPDir.Size = new System.Drawing.Size(196, 20);
             this.textSAPDir.TabIndex = 14;
             // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(8, 41);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(74, 13);
-            this.label20.TabIndex = 13;
-            this.label20.Text = "SAP  directory";
-            this.label20.Click += new System.EventHandler(this.label20_Click);
-            // 
             // checkBoxSAPEnable
             // 
             this.checkBoxSAPEnable.AutoSize = true;
@@ -761,29 +769,16 @@
             this.checkBoxSAPEnable.TabIndex = 3;
             this.checkBoxSAPEnable.Text = "Enable";
             this.checkBoxSAPEnable.UseVisualStyleBackColor = true;
-            this.checkBoxSAPEnable.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            this.checkBoxSAPEnable.CheckedChanged += new System.EventHandler(this.checkBoxSAPEnable_CheckedChanged);
             // 
-            // checkBoxSSISEnable
+            // label20
             // 
-            this.checkBoxSSISEnable.AutoSize = true;
-            this.checkBoxSSISEnable.Location = new System.Drawing.Point(10, 6);
-            this.checkBoxSSISEnable.Name = "checkBoxSSISEnable";
-            this.checkBoxSSISEnable.Size = new System.Drawing.Size(59, 17);
-            this.checkBoxSSISEnable.TabIndex = 2;
-            this.checkBoxSSISEnable.Text = "Enable";
-            this.checkBoxSSISEnable.UseVisualStyleBackColor = true;
-            this.checkBoxSSISEnable.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
-            // 
-            // checkBoxInformaticaEnable
-            // 
-            this.checkBoxInformaticaEnable.AutoSize = true;
-            this.checkBoxInformaticaEnable.Location = new System.Drawing.Point(9, 6);
-            this.checkBoxInformaticaEnable.Name = "checkBoxInformaticaEnable";
-            this.checkBoxInformaticaEnable.Size = new System.Drawing.Size(59, 17);
-            this.checkBoxInformaticaEnable.TabIndex = 1;
-            this.checkBoxInformaticaEnable.Text = "Enable";
-            this.checkBoxInformaticaEnable.UseVisualStyleBackColor = true;
-            this.checkBoxInformaticaEnable.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged_1);
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(8, 41);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(74, 13);
+            this.label20.TabIndex = 13;
+            this.label20.Text = "SAP  directory";
             // 
             // label6
             // 
@@ -793,7 +788,6 @@
             this.label6.Size = new System.Drawing.Size(211, 13);
             this.label6.TabIndex = 0;
             this.label6.Text = "Configure external sources you wish to use:";
-            this.label6.Click += new System.EventHandler(this.label6_Click_1);
             // 
             // toolTip1
             // 
