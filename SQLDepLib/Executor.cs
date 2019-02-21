@@ -714,7 +714,7 @@ namespace SQLDepLib
 
         private void SaveStructureToFile(SQLCompleteStructure completeJson, Arguments args)
         {
-            completeJson.createdBy = "SQLdep v1.6.7";
+            completeJson.createdBy = "SQLdep v1.7.0-beta";
             completeJson.exportId = this.runId;
             completeJson.physicalInstance = this.DBExecutor.Server;
 
@@ -739,18 +739,53 @@ namespace SQLDepLib
         {
             if (args.ext_useInformatica)
             {
-                zipFile.AddDirectory(args.ext_InformaticaPath, "__INFA__");    
+                addDirectoryToZipFile(zipFile, args.ext_InformaticaPath, "__INFA__", args.ext_INFAMask);    
             }
 
             if (args.ext_useSAP)
             {
-                zipFile.AddDirectory(args.ext_SAPPath, "__SAP__");
+                addDirectoryToZipFile(zipFile, args.ext_SAPPath, "__SAP__", args.ext_SAPMask);
             }
 
             if (args.ext_useSSIS)
             {
-                zipFile.AddDirectory(args.ext_SSISPath, "__SSIS__");
+                addDirectoryToZipFile(zipFile, args.ext_SSISPath, "__SSIS__", args.ext_SSISMask);
             }
+        }
+
+        private void addDirectoryToZipFile(ZipFile zipFile, String dirPath, String zipDirPath, String fileMask="*")
+        {
+            if (String.IsNullOrEmpty(fileMask))
+            {
+                fileMask = "*";
+            }
+
+            string[] allFiles = Directory.GetFiles(dirPath, fileMask, SearchOption.AllDirectories);
+          
+            foreach (var file in allFiles)
+            {
+                String zipDir = Path.Combine(zipDirPath, GetCleanFolderName(dirPath, file));
+                zipFile.AddFile(file, zipDir);
+            }
+        }
+
+        private string GetCleanFolderName(string source, string filepath)
+        {
+            if (string.IsNullOrWhiteSpace(filepath))
+            {
+                return string.Empty;
+            }
+
+            var result = filepath.Substring(source.Length);
+
+            if (result.StartsWith("\\"))
+            {
+                result = result.Substring(1);
+            }
+
+            result = result.Substring(0, result.Length - new FileInfo(filepath).Name.Length);
+
+            return result;
         }
 
         private List<SQLDatabaseModelItem> GetDatabaseModels(string sqlDialect, List<string> dbNames)

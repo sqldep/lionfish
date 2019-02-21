@@ -57,6 +57,10 @@ namespace SQLDep
             this.checkBoxInformaticaEnable.Checked = UIConfig.Get(UIConfig.EXT_INFA_ENABLE, false);
             this.checkBoxSAPEnable.Checked = UIConfig.Get(UIConfig.EXT_SAP_ENABLE, false);
             this.checkBoxSSISEnable.Checked = UIConfig.Get(UIConfig.EXT_SSIS_ENABLE, false);
+            this.textBoxInfaMask.Text = UIConfig.Get(UIConfig.EXT_INFA_MASK, "*");
+            this.textBoxSSISMask.Text = UIConfig.Get(UIConfig.EXT_SSIS_MASK, "*");
+            this.textBoxSAPMask.Text = UIConfig.Get(UIConfig.EXT_SAP_MASK, "*");
+
 
             this.EnableAuthSettings();
             CheckForIllegalCrossThreadCalls = false;
@@ -358,7 +362,10 @@ namespace SQLDep
                 ext_useSSIS = checkBoxSSISEnable.Checked,
                 ext_useSAP = checkBoxSAPEnable.Checked,
                 ext_useInformatica = checkBoxInformaticaEnable.Checked,
-                customSqlSetName = textBoxBatchName.Text
+                customSqlSetName = textBoxBatchName.Text,
+                ext_SAPMask = textBoxSAPMask.Text,
+                ext_INFAMask = textBoxInfaMask.Text,
+                ext_SSISMask = textBoxSSISMask.Text,
 
             };
 
@@ -397,6 +404,9 @@ namespace SQLDep
             UIConfig.Set(UIConfig.EXT_SAP_ENABLE, this.checkBoxSAPEnable.Checked);
             UIConfig.Set(UIConfig.EXT_SSIS_ENABLE, this.checkBoxSSISEnable.Checked);
             UIConfig.Set(UIConfig.EXT_INFA_ENABLE, this.checkBoxInformaticaEnable.Checked);
+            UIConfig.Set(UIConfig.EXT_SSIS_MASK, this.textBoxSSISMask.Text);
+            UIConfig.Set(UIConfig.EXT_SAP_MASK, this.textBoxSAPMask.Text);
+            UIConfig.Set(UIConfig.EXT_INFA_MASK, this.textBoxInfaMask.Text);
         }
 
         public AsyncExecutor AsyncExecutor { get; set; }

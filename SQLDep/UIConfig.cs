@@ -40,6 +40,9 @@ namespace SQLDep
         public const string EXT_INFA_ENABLE = "ext_infa_enable";
         public const string EXT_SAP_ENABLE = "ext_sap_enable";
         public const string EXT_SSIS_ENABLE = "ext_ssis_enable";
+        public const string EXT_SSIS_MASK = "ext_ssis_mask";
+        public const string EXT_SAP_MASK = "ext_sap_mask";
+        public const string EXT_INFA_MASK = "ext_infa_mask";
 
 
         private const string ConfigFilename = "UIConfig.xml";

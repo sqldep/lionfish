@@ -36,6 +36,9 @@ namespace SQLDepLib
         public bool ext_useSAP { get; set; }
         public bool ext_useSSIS { get; set; }
         public bool ext_useInformatica { get; set; }
+        public string ext_SAPMask { get; set; }
+        public string ext_INFAMask { get; set; }
+        public string ext_SSISMask { get; set; }
 
         public Arguments()
         {
@@ -57,7 +60,8 @@ namespace SQLDepLib
             useFS = false;
             warehouse = string.Empty;
             role = string.Empty;
-            ext_InformaticaPath = ext_SAPPath = ext_SSISPath = string.Empty;
+            ext_SSISMask = ext_INFAMask = ext_SAPMask = 
+                ext_InformaticaPath = ext_SAPPath = ext_SSISPath = string.Empty;
             ext_useInformatica = ext_useSAP = ext_useSSIS = false;
         }
 

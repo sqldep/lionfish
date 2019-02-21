@@ -97,6 +97,12 @@
             this.label20 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.textBoxSAPMask = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.textBoxSSISMask = new System.Windows.Forms.TextBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.textBoxInfaMask = new System.Windows.Forms.TextBox();
+            this.label22 = new System.Windows.Forms.Label();
             this.tabControlMain.SuspendLayout();
             this.tabPageBasic.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -630,6 +636,8 @@
             // 
             // tabInformatica
             // 
+            this.tabInformatica.Controls.Add(this.textBoxInfaMask);
+            this.tabInformatica.Controls.Add(this.label22);
             this.tabInformatica.Controls.Add(this.buttonInfaDirBrowse);
             this.tabInformatica.Controls.Add(this.textInformaticaRootDir);
             this.tabInformatica.Controls.Add(this.label18);
@@ -681,6 +689,8 @@
             // 
             // tabSSIS
             // 
+            this.tabSSIS.Controls.Add(this.textBoxSSISMask);
+            this.tabSSIS.Controls.Add(this.label21);
             this.tabSSIS.Controls.Add(this.buttonSSASBrowse);
             this.tabSSIS.Controls.Add(this.textSSISDir);
             this.tabSSIS.Controls.Add(this.label19);
@@ -732,6 +742,8 @@
             // 
             // tabSAP
             // 
+            this.tabSAP.Controls.Add(this.textBoxSAPMask);
+            this.tabSAP.Controls.Add(this.label17);
             this.tabSAP.Controls.Add(this.buttonSAPBrowse);
             this.tabSAP.Controls.Add(this.textSAPDir);
             this.tabSAP.Controls.Add(this.checkBoxSAPEnable);
@@ -795,6 +807,57 @@
             this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTip1.ToolTipTitle = "API key";
             // 
+            // textBoxSAPMask
+            // 
+            this.textBoxSAPMask.Location = new System.Drawing.Point(11, 100);
+            this.textBoxSAPMask.Name = "textBoxSAPMask";
+            this.textBoxSAPMask.Size = new System.Drawing.Size(95, 20);
+            this.textBoxSAPMask.TabIndex = 17;
+            this.textBoxSAPMask.Text = "*";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(8, 84);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(51, 13);
+            this.label17.TabIndex = 16;
+            this.label17.Text = "File mask";
+            // 
+            // textBoxSSISMask
+            // 
+            this.textBoxSSISMask.Location = new System.Drawing.Point(10, 97);
+            this.textBoxSSISMask.Name = "textBoxSSISMask";
+            this.textBoxSSISMask.Size = new System.Drawing.Size(95, 20);
+            this.textBoxSSISMask.TabIndex = 19;
+            this.textBoxSSISMask.Text = "*";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(7, 81);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(51, 13);
+            this.label21.TabIndex = 18;
+            this.label21.Text = "File mask";
+            // 
+            // textBoxInfaMask
+            // 
+            this.textBoxInfaMask.Location = new System.Drawing.Point(9, 96);
+            this.textBoxInfaMask.Name = "textBoxInfaMask";
+            this.textBoxInfaMask.Size = new System.Drawing.Size(95, 20);
+            this.textBoxInfaMask.TabIndex = 19;
+            this.textBoxInfaMask.Text = "*";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(6, 80);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(51, 13);
+            this.label22.TabIndex = 18;
+            this.label22.Text = "File mask";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -804,7 +867,7 @@
             this.Controls.Add(this.progressBarCalc);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "SQLdep v1.6.7";
+            this.Text = "SQLdep v1.7.0-beta";
             this.tabControlMain.ResumeLayout(false);
             this.tabPageBasic.ResumeLayout(false);
             this.tabPageBasic.PerformLayout();
@@ -895,6 +958,12 @@
         private System.Windows.Forms.Button buttonSAPBrowse;
         private System.Windows.Forms.TextBox textSAPDir;
         private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TextBox textBoxSAPMask;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.TextBox textBoxInfaMask;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.TextBox textBoxSSISMask;
+        private System.Windows.Forms.Label label21;
     }
 }
 
