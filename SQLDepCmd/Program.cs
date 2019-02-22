@@ -14,6 +14,7 @@ namespace SQLDepCmd
         static int Main(string[] args)
         {
             Arguments arguments = new Arguments();
+            bool useGUIConfig = false;
 
             var p = new OptionSet() {
                 { "dbType=", "database type: mssql|oracle|greenplum|postgres|redshift|snowflake", v => arguments.dbType = v },
@@ -27,73 +28,86 @@ namespace SQLDepCmd
                 { "n|name=",  "batch name for the web dashboard", v => arguments.customSqlSetName = v },
                 { "f|file=",  "output file", v => arguments.exportFileName = v },
                 { "k|key=",  "api key (Guid)", v => arguments.sMyKey = v },
-                { "h|help",  "show help", v => arguments.help = "set" },
+                { "h|help",  "show help", v => arguments.help = true },
                 { "driver",  "driver name", v => arguments.driverName = v },
                 { "send=",  "SEND or SENDONLY, default do not send", v => arguments.sendFile = v.ToUpper() },
-                { "use-filesystem",  "Use this option to use FS. file_system.conf must be configured!", v => arguments.useFS = true},
+                { "use-filesystem",  "Use this option to use FS. file_system.conf must be configured!", v => arguments.fs_useFs = true},
                 { "warehouse",  "Warehouse (Snowflake only)", v => arguments.warehouse = v },
                 { "role",  "Role (Snowflake only)", v => arguments.role = v },
+                { "gui-config",  "Use configuration saved in GUI version.", v => useGUIConfig = true},
             };
 
             try
             {
                 p.Parse(args);
+
+                if (useGUIConfig)
+                {
+                    if (String.IsNullOrEmpty(arguments.exportFileName))
+                    {
+                        throw new ArgumentException("--file argument needs to be set when using GUI config.");
+                    }
+
+                    Arguments old = arguments;
+                    arguments = UIConfig.GetArguments();
+                    arguments.sendFile = old.sendFile;
+                    arguments.exportFileName = old.exportFileName;
+                }
                 
                 if (arguments.help.Equals("set") || (args.Length == 0))
                 {
                     ShowHelp(p);
+                    return 0;
                 }
-                else
+
+                arguments.myKey = Guid.Parse(arguments.sMyKey);
+
+                DBExecutor dbExecutor = new DBExecutor();
+
+                bool runDb = (arguments.sendFile != "SENDONLY");
+                bool sendIt = (arguments.sendFile == "SEND" || arguments.sendFile == "SENDONLY");
+                string connectString = dbExecutor.BuildConnectionString(arguments, DBExecutor.UseDriver.DEFAULT);
+                dbExecutor.ConnectString = connectString;
+
+                Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, arguments.dbType);
+
+                if (runDb)
                 {
+                    executor.Run(arguments);
+                }
 
-                    arguments.myKey = Guid.Parse(arguments.sMyKey);
+                if (sendIt)
+                {
+                    List<string> sendFiles = new List<string>();
 
-                    DBExecutor dbExecutor = new DBExecutor();
-
-                    bool runDb = (arguments.sendFile != "SENDONLY");
-                    bool sendIt = (arguments.sendFile == "SEND" || arguments.sendFile == "SENDONLY");
-                    string connectString = dbExecutor.BuildConnectionString(arguments, DBExecutor.UseDriver.DEFAULT);
-                    dbExecutor.ConnectString = connectString;
-
-                    Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, arguments.dbType);
-
-                    if (runDb)
+                    FileAttributes fileattr;
+                    foreach (var item in arguments.exportFileName.Split(','))
                     {
-                        executor.Run(arguments);
-                    }
+                        fileattr = File.GetAttributes(item);
 
-                    if (sendIt)
-                    {
-                        List<string> sendFiles = new List<string>();
-
-                        FileAttributes fileattr;
-                        foreach (var item in arguments.exportFileName.Split(','))
+                        if ((fileattr & FileAttributes.Directory) == FileAttributes.Directory)
                         {
-                            fileattr = File.GetAttributes(item);
-
-                            if ((fileattr & FileAttributes.Directory) == FileAttributes.Directory)
+                            // add whole directory content
+                            foreach (string fileName in Directory.EnumerateFiles(item, "*.*"))
                             {
-                                // add whole directory content
-                                foreach (string fileName in Directory.EnumerateFiles(item, "*.*"))
-                                {
-                                    // skip inner directories
-                                    fileattr = File.GetAttributes(fileName);
+                                // skip inner directories
+                                fileattr = File.GetAttributes(fileName);
 
-                                    if ((fileattr & FileAttributes.Directory) == 0)
-                                    {
-                                        sendFiles.Add(fileName);
-                                    }
+                                if ((fileattr & FileAttributes.Directory) == 0)
+                                {
+                                    sendFiles.Add(fileName);
                                 }
                             }
-                            else
-                            {
-                                sendFiles.Add(item);
-                            }
                         }
-
-                        executor.SendFiles(sendFiles, arguments.sMyKey);
+                        else
+                        {
+                            sendFiles.Add(item);
+                        }
                     }
+
+                    executor.SendFiles(sendFiles, arguments.sMyKey);
                 }
+                
             }
             catch (Exception e)
             {
@@ -104,7 +118,7 @@ namespace SQLDepCmd
                     exMessage += "\nInner exception: " + e.InnerException.Message;
                 }
                 Logger.Exception(exMessage);
-                return -1;
+                return 1;
             }
             return 0; // standard success
         }

@@ -237,9 +237,13 @@ namespace SQLDep
         {
             switch (sqlDialect)
             {
-                case "snowflake": return 6;
-                case "teradata": return 2;
                 case "oracle": return 0;
+                case "mssql": return 1;
+                case "teradata": return 2;
+                case "greenplum": return 3;
+                case "redshift": return 4;
+                case "postgres": return 5;
+                case "snowflake": return 6;
                 default: return 1;
             }
         }
@@ -448,17 +452,6 @@ namespace SQLDep
                 DBExecutor dbExecutor = new DBExecutor();
                 this.BuildConnectionString(dbExecutor);
 
-                // create filesystem configuration file, Executor will use this
-                if (checkboxUseFS.Checked)
-                    CreateFileSystemCfgFile();
-
-                string myName = this.textBoxBatchName.Text;
-                Guid myKey;
-                if (!Guid.TryParse(this.textBoxKey.Text, out myKey))
-                {
-                    throw new SQLDepException("Invalid or missing API key. Get one in your dashboard on SQLdep website. (https://app.sqldep.com/queryflow/upload/api/)");
-                }
-
                 string sqlDialect = this.GetDatabaseTypeName(this.comboBoxDatabase.SelectedIndex);
 
                 Executor executor = ExecutorFactory.CreateExecutor(dbExecutor, sqlDialect);
@@ -478,16 +471,6 @@ namespace SQLDep
                 Logger.Log(msg);
                 MessageBox.Show(msg);
             }
-        }
-
-        private void CreateFileSystemCfgFile()
-        {
-            FileSystemData fsData = new FileSystemData();
-            fsData.ConfFile.DefaultDatabase = this.textBoxDefaultDatabase.Text;
-            fsData.ConfFile.DefaultSchema = this.textBoxDefautSchema.Text;
-            fsData.ConfFile.InputDir = this.textBoxRootDirectory.Text;
-            fsData.ConfFile.FileMask = this.textBoxFileMask.Text;
-            fsData.Save();
         }
 
         public void ShowProgress ()

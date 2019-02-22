@@ -42,13 +42,13 @@ namespace SQLDepLib
                 this.ProgressInfo.SetProgressPercent(10, "Collecting data from DB.");
 
                 // this will fill some dbStructure fields, such as queries and tables...
-                SQLCompleteStructure dbStructure = this.GetCompleteStructure(args.dbType, args.useFS);
+                SQLCompleteStructure dbStructure = this.GetCompleteStructure(args.dbType, args.fs_useFs);
 
                 // append queries from FS
-                if (args.useFS)
+                if (args.fs_useFs)
                 {
                     this.ProgressInfo.SetProgressPercent(85, "Collecting data from FileSystem.");
-                    this.GetQueriesFromFS(dbStructure);
+                    this.GetQueriesFromFS(dbStructure, args);
                 }
 
                 int totalTablesCount = 0;
@@ -104,13 +104,11 @@ namespace SQLDepLib
         /// Gets all files that are matched with fileMask and appends them to dbStructure as queries.
         /// </summary>
         /// <param name="dbStructure"></param>
-        private void GetQueriesFromFS(SQLCompleteStructure dbStructure)
+        private void GetQueriesFromFS(SQLCompleteStructure dbStructure, Arguments args)
         {
             Logger.Log("Getting data from Filesystem.");
-            FileSystemData fsData = new FileSystemData();
-            fsData.Load();
 
-            string[] allFiles = Directory.GetFiles(fsData.ConfFile.InputDir, fsData.ConfFile.FileMask, SearchOption.AllDirectories);
+            string[] allFiles = Directory.GetFiles(args.fs_path, args.fs_mask, SearchOption.AllDirectories);
 
             foreach (var path in allFiles)
             {
@@ -118,8 +116,8 @@ namespace SQLDepLib
                 SQLQuery newQuery = new SQLQuery();
                 newQuery.name = Path.GetFileNameWithoutExtension(path);
                 newQuery.sourceCode = fileString;
-                newQuery.schema = fsData.ConfFile.DefaultSchema;
-                newQuery.database = fsData.ConfFile.DefaultDatabase;
+                newQuery.schema = args.fs_default_schema;
+                newQuery.database = args.fs_default_db;
                 dbStructure.queries.Add(newQuery);
             }
         }

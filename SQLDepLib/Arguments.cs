@@ -19,15 +19,20 @@ namespace SQLDepLib
         public string customSqlSetName { get; set; }
         public string sMyKey { get; set; }
         public string sendFile { get; set; }
-        public string help { get; set; }
+        public bool help { get; set; }
         public string driverName { get; set; }
         public string dsnName { get; set; }
-        public bool useFS { get; set; }
         public string account { get; set; }
         public string exportFileName { get; set; }
         public string warehouse { get; set; }
         public string role { get; set; }
         public Guid myKey { get; set; }
+
+        public bool fs_useFs { get; set; }
+        public string fs_path { get; set; }
+        public string fs_default_db { get; set; }
+        public string fs_default_schema { get; set; }
+        public string fs_mask { get; set; }
 
         // external files
         public string ext_SAPPath { get; set; }
@@ -53,33 +58,20 @@ namespace SQLDepLib
             exportFileName = string.Empty;
             sMyKey = string.Empty;
             sendFile = string.Empty;
-            help = string.Empty;
+            help = false;
             driverName = string.Empty;
             dsnName = string.Empty;
+
             account = string.Empty; // used in snowflake connection
-            useFS = false;
             warehouse = string.Empty;
             role = string.Empty;
+
+            fs_useFs = false;
+            fs_default_schema = fs_mask = fs_default_db = string.Empty;
+           
             ext_SSISMask = ext_INFAMask = ext_SAPMask = 
                 ext_InformaticaPath = ext_SAPPath = ext_SSISPath = string.Empty;
             ext_useInformatica = ext_useSAP = ext_useSSIS = false;
-        }
-
-
-        public bool Validate()
-        {
-            if (sendFile != "SENDONLY")
-            {
-                // check dbType
-                string[] allDbTypes = { "mssql", "oracle", "greenplum", "postgres", "redshift" };
-                if (!allDbTypes.Contains(dbType))
-                {
-                    Logger.Log("dbType is not valid! It must be one of: {\"mssql\", \"oracle\", \"greenplum\", \"postgres\", \"redshift\"}");
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }
