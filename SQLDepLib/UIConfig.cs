@@ -39,7 +39,7 @@ namespace SQLDepLib
         public const string EXT_INFA_MASK = "ext_infa_mask";
 
 
-        private const string ConfigFilename = "UIConfig.xml";
+        public static string ConfigFilename = "UIConfig.xml";
 
         public static string Get (string key, string defaultValue)
         {
