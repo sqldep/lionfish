@@ -4,7 +4,7 @@ select
   '##DBNAME##' as databaseName,
   x.owner as schemaName,
   x.table_name as tableName,
-  decode(obj.object_type, 'VIEW','Y','MATERIALIZED_VIEW','Y','N') as isView,
+  decode(obj.object_type, 'VIEW','Y','N') as isView,
   x.column_name as columnName,
   x.data_type||
     case
@@ -28,7 +28,7 @@ where
   and c.table_name = x.table_name
   and x.owner =obj.owner
   and x.table_name = obj.object_name 
-  and obj.object_type in ('TABLE','MATERIALIZED VIEW', 'VIEW')
+  and obj.object_type in ('TABLE', 'VIEW') -- this includes underlying tables for materialized views
   and x.owner NOT IN (
     'APEX_040200',
     'CTXSYS',
