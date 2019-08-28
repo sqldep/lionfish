@@ -706,7 +706,7 @@ namespace SQLDepLib
 
         private string SaveStructureToFile(SQLCompleteStructure completeJson, string logJSONName)
         {
-            completeJson.createdBy = "SQLdep v1.6.7";
+            completeJson.createdBy = "SQLdep v1.6.8";
             completeJson.exportId = this.runId;
             completeJson.physicalInstance = this.DBExecutor.Server;
 

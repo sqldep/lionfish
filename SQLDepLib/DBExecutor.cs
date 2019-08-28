@@ -208,7 +208,7 @@ namespace SQLDepLib
                 }
                 else
                 {
-                    ret += "Server=" + args.server + ":" + args.port + ";";
+                    ret += "Server=" + args.server + "," + args.port + ";";
                 }
 
                 if (!string.IsNullOrEmpty(args.database))
